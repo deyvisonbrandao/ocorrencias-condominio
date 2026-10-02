@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ocorrências · Administração · Residencial Jardim das Flores</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/mockup.js"></script>
+  <link rel="stylesheet" href="assets/mockup.css">
+  <style>
+    dialog::backdrop { background: rgb(17 24 39 / 0.5); }
+  </style>
+</head>
+<body class="bg-superficie-app font-sans text-texto antialiased">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:rounded-controle focus:bg-superficie focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-primaria focus:shadow-lg">Pular para o conteúdo</a>
+
+  <!-- Sidebar fixa a partir de 1024px (Flowbite Sidebar). Abaixo disso, o mesmo conteúdo abre num drawer. -->
+  <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-borda bg-superficie lg:flex" aria-label="Menu da administração">
+    <div class="flex h-16 items-center gap-3 border-b border-borda px-4">
+      <span class="flex h-8 w-8 items-center justify-center rounded-controle bg-primaria-suave text-primaria" aria-hidden="true"><svg class="h-5 w-5"><use href="#i-predio"/></svg></span>
+      <div class="min-w-0">
+        <p class="truncate text-sm font-semibold">Residencial Jardim das Flores</p>
+        <p class="text-xs text-texto-secundario">Administração</p>
+      </div>
+    </div>
+    <nav aria-label="Navegação da administração" class="flex-1 overflow-y-auto p-3">
+      <ul class="space-y-1">
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-painel"/></svg>Painel</a></li>
+        <li><a href="fila-admin.html" aria-current="page" class="flex min-h-toque items-center gap-3 rounded-controle bg-primaria-suave px-3 text-sm font-semibold text-primaria"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-lista"/></svg>Ocorrências</a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-usuarios"/></svg>Moradores<span class="ml-auto rounded-full bg-perigo px-2 py-0.5 text-xs font-semibold text-white">3<span class="sr-only"> cadastros pendentes</span></span></a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-escudo"/></svg>Equipe</a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-predio"/></svg>Condomínio</a></li>
+      </ul>
+    </nav>
+    <div class="border-t border-borda p-3">
+      <p class="px-3 text-sm font-semibold">Ana Lima</p>
+      <p class="px-3 text-xs text-texto-secundario">Síndico(a)</p>
+      <button type="button" class="mt-2 flex min-h-toque w-full items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-sair"/></svg>Sair</button>
+    </div>
+  </aside>
+
+  <div class="lg:pl-64">
+    <!-- Barra superior abaixo de 1024px -->
+    <header class="sticky top-0 z-20 border-b border-borda bg-superficie lg:hidden">
+      <div class="flex h-14 items-center gap-1 px-2">
+        <button type="button" onclick="document.getElementById('menu').showModal()" aria-haspopup="dialog" aria-controls="menu" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil hover:text-texto" aria-label="Abrir menu">
+          <svg class="h-6 w-6" aria-hidden="true"><use href="#i-menu"/></svg>
+        </button>
+        <p class="truncate text-base font-semibold">Residencial Jardim das Flores</p>
+      </div>
+    </header>
+
+    <main id="conteudo" class="mx-auto max-w-admin px-4 pb-10 pt-5 md:px-6 md:pt-8 lg:px-8">
+      <div class="flex items-center justify-between gap-3">
+        <h1 tabindex="-1" class="text-xl font-bold leading-7 md:text-2xl md:leading-8">Ocorrências</h1>
+        <a href="#" class="inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">
+          <svg class="h-5 w-5" aria-hidden="true"><use href="#i-mais"/></svg>Nova<span class="hidden sm:inline">&nbsp;ocorrência</span>
+        </a>
+      </div>
+
+      <!-- Visões rápidas: atalhos de filtro, refletidos na URL (?visao=...) -->
+      <nav aria-label="Visões da fila" class="-mx-4 mt-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
+        <ul class="flex w-max gap-2">
+          <li><a href="#" aria-current="true" class="inline-flex min-h-toque items-center gap-2 rounded-full bg-texto px-4 text-sm font-semibold text-white">Em aberto <span class="rounded-full bg-white/20 px-2 text-xs tabular-nums">12</span></a></li>
+          <li><a href="#" class="inline-flex min-h-toque items-center gap-2 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium text-texto hover:bg-superficie-sutil">Não triadas <span class="rounded-full bg-superficie-sutil px-2 text-xs tabular-nums">3</span></a></li>
+          <li><a href="#" class="inline-flex min-h-toque items-center gap-2 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium text-texto hover:bg-superficie-sutil">Atrasadas <span class="rounded-full bg-perigo-suave px-2 text-xs font-semibold tabular-nums text-perigo-texto">2</span></a></li>
+          <li><a href="#" class="inline-flex min-h-toque items-center rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium text-texto hover:bg-superficie-sutil">Encerradas</a></li>
+          <li><a href="#" class="inline-flex min-h-toque items-center rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium text-texto hover:bg-superficie-sutil">Todas</a></li>
+        </ul>
+      </nav>
+
+      <!-- Filtros: botão + bottom sheet abaixo de 768px; inline a partir de 768px -->
+      <div class="mt-3 flex items-center justify-between gap-3 md:hidden">
+        <p class="text-sm text-texto-secundario" aria-live="polite">12 ocorrências</p>
+        <button type="button" onclick="document.getElementById('filtros').showModal()" aria-haspopup="dialog" aria-controls="filtros" class="inline-flex min-h-toque items-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-texto hover:bg-superficie-sutil">
+          <svg class="h-5 w-5" aria-hidden="true"><use href="#i-filtro"/></svg>Filtros
+        </button>
+      </div>
+      <form class="mt-4 hidden flex-wrap items-end gap-3 md:flex" aria-label="Filtros">
+        <div>
+          <label for="f-status" class="block text-sm font-semibold">Status</label>
+          <select id="f-status" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todos os status</option><option>Aberta</option><option>Em andamento</option><option>Resolvida</option><option>Arquivada</option><option>Duplicada</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-tipo" class="block text-sm font-semibold">Tipo</label>
+          <select id="f-tipo" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-urgencia" class="block text-sm font-semibold">Urgência</label>
+          <select id="f-urgencia" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todas</option><option>Não triada</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-origem" class="block text-sm font-semibold">Origem</label>
+          <select id="f-origem" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"><option>Todas</option><option>Moradores</option><option>Administração</option></select>
+        </div>
+        <div>
+          <label for="f-ordem" class="block text-sm font-semibold">Ordenar por</label>
+          <select id="f-ordem" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"><option>Mais recentes</option><option>Urgência</option></select>
+        </div>
+        <p class="ml-auto self-center text-sm text-texto-secundario" aria-live="polite">12 ocorrências</p>      </form>
+
+      <!-- Lista em cartões abaixo de 768px -->
+      <ul class="mt-4 space-y-3 md:hidden" aria-label="Ocorrências">
+        <li>
+          <article class="relative rounded-cartao border border-borda bg-superficie p-4 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="mr-1 text-sm font-semibold text-texto-secundario">#62</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+              <span class="inline-flex items-center rounded-full border border-dashed border-borda-controle bg-superficie px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
+            </div>
+            <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Som alto depois das 22h no bloco B</a></h2>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span><span aria-hidden="true">·</span>
+              <span class="inline-flex items-center gap-1"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</span><span aria-hidden="true">·</span><time datetime="2026-10-02T13:50">há 20 min</time>
+            </p>
+          </article>
+        </li>
+        <li>
+          <article class="relative rounded-cartao border border-borda bg-superficie p-4 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="mr-1 text-sm font-semibold text-texto-secundario">#61</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-atrasada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span>
+            </div>
+            <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Portão da garagem não fecha sozinho</a></h2>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span><span aria-hidden="true">·</span>
+              <span>Carlos Pereira · Bloco A, apto 12</span><span aria-hidden="true">·</span><span class="font-medium text-perigo-texto">Prazo 01/10</span>
+            </p>
+          </article>
+        </li>
+        <li>
+          <article class="relative rounded-cartao border border-borda bg-superficie p-4 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="mr-1 text-sm font-semibold text-texto-secundario">#60</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+              <span class="inline-flex items-center rounded-full border border-dashed border-borda-controle bg-superficie px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span>
+            </div>
+            <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Qual o horário permitido para mudanças no sábado?</a></h2>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-duvida"/></svg>Dúvida</span><span aria-hidden="true">·</span>
+              <span class="inline-flex items-center gap-1"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</span><span aria-hidden="true">·</span><time datetime="2026-10-02T09:00">há 5 h</time>
+            </p>
+          </article>
+        </li>
+        <li>
+          <article class="relative rounded-cartao border border-borda bg-superficie p-4 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="mr-1 text-sm font-semibold text-texto-secundario">#59</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
+            </div>
+            <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Carro estacionado na vaga de visitante há uma semana</a></h2>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span><span aria-hidden="true">·</span>
+              <span>Joana Ribeiro · Bloco C, apto 41</span><span aria-hidden="true">·</span><span>Prazo 08/10</span>
+            </p>
+          </article>
+        </li>
+        <li>
+          <article class="relative rounded-cartao border border-borda bg-superficie p-4 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="mr-1 text-sm font-semibold text-texto-secundario">#54</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span>
+            </div>
+            <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Repintar faixa de pedestres da garagem</a></h2>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</span><span aria-hidden="true">·</span>
+              <span>Administração</span><span aria-hidden="true">·</span><span>Sem prazo</span>
+            </p>
+          </article>
+        </li>
+      </ul>
+
+      <!-- Tabela a partir de 768px (Flowbite Table) -->
+      <div class="mt-4 hidden overflow-hidden rounded-cartao border border-borda bg-superficie md:block">
+        <table class="w-full text-left text-sm">
+          <caption class="sr-only">Ocorrências em aberto, mais recentes primeiro</caption>
+          <thead class="border-b border-borda bg-superficie-app text-xs font-semibold uppercase tracking-wide text-texto-secundario">
+            <tr>
+              <th scope="col" class="px-4 py-3">Nº</th>
+              <th scope="col" class="px-4 py-3">Ocorrência</th>
+              <th scope="col" class="px-4 py-3">Status</th>
+              <th scope="col" class="px-4 py-3">Urgência</th>
+              <th scope="col" class="px-4 py-3">Prazo</th>
+              <th scope="col" class="hidden px-4 py-3 xl:table-cell">Autor</th>
+              <th scope="col" class="px-4 py-3">Criada</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-borda">
+            <tr class="hover:bg-superficie-app">
+              <td class="px-4 py-3 font-semibold text-texto-secundario">#62</td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Som alto depois das 22h no bloco B</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação<span aria-hidden="true">·</span><svg class="h-4 w-4" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span></td>
+              <td class="px-4 py-3"><span class="inline-flex whitespace-nowrap rounded-full border border-dashed border-borda-controle px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span></td>
+              <td class="px-4 py-3 text-texto-suave">—</td>
+              <td class="hidden px-4 py-3 xl:table-cell"><span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</span></td>
+              <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-10-02T13:50">há 20 min</time></td>
+            </tr>
+            <tr class="hover:bg-superficie-app">
+              <td class="px-4 py-3 font-semibold text-texto-secundario">#61</td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Portão da garagem não fecha sozinho</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span></td>
+              <td class="px-4 py-3"><span class="block whitespace-nowrap font-medium text-perigo-texto">01/10/2026</span><span class="mt-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-atrasada-fundo px-2 py-0.5 text-xs font-semibold text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span></td>
+              <td class="hidden px-4 py-3 xl:table-cell">Carlos Pereira · Bloco A, apto 12</td>
+              <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-29T12:10">29/09/2026</time></td>
+            </tr>
+            <tr class="hover:bg-superficie-app">
+              <td class="px-4 py-3 font-semibold text-texto-secundario">#60</td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Qual o horário permitido para mudanças no sábado?</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-duvida"/></svg>Dúvida</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span></td>
+              <td class="px-4 py-3"><span class="inline-flex whitespace-nowrap rounded-full border border-dashed border-borda-controle px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span></td>
+              <td class="px-4 py-3 text-texto-suave">—</td>
+              <td class="hidden px-4 py-3 xl:table-cell"><span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</span></td>
+              <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-10-02T09:00">há 5 h</time></td>
+            </tr>
+            <tr class="hover:bg-superficie-app">
+              <td class="px-4 py-3 font-semibold text-texto-secundario">#59</td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Carro estacionado na vaga de visitante há uma semana</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação<span aria-hidden="true">·</span><svg class="h-4 w-4" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span></td>
+              <td class="whitespace-nowrap px-4 py-3">08/10/2026</td>
+              <td class="hidden px-4 py-3 xl:table-cell">Joana Ribeiro · Bloco C, apto 41</td>
+              <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-27T18:00">27/09/2026</time></td>
+            </tr>
+            <tr class="hover:bg-superficie-app">
+              <td class="px-4 py-3 font-semibold text-texto-secundario">#54</td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Repintar faixa de pedestres da garagem</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span></td>
+              <td class="px-4 py-3 text-texto-suave">Sem prazo</td>
+              <td class="hidden px-4 py-3 xl:table-cell">Administração</td>
+              <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-25T10:00">25/09/2026</time></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-5 flex justify-center">
+        <button type="button" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle border border-borda-controle bg-superficie px-5 text-sm font-semibold text-texto hover:bg-superficie-sutil md:w-auto">Carregar mais</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom sheet de filtros (< 768px): <dialog> nativo com showModal() = foco preso, Esc fecha, fundo inerte -->
+  <dialog id="filtros" aria-labelledby="filtros-titulo" class="m-0 mt-auto w-full max-w-none rounded-t-2xl bg-superficie p-0 text-texto shadow-xl">
+    <form method="dialog" class="flex max-h-[85vh] flex-col">
+      <div class="flex items-center justify-between border-b border-borda px-4 py-2">
+        <h2 id="filtros-titulo" class="text-base font-semibold">Filtros</h2>
+        <button value="cancelar" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar filtros"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+      </div>
+      <div class="space-y-5 overflow-y-auto px-4 py-4">
+        <div>
+          <label for="m-status" class="block text-sm font-semibold">Status</label>
+          <select id="m-status" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os status</option><option>Aberta</option><option>Em andamento</option><option>Resolvida</option><option>Arquivada</option><option>Duplicada</option></select>
+        </div>
+        <div>
+          <label for="m-tipo" class="block text-sm font-semibold">Tipo</label>
+          <select id="m-tipo" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option></select>
+        </div>
+        <div>
+          <label for="m-urgencia" class="block text-sm font-semibold">Urgência</label>
+          <select id="m-urgencia" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todas</option><option>Não triada</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+        </div>
+        <div>
+          <label for="m-origem" class="block text-sm font-semibold">Origem</label>
+          <select id="m-origem" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todas</option><option>Moradores</option><option>Administração</option></select>
+        </div>
+        <div>
+          <label for="m-ordem" class="block text-sm font-semibold">Ordenar por</label>
+          <select id="m-ordem" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Mais recentes</option><option>Urgência</option></select>
+        </div>
+      </div>
+      <div class="flex gap-3 border-t border-borda px-4 py-3">        <button value="limpar" class="inline-flex min-h-toque flex-1 items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold">Limpar</button>
+        <button value="aplicar" class="inline-flex min-h-toque flex-1 items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Ver resultados</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Drawer do menu (< 1024px) -->
+  <dialog id="menu" aria-label="Menu da administração" class="m-0 h-full max-h-none w-72 max-w-[85vw] bg-superficie p-0 text-texto shadow-xl">
+    <div class="flex h-14 items-center justify-between border-b border-borda px-4">
+      <p class="truncate text-sm font-semibold">Residencial Jardim das Flores</p>
+      <button type="button" onclick="this.closest('dialog').close()" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar menu"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+    </div>
+    <nav aria-label="Navegação da administração" class="p-3">
+      <ul class="space-y-1">
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-painel"/></svg>Painel</a></li>
+        <li><a href="fila-admin.html" aria-current="page" class="flex min-h-toque items-center gap-3 rounded-controle bg-primaria-suave px-3 text-sm font-semibold text-primaria"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-lista"/></svg>Ocorrências</a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-usuarios"/></svg>Moradores<span class="ml-auto rounded-full bg-perigo px-2 py-0.5 text-xs font-semibold text-white">3<span class="sr-only"> cadastros pendentes</span></span></a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-escudo"/></svg>Equipe</a></li>
+        <li><a href="#" class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-predio"/></svg>Condomínio</a></li>
+        <li class="border-t border-borda pt-2"><button type="button" class="flex min-h-toque w-full items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-sair"/></svg>Sair</button></li>
+      </ul>
+    </nav>
+  </dialog>
+</body>
+</html>

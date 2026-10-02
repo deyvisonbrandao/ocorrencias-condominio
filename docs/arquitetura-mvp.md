@@ -45,7 +45,7 @@ condominio-ocorrencias/
 - Habilitado fora de produção, ou protegido por flag.
 
 **Flowbite**
-- Tailwind + `flowbite`, com `initFlowbite()` nos componentes interativos.
+- Tailwind + `flowbite` como referência de marcação e classes, com ícones do Flowbite Icons (SVG inline). O comportamento interativo (modal, drawer, menus, abas) fica no Angular, com `<dialog>` nativo; **sem `initFlowbite()`** ([ADR-006](adr/006-flowbite-sem-initflowbite.md)).
 - Componentes de UI encapsulados em `shared/ui`: botão, input, select, badge de status/tipo, timeline, modal, toast, bottom-nav, abas.
 - Assim as telas não dependem direto das classes do Flowbite.
 - O `zidane` define os tokens e o mapeamento de componentes.

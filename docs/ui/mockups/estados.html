@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Estados e padrões · Mockups de UI</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/mockup.js"></script>
+  <link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body class="bg-superficie-sutil font-sans text-texto antialiased">
+  <main class="mx-auto max-w-6xl px-4 py-6">
+    <h1 class="text-xl font-bold">Estados e padrões</h1>
+    <p class="mt-1 text-sm text-texto-secundario">Catálogo dos estados de vazio, carregando, erro, resultado parcial, validação, toast e modais. Cada quadro tem 375px de largura útil. Referência: seções 5 e 6 de <code>docs/ui/especificacao.md</code>.</p>
+
+    <div class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+      <!-- 1. Carregando -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e1">
+        <h2 id="e1" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">1 · Carregando (skeleton)</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda" aria-busy="true">
+          <p class="sr-only" role="status">Carregando ocorrências</p>
+          <ul class="space-y-3" aria-hidden="true">
+            <li class="animate-pulse rounded-cartao border border-borda bg-superficie p-4">
+              <div class="flex gap-2"><div class="h-5 w-24 rounded-full bg-gray-200"></div><div class="h-5 w-20 rounded-full bg-gray-200"></div></div>
+              <div class="mt-3 h-4 w-4/5 rounded bg-gray-200"></div>
+              <div class="mt-2 h-3 w-full rounded bg-gray-200"></div>
+              <div class="mt-1.5 h-3 w-2/3 rounded bg-gray-200"></div>
+              <div class="mt-4 h-3 w-1/3 rounded bg-gray-200"></div>
+            </li>
+            <li class="animate-pulse rounded-cartao border border-borda bg-superficie p-4">
+              <div class="flex gap-2"><div class="h-5 w-20 rounded-full bg-gray-200"></div><div class="h-5 w-24 rounded-full bg-gray-200"></div></div>
+              <div class="mt-3 h-4 w-3/5 rounded bg-gray-200"></div>
+              <div class="mt-2 h-3 w-full rounded bg-gray-200"></div>
+              <div class="mt-4 h-3 w-1/4 rounded bg-gray-200"></div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 2. Vazio: feed -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e2">
+        <h2 id="e2" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">2 · Vazio (feed do condomínio)</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div class="flex flex-col items-center rounded-cartao border border-dashed border-gray-300 bg-superficie px-6 py-10 text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-primaria-suave text-primaria" aria-hidden="true"><svg class="h-6 w-6"><use href="#i-lista"/></svg></span>
+            <h3 class="mt-4 text-base font-semibold">Nenhuma ocorrência pública ainda</h3>
+            <p class="mt-1 text-sm text-texto-secundario">Dúvidas, sugestões, manutenções e comunicados de obra registrados pelos moradores aparecem aqui.</p>
+            <a href="nova-ocorrencia.html" class="mt-5 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-mais"/></svg>Registrar ocorrência</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Vazio filtrado: fila admin -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e3">
+        <h2 id="e3" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">3 · Vazio com filtro (fila admin)</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div class="flex flex-col items-center rounded-cartao border border-dashed border-gray-300 bg-superficie px-6 py-10 text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-superficie-sutil text-texto-secundario" aria-hidden="true"><svg class="h-6 w-6"><use href="#i-filtro"/></svg></span>
+            <h3 class="mt-4 text-base font-semibold">Nenhuma ocorrência com esses filtros</h3>
+            <p class="mt-1 text-sm text-texto-secundario">Tipo: Reclamação · Urgência: Alta</p>
+            <button type="button" class="mt-5 inline-flex min-h-toque items-center rounded-controle border border-borda-controle bg-superficie px-5 text-sm font-semibold hover:bg-superficie-sutil">Limpar filtros</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Erro de carregamento -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e4">
+        <h2 id="e4" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">4 · Erro ao carregar a tela</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div role="alert" class="flex flex-col items-center rounded-cartao border border-perigo-linha bg-superficie px-6 py-10 text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-perigo-suave text-perigo-texto" aria-hidden="true"><svg class="h-6 w-6"><use href="#i-alerta"/></svg></span>
+            <h3 class="mt-4 text-base font-semibold">Não foi possível carregar as ocorrências</h3>
+            <p class="mt-1 text-sm text-texto-secundario">Verifique sua conexão e tente de novo.</p>
+            <button type="button" class="mt-5 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-recarregar"/></svg>Tentar de novo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Resultado parcial -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e5">
+        <h2 id="e5" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">5 · Resultado parcial (falha ao carregar mais)</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div class="rounded-cartao border border-borda bg-superficie p-4">
+            <p class="text-sm font-semibold">#55 · Aviso de obra no apartamento 304</p>
+            <p class="mt-1 text-sm text-texto-suave">Bloco D · 28/09/2026</p>
+          </div>
+          <div role="alert" class="mt-3 flex items-start gap-3 rounded-cartao border border-perigo-linha bg-perigo-suave p-3 text-sm text-perigo-texto">
+            <svg class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true"><use href="#i-alerta"/></svg>
+            <div class="flex-1">
+              <p>Não foi possível carregar mais ocorrências.</p>
+              <button type="button" class="mt-2 inline-flex min-h-toque items-center gap-2 rounded-controle border border-perigo-borda bg-superficie px-4 font-semibold hover:bg-perigo-suave">Tentar de novo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Validação de formulário -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e6">
+        <h2 id="e6" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">6 · Erro de validação no campo</h2>
+        <div class="space-y-5 rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div>
+            <label for="v-titulo" class="block text-sm font-semibold">Título</label>
+            <input id="v-titulo" type="text" aria-invalid="true" aria-describedby="v-titulo-erro" class="mt-2 block min-h-toque w-full rounded-controle border-2 border-perigo-borda bg-superficie px-3 text-base focus:outline-none focus:ring-2 focus:ring-perigo-borda/30">
+            <p id="v-titulo-erro" class="mt-1.5 flex items-start gap-1.5 text-sm font-medium text-perigo"><svg class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true"><use href="#i-alerta"/></svg>Informe um título.</p>
+          </div>
+          <div>
+            <label for="v-desc" class="block text-sm font-semibold">Descrição</label>
+            <textarea id="v-desc" rows="3" aria-invalid="true" aria-describedby="v-desc-erro" class="mt-2 block w-full rounded-controle border-2 border-perigo-borda bg-superficie px-3 py-2.5 text-base focus:outline-none">Luz apagada no hall</textarea>
+            <div class="mt-1.5 flex items-start justify-between gap-3">
+              <p id="v-desc-erro" class="flex items-start gap-1.5 text-sm font-medium text-perigo"><svg class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true"><use href="#i-alerta"/></svg>A descrição precisa ter pelo menos 20 caracteres.</p>
+              <span class="text-sm tabular-nums text-texto-suave">19/2000</span>
+            </div>
+          </div>
+          <button type="button" disabled class="inline-flex min-h-toque w-full cursor-wait items-center justify-center gap-2 rounded-controle bg-primaria px-5 text-base font-semibold text-white opacity-80">
+            <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".3" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            Registrando…
+          </button>
+          <p class="text-xs text-texto-secundario">Botão no estado carregando: desabilitado, com rótulo no gerúndio. Os erros acima aparecem ao sair do campo ou ao enviar; no envio, o foco vai para o primeiro campo inválido.</p>
+        </div>
+      </section>
+
+      <!-- 7. Toasts -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e7">
+        <h2 id="e7" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">7 · Toast (sucesso e erro de ação)</h2>
+        <div class="space-y-3 rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div role="status" class="flex items-center gap-3 rounded-cartao border border-sucesso-linha bg-superficie p-3 shadow-lg">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sucesso-suave text-sucesso-texto" aria-hidden="true"><svg class="h-5 w-5"><use href="#i-check"/></svg></span>
+            <p class="flex-1 text-sm font-medium">Ocorrência #63 registrada.</p>
+            <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar aviso"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+          </div>
+          <div role="alert" class="flex items-center gap-3 rounded-cartao border border-perigo-linha bg-superficie p-3 shadow-lg">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-perigo-suave text-perigo-texto" aria-hidden="true"><svg class="h-5 w-5"><use href="#i-alerta"/></svg></span>
+            <p class="flex-1 text-sm font-medium">Não foi possível salvar. Tente de novo.</p>
+            <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar aviso"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+          </div>
+          <p class="text-xs text-texto-secundario">Abaixo de 768px: fixo acima da bottom-nav (ou a 16px da base nas telas sem ela). A partir de 768px: canto superior direito. Sucesso some em 5s (pausa no hover e no foco); erro só fecha manualmente.</p>
+        </div>
+      </section>
+
+      <!-- 8. Conflito de versão -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e8">
+        <h2 id="e8" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">8 · Conflito (alterada por outra pessoa)</h2>
+        <div class="rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div role="alert" class="rounded-cartao border border-aviso-linha bg-aviso-suave p-4 text-sm text-aviso-texto">
+            <p class="font-semibold">Esta ocorrência foi alterada por outra pessoa</p>
+            <p class="mt-1">Sua alteração não foi salva. Recarregue para ver a versão atual e tente de novo.</p>
+            <button type="button" class="mt-3 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-4 font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-recarregar"/></svg>Recarregar ocorrência</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Duplicada e reabertura expirada (detalhe do morador) -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e9">
+        <h2 id="e9" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">9 · Avisos no detalhe do morador</h2>
+        <div class="space-y-3 rounded-cartao bg-superficie-app p-4 ring-1 ring-borda">
+          <div class="flex gap-3 rounded-cartao border border-info-linha bg-info-suave p-3 text-sm text-info-texto">
+            <svg class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true"><use href="#i-link"/></svg>
+            <p>Esta ocorrência foi marcada como duplicada da <a href="#" class="font-semibold underline">#48 · Em andamento</a>. O acompanhamento continua por lá.</p>
+          </div>
+          <div class="flex gap-3 rounded-cartao border border-info-linha bg-info-suave p-3 text-sm text-info-texto">
+            <svg class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true"><use href="#i-link"/></svg>
+            <p>Esta ocorrência foi marcada como duplicada da <strong class="font-semibold">#48 · Em andamento</strong>. Os detalhes dela não são públicos.</p>
+          </div>
+          <div class="rounded-cartao border border-borda bg-superficie p-3 text-sm text-texto-secundario">
+            Prazo para reabrir encerrado em 01/11/2026. Se o problema voltou, <a href="nova-ocorrencia.html" class="font-semibold text-primaria underline">registre uma nova ocorrência</a>.
+          </div>
+          <div class="rounded-cartao border border-borda bg-superficie p-3 text-sm text-texto-secundario">
+            Só quem registrou e a administração podem comentar nesta ocorrência.
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Modal: reabrir (morador) -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e10">
+        <h2 id="e10" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">10 · Modal: reabrir (morador)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="dialog" aria-modal="true" aria-labelledby="m10-t" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <div class="flex items-start justify-between gap-3">
+              <h3 id="m10-t" class="pt-2 text-base font-semibold">Reabrir ocorrência #57</h3>
+              <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+            </div>
+            <p class="mt-1 text-sm text-texto-secundario">Ela volta para Aberta, sem prazo, e a administração analisa de novo.</p>
+            <label for="m10-j" class="mt-4 block text-sm font-semibold">Por que você está reabrindo?</label>
+            <p id="m10-d" class="mt-0.5 text-sm text-texto-secundario">A administração e os moradores do condomínio veem esta justificativa.</p>
+            <textarea id="m10-j" rows="3" aria-describedby="m10-d" class="mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">A lâmpada voltou a queimar ontem.</textarea>
+            <div class="mt-4 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Reabrir ocorrência</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. Modal: retirar (morador) -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e11">
+        <h2 id="e11" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">11 · Modal: retirar (morador)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="m11-t" aria-describedby="m11-d" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <h3 id="m11-t" class="pt-2 text-base font-semibold">Retirar a ocorrência #57?</h3>
+            <p id="m11-d" class="mt-1 text-sm text-texto-secundario">Ela será arquivada e sai da fila da administração. Você pode reabrir em até 30 dias.</p>
+            <div class="mt-5 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil">Manter ocorrência</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-perigo px-4 text-sm font-semibold text-white hover:bg-perigo-hover">Retirar ocorrência</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Modal: resolver (admin) -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e12">
+        <h2 id="e12" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">12 · Modal: resolver (admin)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="dialog" aria-modal="true" aria-labelledby="m12-t" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <div class="flex items-start justify-between gap-3">
+              <h3 id="m12-t" class="pt-2 text-base font-semibold">Resolver ocorrência #61</h3>
+              <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+            </div>
+            <label for="m12-c" class="mt-3 block text-sm font-semibold">O que foi feito?</label>
+            <p id="m12-d" class="mt-0.5 text-sm text-texto-secundario">Comentário público: quem vê a ocorrência lê este texto.</p>
+            <textarea id="m12-c" rows="3" aria-describedby="m12-d" class="mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
+            <div class="mt-4 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-check"/></svg>Marcar como resolvida</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. Modal: duplicada (admin) -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e13">
+        <h2 id="e13" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">13 · Modal: marcar como duplicada (admin)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="dialog" aria-modal="true" aria-labelledby="m13-t" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <div class="flex items-start justify-between gap-3">
+              <h3 id="m13-t" class="pt-2 text-base font-semibold">Marcar #62 como duplicada</h3>
+              <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+            </div>
+            <label for="m13-n" class="mt-3 block text-sm font-semibold">Número da ocorrência principal</label>
+            <div class="mt-2 flex gap-2">
+              <span class="inline-flex min-h-toque items-center rounded-controle border border-borda-controle bg-superficie-sutil px-3 text-base text-texto-secundario" aria-hidden="true">#</span>
+              <input id="m13-n" inputmode="numeric" value="48" class="block min-h-toque min-w-0 flex-1 rounded-controle border border-borda-controle px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            </div>
+            <div class="mt-3 rounded-controle border border-borda bg-superficie-app p-3" aria-live="polite">
+              <p class="text-sm font-semibold">#48 · Barulho de obra no bloco B</p>
+              <p class="mt-1 text-sm text-texto-secundario">Em andamento · Reclamação</p>
+            </div>
+            <div class="mt-4 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Vincular à #48</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. Modal: arquivar (admin), motivo segue a visibilidade da ocorrência -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e14">
+        <h2 id="e14" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">14 · Modal: arquivar (admin, ocorrência pública)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="dialog" aria-modal="true" aria-labelledby="m14-t" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <div class="flex items-start justify-between gap-3">
+              <h3 id="m14-t" class="pt-2 text-base font-semibold">Arquivar ocorrência #60</h3>
+              <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+            </div>
+            <label for="m14-m" class="mt-3 block text-sm font-semibold">Motivo do arquivamento</label>
+            <p id="m14-d" class="mt-0.5 text-sm text-texto-secundario">O autor e os moradores do condomínio veem este motivo. Para detalhes sensíveis, use uma nota interna.</p>
+            <textarea id="m14-m" rows="3" aria-describedby="m14-d" class="mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
+            <p class="mt-2 text-xs text-texto-secundario">Variante restrita: "Hoje, só o autor e a administração veem este motivo. Se a ocorrência ficar pública, ele também aparece. Para detalhes sensíveis, use uma nota interna."</p>
+            <div class="mt-4 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-perigo-texto hover:bg-perigo-suave"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-arquivo"/></svg>Arquivar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. Alertdialog: triagem que torna pública uma Reclamação -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e15">
+        <h2 id="e15" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">15 · Confirmação: tornar pública (triagem)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="m15-t" aria-describedby="m15-d" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <h3 id="m15-t" class="pt-2 text-base font-semibold">Tornar a ocorrência #59 pública?</h3>
+            <p id="m15-d" class="mt-1 text-sm text-texto-secundario">Ao mudar de Reclamação para Dúvida, a ocorrência entra no feed e todos os moradores ativos passam a ver todo o histórico público: o bloco do autor, a descrição, os comentários públicos e, se houver, o motivo de arquivamento e a justificativa de reabertura. Notas internas continuam só com a administração.</p>
+            <p class="mt-2 text-xs text-texto-secundario">Variante anônima: "…todo o histórico público: a descrição, os comentários públicos e, se houver, o motivo de arquivamento e a justificativa de reabertura. O autor continua anônimo."</p>
+            <div class="mt-5 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil">Manter restrita</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Tornar pública</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. Legenda de badges -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e16">
+        <h2 id="e16" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">16 · Badges: status, urgência e marcadores</h2>
+        <div class="space-y-4 rounded-cartao bg-superficie p-4 ring-1 ring-borda">
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-resolvida-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-resolvida-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-resolvida-ponto" aria-hidden="true"></span>Resolvida</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-arquivada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-arquivada-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-arquivada-ponto" aria-hidden="true"></span>Arquivada</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-duplicada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-duplicada-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-duplicada-ponto" aria-hidden="true"></span>Duplicada</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center rounded-full border border-dashed border-borda-controle bg-superficie px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-alta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-alta-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-3"/></svg><span class="sr-only">Urgência </span>Alta</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center gap-1 rounded-full bg-atrasada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span>
+            <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
+            <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span>
+          </div>
+          <p class="text-xs text-texto-secundario">Crítica e Atrasada são os dois badges sólidos. Distinguem-se pelo ícone (4 barras × relógio) e pelo texto, não pela cor.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

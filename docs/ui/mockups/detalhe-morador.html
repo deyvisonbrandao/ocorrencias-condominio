@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ocorrência #57 · Residencial Jardim das Flores</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/mockup.js"></script>
+  <link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body class="bg-superficie-app font-sans text-texto antialiased">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:rounded-controle focus:bg-superficie focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-primaria focus:shadow-lg">Pular para o conteúdo</a>
+
+  <!-- Tela empilhada (sem bottom-nav). Cenário: ocorrência da própria pessoa, RESOLVIDA, dentro da janela de 30 dias. -->
+  <header class="sticky top-0 z-30 border-b border-borda bg-superficie">
+    <div class="mx-auto flex h-14 max-w-conteudo items-center gap-1 px-2 md:hidden">
+      <a href="feed.html" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil hover:text-texto" aria-label="Voltar para ocorrências">
+        <svg class="h-6 w-6" aria-hidden="true"><use href="#i-voltar"/></svg>
+      </a>
+      <p class="truncate text-base font-semibold">Ocorrência #57</p>
+    </div>
+    <div class="mx-auto hidden h-14 max-w-admin items-center gap-3 px-6 md:flex">
+      <span class="flex h-8 w-8 items-center justify-center rounded-controle bg-primaria-suave text-primaria" aria-hidden="true"><svg class="h-5 w-5"><use href="#i-predio"/></svg></span>
+      <p class="truncate text-base font-semibold">Residencial Jardim das Flores</p>
+      <nav aria-label="Navegação principal" class="ml-auto flex items-center gap-1">
+        <a href="feed.html" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto">Condomínio</a>
+        <a href="#" aria-current="page" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-semibold text-primaria">Minhas</a>
+        <a href="#" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto">Perfil</a>
+        <a href="nova-ocorrencia.html" class="ml-2 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-mais"/></svg>Nova ocorrência</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" class="mx-auto max-w-conteudo px-4 pb-10 pt-5 md:px-6 md:pt-8">
+    <a href="#" class="hidden min-h-toque items-center gap-1 text-sm font-semibold text-primaria hover:underline md:inline-flex">
+      <svg class="h-4 w-4" aria-hidden="true"><use href="#i-voltar"/></svg>Minhas ocorrências
+    </a>
+
+    <!-- Cabeçalho da ocorrência -->
+    <div class="flex flex-wrap items-center gap-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-status-resolvida-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-resolvida-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-resolvida-ponto" aria-hidden="true"></span>Resolvida</span>
+      <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span>
+      <span class="hidden text-sm font-medium text-texto-suave md:ml-2 md:inline">#57</span>
+    </div>
+    <h1 tabindex="-1" class="mt-2 text-xl font-bold leading-7 md:text-2xl md:leading-8">Lâmpada queimada no hall do bloco B</h1>
+
+    <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm leading-5">
+      <dt class="text-texto-suave">Registrada por</dt><dd class="text-texto">Você · Bloco B</dd>
+      <dt class="text-texto-suave">Criada em</dt><dd><time datetime="2026-09-30T19:40">30/09/2026 às 19:40</time></dd>
+      <dt class="text-texto-suave">Local</dt><dd>Hall do térreo, bloco B</dd>
+      <dt class="text-texto-suave">Prazo</dt><dd><time datetime="2026-10-03">03/10/2026</time></dd>
+      <dt class="text-texto-suave">Resolvida em</dt><dd><time datetime="2026-10-02T10:30">02/10/2026 às 10:30</time></dd>
+    </dl>
+
+    <p class="mt-4 whitespace-pre-line rounded-cartao border border-borda bg-superficie p-4 text-base leading-6">A lâmpada do hall do térreo está queimada há três dias e o corredor fica escuro à noite. Quem chega tarde precisa usar a lanterna do celular.</p>
+
+    <!-- Ação do autor: reabrir (só RESOLVIDA ou ARQUIVADA, até 30 dias após o fechamento) -->
+    <section aria-labelledby="reabrir-titulo" class="mt-4 rounded-cartao border border-borda bg-superficie p-4">
+      <h2 id="reabrir-titulo" class="text-sm font-semibold leading-5">O problema continua?</h2>
+      <p class="mt-1 text-sm leading-5 text-texto-secundario">Você pode reabrir até <time datetime="2026-11-01">01/11/2026</time>. A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração.</p>
+      <button type="button" class="mt-3 inline-flex min-h-toque w-full items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-texto hover:bg-superficie-sutil md:w-auto">
+        <svg class="h-5 w-5" aria-hidden="true"><use href="#i-reabrir"/></svg>Reabrir ocorrência
+      </button>
+    </section>
+
+    <!-- Histórico (timeline Flowbite vertical), ordem cronológica -->
+    <section aria-labelledby="historico-titulo" class="mt-8">
+      <h2 id="historico-titulo" class="text-lg font-semibold leading-7">Histórico</h2>
+      <ol class="relative ml-3 mt-4 border-l border-borda">
+        <li class="mb-6 ml-6">
+          <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-superficie-sutil text-texto-secundario ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-mais"/></svg></span>
+          <p class="text-sm leading-5"><strong class="font-semibold">Você</strong> registrou a ocorrência</p>
+          <time datetime="2026-09-30T19:40" class="text-sm text-texto-suave">30/09/2026 às 19:40</time>
+        </li>
+        <li class="mb-6 ml-6">
+          <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-status-andamento-fundo text-status-andamento-texto ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-calendario"/></svg></span>
+          <p class="text-sm leading-5"><strong class="font-semibold">Síndico(a)</strong> definiu o prazo para <strong class="font-semibold">03/10/2026</strong> e a ocorrência passou para <strong class="font-semibold">Em andamento</strong></p>
+          <time datetime="2026-10-01T08:12" class="text-sm text-texto-suave">01/10/2026 às 08:12</time>
+        </li>
+        <li class="mb-6 ml-6">
+          <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-primaria-suave text-primaria ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-balao"/></svg></span>
+          <div class="rounded-cartao border border-borda bg-superficie p-3">
+            <p class="flex flex-wrap items-baseline gap-x-2 text-sm"><strong class="font-semibold">Síndico(a)</strong><time datetime="2026-10-01T08:13" class="text-texto-suave">01/10 às 08:13</time></p>
+            <p class="mt-1 text-base leading-6">Já chamamos o eletricista. Ele deve vir amanhã de manhã.</p>
+          </div>
+        </li>
+        <li class="mb-6 ml-6">
+          <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-primaria-suave text-primaria ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-balao"/></svg></span>
+          <div class="rounded-cartao border border-borda bg-superficie p-3">
+            <p class="flex flex-wrap items-baseline gap-x-2 text-sm"><strong class="font-semibold">Você</strong><time datetime="2026-10-01T09:00" class="text-texto-suave">01/10 às 09:00</time></p>
+            <p class="mt-1 text-base leading-6">Obrigado! A do 2º andar também está piscando.</p>
+          </div>
+        </li>
+        <li class="ml-6">
+          <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-status-resolvida-fundo text-status-resolvida-texto ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-check"/></svg></span>
+          <p class="text-sm leading-5"><strong class="font-semibold">Síndico(a)</strong> marcou como <strong class="font-semibold">Resolvida</strong></p>
+          <div class="mt-2 rounded-cartao border border-sucesso-linha bg-sucesso-suave p-3">
+            <p class="text-base leading-6 text-texto">Lâmpadas do térreo e do 2º andar trocadas hoje às 10h.</p>
+          </div>
+          <time datetime="2026-10-02T10:30" class="mt-1 block text-sm text-texto-suave">02/10/2026 às 10:30</time>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Comentário: só quem registrou (morador) -->
+    <form class="mt-8 rounded-cartao border border-borda bg-superficie p-4" novalidate>
+      <label for="comentario" class="block text-sm font-semibold leading-5">Comentar</label>
+      <p id="comentario-dica" class="mt-0.5 text-sm text-texto-secundario">A administração e os moradores do condomínio podem ler seu comentário.</p>
+      <textarea id="comentario" rows="3" maxlength="2000" aria-describedby="comentario-dica"
+        class="mt-2 block w-full rounded-controle border border-borda-controle bg-superficie px-3 py-2.5 text-base leading-6 focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
+      <div class="mt-3 flex justify-end">
+        <button type="submit" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover md:w-auto">Enviar comentário</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
