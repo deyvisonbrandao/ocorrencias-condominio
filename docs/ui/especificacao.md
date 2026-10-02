@@ -552,6 +552,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   1. h1 "Ocorrências" + botão primário "Nova ocorrência" ("Nova" abaixo de 640px).
   2. **Visões rápidas** (`ui-chips-visao`), com contadores: **Em aberto** (padrão: ABERTA + EM_ANDAMENTO) · Não triadas (R3) · Atrasadas (R2) · Encerradas (RESOLVIDA, ARQUIVADA, DUPLICADA) · Todas.
   3. **Filtros e ordenação** (issue #15):
+     - Status: Aberta, Em andamento, Resolvida, Arquivada, Duplicada;
      - Tipo;
      - Urgência: Não triada, Crítica, Alta, Média, Baixa;
      - Origem: Todas, Moradores, Administração;

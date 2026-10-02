@@ -78,6 +78,12 @@
       </div>
       <form class="mt-4 hidden flex-wrap items-end gap-3 md:flex" aria-label="Filtros">
         <div>
+          <label for="f-status" class="block text-sm font-semibold">Status</label>
+          <select id="f-status" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todos os status</option><option>Aberta</option><option>Em andamento</option><option>Resolvida</option><option>Arquivada</option><option>Duplicada</option>
+          </select>
+        </div>
+        <div>
           <label for="f-tipo" class="block text-sm font-semibold">Tipo</label>
           <select id="f-tipo" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
             <option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option>
@@ -255,6 +261,10 @@
         <button value="cancelar" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar filtros"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
       </div>
       <div class="space-y-5 overflow-y-auto px-4 py-4">
+        <div>
+          <label for="m-status" class="block text-sm font-semibold">Status</label>
+          <select id="m-status" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os status</option><option>Aberta</option><option>Em andamento</option><option>Resolvida</option><option>Arquivada</option><option>Duplicada</option></select>
+        </div>
         <div>
           <label for="m-tipo" class="block text-sm font-semibold">Tipo</label>
           <select id="m-tipo" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option></select>
