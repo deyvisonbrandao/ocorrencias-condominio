@@ -212,6 +212,8 @@ Com `prefers-reduced-motion: reduce`, nada desliza nem escala, o skeleton fica e
 
 A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, e os mockups usam a forma v3 ([`mockups/assets/mockup.js`](mockups/assets/mockup.js)).
 
+> **Decisão da issue #3:** Tailwind v4 com o `@theme` abaixo, **sem** `@plugin "flowbite/plugin"` e sem `@source` do Flowbite. O plugin (3.x e 4.x) gera um seletor inválido (`:is():hover`, no `::file-selector-button`) que vira warning no build de produção, e o tema que ele lê (`--color-brand`, `--color-body`…) não existe sem importar o tema do Flowbite. O único estilo dele que o MVP usava, o reset do `<select>` com a seta, está em `styles.css`. O Flowbite segue como referência de marcação e classes e como fonte dos ícones (ADR-006).
+
 **Tailwind v4 (`@theme` em `apps/web/src/styles.css`)**, com Flowbite 3:
 
 ```css
@@ -291,6 +293,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Drawer | `ui-drawer` | Drawer | `lado: 'esquerda' \| 'base'` | — | Também `<dialog>`. Usado pelo menu do admin abaixo de 1024px e pelos filtros da fila abaixo de 768px. |
 | Navegação do morador | `ui-bottom-nav` | Bottom Navigation | itens fixos | ativo (`primaria` + `aria-current="page"`), hover | `<nav aria-label="Navegação principal">`. Célula de 64px de altura. |
 | Barra superior | `ui-barra-superior` | Navbar | `modo: 'raiz' \| 'empilhada'` | — | Na empilhada, o botão voltar tem `aria-label` específico ("Voltar para ocorrências"). |
+| Pular para o conteúdo | `ui-pular-conteudo` | — | — | oculto, visível no foco | Primeiro item de todo shell. Leva o foco ao `h1` de `#conteudo` sem trocar a URL (o `href="#conteudo"` puro recarregaria a rota por causa do `<base href>`). |
 | Sidebar do admin | `ui-sidebar` | Sidebar | itens por papel | ativo, hover, contador (pendentes) | O contador tem texto `sr-only` ("3 cadastros pendentes"). |
 | Abas | `ui-abas` | Tabs (estilo sublinhado) | `abas: {rotulo, contador?, rota}` | ativa, hover, foco | São **links de rota** (`aria-current="page"`), não `role="tab"`: cada aba é uma URL (`?aba=pendentes`). Rolam na horizontal abaixo de 640px. |
 | Visões rápidas | `ui-chips-visao` | Button Group / pills | `visoes: {rotulo, contador?, query}` | ativa (fundo `texto`, letra branca, **17.74**), inativa (contorno `borda-controle`) | Links com `aria-current="true"`. Rolagem horizontal com a última visível pela metade como pista. |
