@@ -1,0 +1,125 @@
+<h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">Vitrine de componentes</h1>
+<p class="mt-1 text-sm text-texto-secundario">Componentes de shared/ui com os estados da especificação. Só existe em desenvolvimento.</p>
+
+<section class="mt-8" aria-labelledby="vitrine-botoes">
+  <h2 id="vitrine-botoes" class="text-lg font-semibold">Botões</h2>
+  <div class="mt-3 flex flex-wrap gap-2">
+    <button type="button" ui-botao>Primário</button>
+    <button type="button" ui-botao variante="secundario">Secundário</button>
+    <button type="button" ui-botao variante="texto">Texto</button>
+    <button type="button" ui-botao variante="perigo">Perigo</button>
+    <button type="button" ui-botao variante="perigo-contorno">Perigo contorno</button>
+    <button type="button" ui-botao desabilitado>Desabilitado</button>
+    <button type="button" ui-botao variante="texto" icone aria-label="Fechar exemplo">
+      <ui-icone nome="fechar" />
+    </button>
+  </div>
+  <button
+    type="button"
+    ui-botao
+    bloco
+    class="mt-3"
+    rotuloCarregando="Registrando…"
+    [carregando]="carregando()"
+    (click)="simularEnvio()"
+  >
+    Registrar ocorrência
+  </button>
+</section>
+
+<section class="mt-8" aria-labelledby="vitrine-campos">
+  <h2 id="vitrine-campos" class="text-lg font-semibold">Campos</h2>
+  <form class="mt-3 space-y-6" [formGroup]="formulario" (ngSubmit)="validar()" novalidate>
+    <ui-campo formControlName="titulo" rotulo="Título" dica="Resuma em poucas palavras." [maxlength]="100" [erro]="erroDoTitulo()" />
+    <ui-campo formControlName="senha" tipo="password" rotulo="Senha" dica="Mínimo de 8 caracteres." autocomplete="new-password" [erro]="erroDaSenha()" />
+    <ui-campo formControlName="local" rotulo="Local" opcional dica="Ex.: garagem G2, hall do bloco B, salão de festas." />
+    <ui-campo formControlName="prazo" tipo="date" rotulo="Prazo" />
+    <ui-campo rotulo="Número da principal" prefixo="#" inputmode="numeric" />
+    <ui-select formControlName="urgencia" rotulo="Urgência" opcional placeholder="Escolha a urgência" [opcoes]="opcoesUrgencia" dica="O morador não vê a urgência." />
+    <ui-area-texto formControlName="descricao" rotulo="Descrição" dica="Conte o que aconteceu, quando e onde. Mínimo de 20 caracteres." contador [min]="20" [max]="2000" [erro]="erroDaDescricao()" />
+    <button type="submit" ui-botao variante="secundario">Validar formulário</button>
+  </form>
+</section>
+
+<section class="mt-8" aria-labelledby="vitrine-badges">
+  <h2 id="vitrine-badges" class="text-lg font-semibold">Badges</h2>
+  <div class="mt-3 flex flex-wrap gap-1.5">
+    @for (item of status; track item) {
+      <ui-badge-status [status]="item" />
+    }
+  </div>
+  <div class="mt-3 flex flex-wrap gap-1.5">
+    @for (item of urgencias; track item) {
+      <ui-badge-urgencia [urgencia]="item" />
+    }
+  </div>
+  <div class="mt-3 flex flex-wrap gap-1.5">
+    <ui-marcador tipo="atrasada" />
+    <ui-marcador tipo="restrita" />
+    @for (item of tipos; track item) {
+      <ui-badge-tipo [tipo]="item" />
+    }
+  </div>
+</section>
+
+<section class="mt-8 space-y-3" aria-labelledby="vitrine-alertas">
+  <h2 id="vitrine-alertas" class="text-lg font-semibold">Alertas</h2>
+  <ui-alerta tom="info" titulo="Seu nome não aparece.">Evite se identificar no texto.</ui-alerta>
+  <ui-alerta tom="aviso">Esta ocorrência foi alterada por outra pessoa.</ui-alerta>
+  <ui-alerta tom="perigo" titulo="Risco imediato?">Acione a portaria ou ligue 193 (Bombeiros).</ui-alerta>
+  <ui-alerta tom="sucesso">Cadastro aprovado.</ui-alerta>
+</section>
+
+<section class="mt-8 space-y-3" aria-labelledby="vitrine-estados">
+  <h2 id="vitrine-estados" class="text-lg font-semibold">Estados</h2>
+  <ui-estado-vazio
+    icone="lista"
+    titulo="Nenhuma ocorrência pública ainda"
+    [nivel]="3"
+    texto="Dúvidas, sugestões, manutenções e comunicados de obra aparecem aqui."
+  >
+    <button type="button" ui-botao>Registrar ocorrência</button>
+  </ui-estado-vazio>
+  <ui-estado-erro titulo="Não foi possível carregar as ocorrências." />
+  <ui-skeleton [quantidade]="2" />
+</section>
+
+<section class="mt-8" aria-labelledby="vitrine-abas">
+  <h2 id="vitrine-abas" class="text-lg font-semibold">Abas</h2>
+  <ui-abas class="mt-3 block" rotulo="Situação do cadastro" [abas]="abas" />
+</section>
+
+<section class="mt-8" aria-labelledby="vitrine-sobreposicoes">
+  <h2 id="vitrine-sobreposicoes" class="text-lg font-semibold">Modal, drawer e toast</h2>
+  <div class="mt-3 flex flex-wrap gap-2">
+    <button type="button" ui-botao variante="secundario" (click)="modal.abrir()">Abrir modal</button>
+    <button type="button" ui-botao variante="secundario" (click)="confirmacao.abrir()">Abrir confirmação</button>
+    <button type="button" ui-botao variante="secundario" (click)="filtros.abrir()">Abrir filtros</button>
+    <button type="button" ui-botao variante="secundario" (click)="mostrarSucesso()">Toast de sucesso</button>
+    <button type="button" ui-botao variante="secundario" (click)="mostrarErro()">Toast de erro</button>
+  </div>
+</section>
+
+<ui-modal #modal titulo="Arquivar ocorrência #57">
+  <ui-campo rotulo="Motivo" dica="O autor e os moradores do condomínio veem este motivo." />
+  <ng-container acoes>
+    <button type="button" ui-botao variante="secundario" (click)="modal.fechar()">Cancelar</button>
+    <button type="button" ui-botao (click)="modal.fechar()">Arquivar</button>
+  </ng-container>
+</ui-modal>
+
+<ui-modal #confirmacao tipo="alertdialog" titulo="Descartar ocorrência?">
+  O que você escreveu será perdido.
+  <ng-container acoes>
+    <button type="button" ui-botao variante="secundario" data-foco-inicial (click)="confirmacao.fechar()">
+      Continuar escrevendo
+    </button>
+    <button type="button" ui-botao variante="perigo" (click)="confirmacao.fechar()">Descartar</button>
+  </ng-container>
+</ui-modal>
+
+<ui-drawer #filtros lado="base" titulo="Filtros" rotuloFechar="Fechar filtros">
+  <div class="space-y-5 p-4">
+    <ui-select rotulo="Urgência" placeholder="Todas" [opcoes]="opcoesUrgencia" />
+  </div>
+</ui-drawer>
