@@ -12,11 +12,11 @@
     "apps/web"
   ],
   "scripts": {
-    "dev": "npm run build -w @ocorrencias/contratos && concurrently -k -n api,web -c blue,magenta \"npm run start:dev -w @ocorrencias/api\" \"npm run start -w @ocorrencias/web\"",
+    "dev": "npm run build -w @ocorrencias/contratos && concurrently -k -n contratos,api,web -c gray,blue,magenta \"npm run dev -w @ocorrencias/contratos\" \"npm run start:dev -w @ocorrencias/api\" \"npm run start -w @ocorrencias/web\"",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test -w @ocorrencias/api && npm run test -w @ocorrencias/web -- --watch=false",
-    "db:up": "docker compose up -d",
+    "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down"
   },
   "devDependencies": {
