@@ -95,4 +95,15 @@ const SPRITE = `
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.insertAdjacentHTML('afterbegin', SPRITE);
+
+  const tipoVisibilidade = document.getElementById('tipo-visibilidade-texto');
+  if (tipoVisibilidade) {
+    document.querySelectorAll('input[name="tipo"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        tipoVisibilidade.textContent = radio.value === 'RECLAMACAO_BARULHO'
+          ? 'Só você e a administração vão ver esta ocorrência. Ela não aparece no feed do condomínio.'
+          : 'Todos os moradores do condomínio vão ver esta ocorrência.';
+      });
+    });
+  }
 });
