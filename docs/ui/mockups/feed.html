@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ocorrências do condomínio · Residencial Jardim das Flores</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/mockup.js"></script>
+  <link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body class="bg-superficie-app font-sans text-texto antialiased">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:rounded-controle focus:bg-superficie focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-primaria focus:shadow-lg">Pular para o conteúdo</a>
+
+  <!-- Barra superior (tela raiz): nome do condomínio. Em md+ vira a navegação principal. -->
+  <header class="sticky top-0 z-30 border-b border-borda bg-superficie">
+    <div class="mx-auto flex h-14 max-w-conteudo items-center gap-3 px-4 md:max-w-admin md:px-6">
+      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-controle bg-primaria-suave text-primaria" aria-hidden="true">
+        <svg class="h-5 w-5"><use href="#i-predio"/></svg>
+      </span>
+      <p class="truncate text-base font-semibold">Residencial Jardim das Flores</p>
+      <nav aria-label="Navegação principal" class="ml-auto hidden items-center gap-1 md:flex">
+        <a href="feed.html" aria-current="page" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-semibold text-primaria">Condomínio</a>
+        <a href="#" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto">Minhas</a>
+        <a href="#" class="inline-flex min-h-toque items-center rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto">Perfil</a>
+        <a href="nova-ocorrencia.html" class="ml-2 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">
+          <svg class="h-5 w-5" aria-hidden="true"><use href="#i-mais"/></svg>Nova ocorrência
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" class="mx-auto max-w-conteudo px-4 pb-28 pt-5 md:px-6 md:pb-12 md:pt-8">
+    <h1 tabindex="-1" class="text-xl font-bold leading-7 md:text-2xl md:leading-8">Ocorrências do condomínio</h1>
+    <p class="mt-1 text-sm leading-5 text-texto-secundario">
+      Ocorrências públicas dos moradores. Reclamações ficam visíveis só para quem registrou e para a administração.
+    </p>
+
+    <ul class="mt-5 space-y-3" aria-label="Ocorrências">
+      <!-- Card: em andamento + atrasada -->
+      <li>
+        <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-atrasada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span>
+            </div>
+            <span class="shrink-0 text-sm font-medium text-texto-suave">#61</span>
+          </div>
+          <h2 class="mt-2 text-base font-semibold leading-6">
+            <a href="detalhe-morador.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Portão da garagem não fecha sozinho</a>
+          </h2>
+          <p class="mt-1 line-clamp-2 text-sm leading-5 text-texto-secundario">O portão da garagem do subsolo fica aberto depois que o carro passa. Já aconteceu ontem à noite e hoje de manhã.</p>
+          <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+            <span>Bloco A</span><span aria-hidden="true">·</span><time datetime="2026-10-02T12:10">há 2 h</time><span aria-hidden="true">·</span><span>Prazo 01/10</span>
+          </p>
+        </article>
+      </li>
+
+      <!-- Card: aberta + anônima -->
+      <li>
+        <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-duvida"/></svg>Dúvida</span>
+            </div>
+            <span class="shrink-0 text-sm font-medium text-texto-suave">#60</span>
+          </div>
+          <h2 class="mt-2 text-base font-semibold leading-6">
+            <a href="detalhe-morador.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Qual o horário permitido para mudanças no sábado?</a>
+          </h2>
+          <p class="mt-1 line-clamp-2 text-sm leading-5 text-texto-secundario">Vou receber uma entrega grande no sábado e não encontrei no regimento se o elevador de serviço pode ser usado à tarde.</p>
+          <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+            <span class="inline-flex items-center gap-1"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônima</span><span aria-hidden="true">·</span><time datetime="2026-10-02T09:00">há 5 h</time>
+          </p>
+        </article>
+      </li>
+
+      <!-- Card: da própria pessoa -->
+      <li>
+        <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span>
+            </div>
+            <span class="shrink-0 text-sm font-medium text-texto-suave">#57</span>
+          </div>
+          <h2 class="mt-2 text-base font-semibold leading-6">
+            <a href="detalhe-morador.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Lâmpada queimada no hall do bloco B</a>
+          </h2>
+          <p class="mt-1 line-clamp-2 text-sm leading-5 text-texto-secundario">A lâmpada do hall do térreo está queimada há três dias e o corredor fica escuro à noite.</p>
+          <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+            <span class="font-medium text-texto-secundario">Sua</span><span aria-hidden="true">·</span><span>Bloco B</span><span aria-hidden="true">·</span><time datetime="2026-09-30T19:40">há 2 dias</time>
+          </p>
+        </article>
+      </li>
+
+      <!-- Card: resolvida -->
+      <li>
+        <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-resolvida-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-resolvida-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-resolvida-ponto" aria-hidden="true"></span>Resolvida</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-melhoria"/></svg>Melhoria</span>
+            </div>
+            <span class="shrink-0 text-sm font-medium text-texto-suave">#58</span>
+          </div>
+          <h2 class="mt-2 text-base font-semibold leading-6">
+            <a href="detalhe-morador.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Instalar bicicletário coberto perto da guarita</a>
+          </h2>
+          <p class="mt-1 line-clamp-2 text-sm leading-5 text-texto-secundario">As bicicletas ficam na chuva. Sugiro usar o espaço ao lado da guarita, que hoje está vazio.</p>
+          <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+            <span>Bloco C</span><span aria-hidden="true">·</span><time datetime="2026-10-01T08:15">ontem</time>
+          </p>
+        </article>
+      </li>
+
+      <!-- Card: arquivada -->
+      <li>
+        <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-status-arquivada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-arquivada-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-arquivada-ponto" aria-hidden="true"></span>Arquivada</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-obra"/></svg>Mudança ou obra</span>
+            </div>
+            <span class="shrink-0 text-sm font-medium text-texto-suave">#55</span>
+          </div>
+          <h2 class="mt-2 text-base font-semibold leading-6">
+            <a href="detalhe-morador.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Aviso de obra no apartamento 304 de 06 a 10/10</a>
+          </h2>
+          <p class="mt-1 line-clamp-2 text-sm leading-5 text-texto-secundario">Troca de piso da cozinha, das 9h às 17h, conforme o horário do regimento.</p>
+          <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
+            <span>Bloco D</span><span aria-hidden="true">·</span><time datetime="2026-09-28T10:00">28/09/2026</time>
+          </p>
+        </article>
+      </li>
+    </ul>
+
+    <div class="mt-5 flex justify-center">
+      <button type="button" class="inline-flex min-h-toque w-full items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-5 text-sm font-semibold text-texto hover:bg-superficie-sutil md:w-auto">
+        Carregar mais
+      </button>
+    </div>
+  </main>
+
+  <!-- Bottom-nav: só nas 3 telas raiz do morador, abaixo de 768px -->
+  <nav aria-label="Navegação principal" class="fixed inset-x-0 bottom-0 z-40 border-t border-borda bg-superficie pb-[env(safe-area-inset-bottom)] md:hidden">
+    <ul class="mx-auto grid h-barra-inferior max-w-md grid-cols-4">
+      <li>
+        <a href="feed.html" aria-current="page" class="flex h-full flex-col items-center justify-center gap-0.5 text-xs font-semibold text-primaria">
+          <svg class="my-1 h-6 w-6" aria-hidden="true"><use href="#i-casa"/></svg>Condomínio
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex h-full flex-col items-center justify-center gap-0.5 text-xs font-medium text-texto-secundario hover:text-texto">
+          <svg class="my-1 h-6 w-6" aria-hidden="true"><use href="#i-lista"/></svg>Minhas
+        </a>
+      </li>
+      <li>
+        <a href="nova-ocorrencia.html" class="group flex h-full flex-col items-center justify-center gap-0.5 text-xs font-medium text-texto-secundario">
+          <span class="flex h-8 w-12 items-center justify-center rounded-full bg-primaria text-white group-hover:bg-primaria-hover" aria-hidden="true"><svg class="h-5 w-5"><use href="#i-mais"/></svg></span>Nova
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex h-full flex-col items-center justify-center gap-0.5 text-xs font-medium text-texto-secundario hover:text-texto">
+          <svg class="my-1 h-6 w-6" aria-hidden="true"><use href="#i-usuario"/></svg>Perfil
+        </a>
+      </li>
+    </ul>
+  </nav>
+</body>
+</html>
