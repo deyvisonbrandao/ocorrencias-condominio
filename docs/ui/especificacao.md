@@ -832,6 +832,8 @@ stateDiagram-v2
 |---|---|
 | `ABERTA` · `EM_ANDAMENTO` · `RESOLVIDA` · `ARQUIVADA` · `DUPLICADA` | Aberta · Em andamento · Resolvida · Arquivada · Duplicada |
 | urgência `null` · `BAIXA` · `MEDIA` · `ALTA` · `CRITICA` | Não triada · Baixa · Média · Alta · Crítica |
+| tipo `MANUTENCAO_AREA_COMUM` · `RECLAMACAO_BARULHO` · `DUVIDA_REGRAS` · `SUGESTAO_MELHORIA` · `COMUNICADO_MUDANCA_OBRA` | Ver 2.2 (rótulo longo e curto) |
+| origem `MORADOR` · `ADMIN` | Moradores · Administração (filtro da fila) |
 | papel `SINDICO` · `SUBSINDICO` · `MORADOR` | Síndico(a) · Subsíndico(a) · Morador (o modelo não tem gênero, R9: "Ana Lima · Síndico(a)") |
 | status de usuário `PENDENTE` · `ATIVO` · `INATIVO` · `RECUSADO` | Pendente · Ativo · Inativo · Recusado |
 
@@ -874,6 +876,8 @@ stateDiagram-v2
 | Nome | obrigatório | "Informe seu nome." |
 | Telefone | celular BR válido | "Informe um celular com DDD, como (11) 91234-5678." |
 | Bloco / Apartamento | obrigatório para morador; opcional para subsíndico(a) novo | "Informe o bloco." / "Informe o apartamento." |
+| Cidade / UF | obrigatório (dados do condomínio) | "Informe a cidade." / "Escolha a UF." |
+| Aceite dos termos | obrigatório | "Para continuar, aceite os termos de uso e a política de privacidade." |
 | E-mail | formato, se preenchido | "Confira o e-mail." |
 | Senha | ≥ 8 | "A senha precisa ter pelo menos 8 caracteres." |
 | Slug | 3–40, `a-z0-9-`, único | "Use só letras minúsculas, números e hífen." / "Endereço já em uso. Tente outro." |
@@ -892,6 +896,7 @@ stateDiagram-v2
 | 409 (transição inválida) | "Esta ação não está mais disponível para esta ocorrência. Recarregue para ver o status atual." |
 | 409 (reabrir fora da janela) | "O prazo de 30 dias para reabrir já terminou." |
 | 409 (limite de admins) | "O condomínio já tem subsíndico." |
+| 409 (principal não vira duplicada) | "Esta ocorrência é a principal de outras duplicadas e não pode virar duplicada." |
 | 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." |
 
 ### 8.6 Toasts de sucesso
@@ -915,6 +920,8 @@ stateDiagram-v2
 | Inativar | "{nome} foi inativado." |
 | Reativar | "{nome} foi reativado." |
 | Link | "Link copiado." |
+| Senha (troca voluntária) | "Senha alterada." |
+| Dados do condomínio | "Dados do condomínio salvos." |
 
 ### 8.7 Textos fixos de regra (não editar sem revisar com produto)
 
@@ -1053,7 +1060,8 @@ Os ícones dos mockups são um sprite SVG próprio e provisório. Na implementa�
 | # | Pendência | Por que importa | Quem decide |
 |---|---|---|---|
 | 1 | **Nomes de enum de evento que as issues não citam:** `ASSUMIDA`, `PRAZO_DEFINIDO`, `PRAZO_ALTERADO`, `RESOLVIDA`, `ARQUIVADA`, `REABERTA`, `MARCADA_DUPLICADA`, `DUPLICADA_DESVINCULADA`, `COMENTARIO` (6.3) | A UI mapeia enum → texto; nomes diferentes quebram o mapeamento | `beckenbauer`, em `packages/contratos` |
-| 2 | **Ordenação por urgência na fila (#15)** exige cursor composto `(rank_urgencia, criado_em, id)`, com rank Crítica 1 → Baixa 4 e **não triadas no fim** (rank 5, não `NULL` na comparação). Sem isso, "Carregar mais" repete ou pula itens. Vale também para o índice `(condominio_id, status, urgencia, criado_em)` do plano | A fila ordenada por urgência e a paginação dependem disso | `beckenbauer` | `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
+| 2 | **Ordenação por urgência na fila (#15)** exige cursor composto `(rank_urgencia, criado_em, id)`, com rank Crítica 1 → Baixa 4 e **não triadas no fim** (rank 5, não `NULL` na comparação). Sem isso, "Carregar mais" repete ou pula itens. Vale também para o índice `(condominio_id, status, urgencia, criado_em)` do plano | A fila ordenada por urgência e a paginação dependem disso | `beckenbauer` |
+| 3 | **Campos que a UI precisa nos presenters:** `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
 | 4 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte) |
 | 5 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
 | 6 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
