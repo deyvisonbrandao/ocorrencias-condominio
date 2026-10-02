@@ -96,3 +96,4 @@ Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api`
   ```bash
   docker compose exec mysql bash /docker-entrypoint-initdb.d/01-banco-shadow.sh
   ```
+- Em Linux com SELinux (Fedora, RHEL), o bind mount de `docker/mysql/init` precisa do sufixo `:z` (`...:/docker-entrypoint-initdb.d:ro,z`) para o container conseguir ler o script.
