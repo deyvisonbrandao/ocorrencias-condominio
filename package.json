@@ -21,5 +21,13 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.5"
+  },
+  "overrides": {
+    "@prisma/adapter-mariadb": {
+      "mariadb": "3.4.7"
+    },
+    "prisma": {
+      "mysql2": "^3.24.5"
+    }
   }
 }
