@@ -2,9 +2,12 @@ name: ocorrencias-condominio
 
 services:
   mysql:
-    build: ./docker/mysql
-    image: ocorrencias-condominio/mysql:8.4
+    image: mysql:8.4
     restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina MYSQL_ROOT_PASSWORD no .env (veja .env.example)}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-ocorrencias}
