@@ -4,7 +4,9 @@
 >
 > Fonte de produto e regras: [`docs/arquitetura-mvp.md`](../arquitetura-mvp.md). Este documento não muda regra de negócio; quando a UI precisa de algo que o plano não fixa, o ponto vai para a seção [Pendências](#12-pendências).
 >
-> Mockups: [`docs/ui/mockups/index.html`](mockups/index.html) (abra no navegador; usa Tailwind e Flowbite via CDN).
+> Mockups: [`docs/ui/mockups/index.html`](mockups/index.html). Abra no navegador. Eles usam o Tailwind via Play CDN com classes no padrão Flowbite; o CSS e o JS do Flowbite não são carregados.
+>
+> Decisões já tomadas que este documento aplica: [ADR-006](../adr/006-flowbite-sem-initflowbite.md) (Flowbite sem `initFlowbite()`) e as regras de produto da seção [1.1](#11-regras-de-produto-aplicadas-pela-ui).
 
 ## Sumário
 
@@ -43,13 +45,32 @@
 | Fonte | Pilha do sistema (`font-sans` padrão do Tailwind) | Inter (sugerida pela doc do Flowbite): seria fonte nova, sem aprovação, e custa download no 4G. |
 | Tema escuro | Fora do MVP. `color-scheme: light` | Dobraria a verificação de contraste. Os tokens são semânticos, então dá para adicionar o tema depois sem trocar classe nas telas. |
 | Cor do tipo | Badge neutro com ícone | Uma cor por tipo: com 5 status, 3 urgências e 5 tipos, a paleta deixaria de ter significado. |
-| Urgência | Três níveis (Baixa, Média, Alta) com ícone de barras e "Não triada" tracejado | Escala numérica: menos legível. **O enum ainda depende de confirmação; ver Pendências.** |
-| Modais e drawers | `<dialog>` nativo com `showModal()`, estilizado com classes Flowbite | Modal JS do Flowbite: não move o foco para dentro, não devolve o foco ao fechar e não prende o Tab. O `<dialog>` faz tudo isso nativamente e sem biblioteca. |
+| Urgência | Quatro níveis (`BAIXA`, `MEDIA`, `ALTA`, `CRITICA`), com ícone de 1 a 4 barras, e "Não triada" com borda tracejada. Crítica é sólida | Escala numérica: menos legível. Só cor: reprova "cor nunca é o único portador". |
+| Badges sólidos | Só dois: **Crítica** (`#7f1d1d`, 4 barras) e **Atrasada** (`#b91c1c`, relógio). Os dois se distinguem pelo ícone e pelo texto, nunca pela cor (contraste entre os dois fundos: 1.55) | Atrasada como único sólido: com 4 níveis, a Crítica precisa pesar mais que a Alta tintada. |
+| Modais e drawers | `<dialog>` nativo com `showModal()`, estilizado com classes Flowbite ([ADR-006](../adr/006-flowbite-sem-initflowbite.md)) | Modal JS do Flowbite: não move o foco para dentro, não devolve o foco ao fechar e não prende o Tab. O `<dialog>` faz tudo isso nativamente e sem biblioteca. |
+| Ícones | **Flowbite Icons**, em SVG inline, servidos por um componente `ui-icone` | Pacote de ícones via npm ou fonte de ícones: peso e uma dependência a mais. O sprite dos mockups é provisório. |
+| QR code | Biblioteca **`qrcode`** (npm), gerada no cliente | Serviço externo de QR: vaza a URL do condomínio para terceiros e depende de rede. |
 | Data do prazo | `<input type="date">` nativo | Datepicker do Flowbite: seletor nativo do celular é melhor no toque e no leitor de tela, e não exige JS. |
 | Fila do admin no celular | Cards empilhados; tabela a partir de 768px | Tabela com rolagem horizontal em 375px: esconde colunas, e com isso a pessoa perde contexto. |
 | Navegação do morador | Bottom-nav com 4 destinos (Condomínio, Minhas, Nova, Perfil) só nas telas raiz | Bottom-nav em todas as telas: no formulário, rouba espaço do teclado e um toque acidental descarta o rascunho. |
 | Paginação | Botão "Carregar mais" (cursor) | Rolagem infinita: tira o rodapé do alcance, confunde o leitor de tela e não permite voltar ao ponto. |
 | Senha | Botão "Mostrar senha" e nenhum campo de confirmação | Campo "Confirmar senha": dobra o esforço; mostrar a senha resolve o erro de digitação com menos atrito. |
+
+### 1.1 Regras de produto aplicadas pela UI
+
+Decididas na revisão do PR #28 (pelo usuário e pelo orquestrador). A UI só exibe o resultado: quem calcula é a API.
+
+| # | Regra | Onde aparece |
+|---|---|---|
+| R1 | **Motivo de arquivamento e justificativa de reabertura seguem a visibilidade da ocorrência**, como um comentário público. A dica do modal é condicional e sugere nota interna para detalhes sensíveis | 5.11, 5.16, 8.7 |
+| R2 | **"Atrasada"** = status ABERTA ou EM_ANDAMENTO **e** `prazo < hoje` no fuso do condomínio. A API calcula e envia `atrasada: boolean` no presenter; **a UI não calcula** | Cards, tabela, detalhe, painel |
+| R3 | **"Não triada"** = `urgencia` nula **e** status ABERTA ou EM_ANDAMENTO. Painel e fila usam o mesmo recorte, então os números batem | 5.13, 5.14 |
+| R4 | **Reabrir limpa o prazo**, seja pelo autor, seja pelo admin. A reabertura pelo autor também zera a urgência (volta para "Não triada") | 5.11, 5.16, 6.3, 6.4 |
+| R5 | Triagem que **torna pública uma Reclamação** pede confirmação em `alertdialog`, com o aviso completo, inclusive no caso identificado | 5.16, 8.7 |
+| R6 | O **subsíndico acessa Condomínio em modo leitura**: link, copiar, QR e cartaz, sem editar | 4.2, 5.13, 5.19 |
+| R7 | A tela **Moradores lista só `papel=MORADOR`**. Admins aparecem apenas em Equipe | 5.17 |
+| R8 | O texto do anonimato não faz promessa absoluta: "Seu nome fica oculto para os outros moradores e para a administração." | 5.10, 8.7 |
+| R9 | Não há gênero no modelo: papéis aparecem como **"Síndico(a)"** e **"Subsíndico(a)"** | Sidebar, timeline, Equipe |
 
 ---
 
@@ -99,29 +120,30 @@ Os contrastes foram calculados pela fórmula de luminância relativa da WCAG 2.x
 
 **Tipo da ocorrência** (badge neutro: fundo `superficie`, borda `borda` decorativa, texto `texto-secundario` com **7.56** de contraste e ícone de 14px)
 
-| Tipo (rótulo longo, usado em formulário e filtro) | Rótulo curto (badge) | Ícone | Visibilidade |
-|---|---|---|---|
-| Manutenção em área comum | Manutenção | chave inglesa | Todos os moradores ativos |
-| Reclamação | Reclamação | megafone | **Só o autor e a administração**. Leva também o marcador "Restrita" na visão do admin e em "Minhas" |
-| Dúvida | Dúvida | interrogação em círculo | Todos os moradores ativos |
-| Melhoria | Melhoria | lâmpada | Todos os moradores ativos |
-| Mudança ou obra | Mudança ou obra | caixa | Todos os moradores ativos |
-
-**Urgência** (só admin; badge tintado, ícone de 3 barras e rótulo; o leitor de tela lê "Urgência alta")
-
-| Urgência | Fundo | Texto | Ícone | Contraste |
+| Enum (issue #12) | Rótulo longo (formulário, filtro, select) | Rótulo curto (badge, chip) | Ícone | Visibilidade |
 |---|---|---|---|---|
-| Não triada (`null`) | `superficie` com borda **tracejada** `borda-controle` | `texto-secundario` | sem ícone | **7.56** (texto); borda **4.83** |
-| Baixa | `urgencia-baixa-fundo` `#f3f4f6` | `urgencia-baixa-texto` `#374151` | 1 barra cheia | **9.37** |
-| Média | `urgencia-media-fundo` `#ffedd5` | `urgencia-media-texto` `#9a3412` | 2 barras cheias | **6.38** |
-| Alta | `urgencia-alta-fundo` `#fee2e2` | `urgencia-alta-texto` `#991b1b` | 3 barras cheias | **6.80** |
+| `MANUTENCAO_AREA_COMUM` | Manutenção em área comum | Manutenção | chave inglesa | Todos os moradores ativos |
+| `RECLAMACAO_BARULHO` | Reclamação | Reclamação | megafone | **Só o autor e a administração**. Leva também o marcador "Restrita" na fila, no detalhe do admin e em "Minhas" |
+| `DUVIDA_REGRAS` | Dúvida | Dúvida | interrogação em círculo | Todos os moradores ativos |
+| `SUGESTAO_MELHORIA` | Sugestão de melhoria | Sugestão | lâmpada | Todos os moradores ativos |
+| `COMUNICADO_MUDANCA_OBRA` | Comunicado de mudança ou obra | Mudança ou obra | caixa | Todos os moradores ativos |
+
+**Urgência** (só admin; ícone de 4 barras, preenchidas conforme o nível, e rótulo; o leitor de tela lê "Urgência alta")
+
+| Enum | Rótulo | Fundo | Texto | Ícone | Contraste |
+|---|---|---|---|---|---|
+| `null` (ver R3) | Não triada | `superficie` com borda **tracejada** `borda-controle` | `texto-secundario` | sem ícone | **7.56** (texto); borda **4.83** |
+| `BAIXA` | Baixa | `urgencia-baixa-fundo` `#f3f4f6` | `urgencia-baixa-texto` `#374151` | 1 de 4 barras | **9.37** |
+| `MEDIA` | Média | `urgencia-media-fundo` `#ffedd5` | `urgencia-media-texto` `#9a3412` | 2 de 4 barras | **6.38** |
+| `ALTA` | Alta | `urgencia-alta-fundo` `#fee2e2` | `urgencia-alta-texto` `#991b1b` | 3 de 4 barras | **6.80** |
+| `CRITICA` | Crítica | **sólido** `urgencia-critica-fundo` `#7f1d1d` | `urgencia-critica-texto` `#ffffff` | 4 de 4 barras | **10.02**; o fundo sobre a página: **10.02** (branco) e **9.59** (`superficie-app`) |
 
 **Marcadores**
 
 | Marcador | Aparência | Contraste | Onde |
 |---|---|---|---|
-| Atrasada | Fundo **sólido** `atrasada-fundo` `#b91c1c`, texto branco e ícone de relógio. É o único badge sólido do sistema, para se distinguir de "Alta" | **6.47** | Card, tabela e detalhe, para todos que veem o prazo |
-| Restrita | Badge neutro com cadeado | **7.56** | Reclamação, na visão do admin e em "Minhas" |
+| Atrasada | Fundo **sólido** `atrasada-fundo` `#b91c1c`, texto branco e ícone de relógio. Divide o peso sólido só com "Crítica", da qual se distingue pelo ícone e pelo texto | **6.47** | Card, tabela e detalhe, para todos que veem o prazo, quando a API envia `atrasada: true` (R2) |
+| Restrita | Badge neutro com cadeado | **7.56** | Reclamação: fila (card e tabela), detalhe do admin e "Minhas" |
 | Anônima / Anônimo | Texto `texto-suave` com ícone de olho cortado, na linha de meta (não é badge) | **4.83** | Card, detalhe e timeline |
 | Nota interna | Card `interna-fundo` `#fffbeb`, borda esquerda 4px `interna-borda` `#d97706`, rótulo "NOTA INTERNA" com cadeado em `interna-rotulo` `#92400e` e texto `interna-texto` `#78350f` | Rótulo **6.84**; texto **8.75**. Borda decorativa (o rótulo e o cadeado carregam a informação) | Timeline do admin |
 
@@ -220,6 +242,7 @@ A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, 
   --color-urgencia-baixa-fundo: #f3f4f6;  --color-urgencia-baixa-texto: #374151;
   --color-urgencia-media-fundo: #ffedd5;  --color-urgencia-media-texto: #9a3412;
   --color-urgencia-alta-fundo: #fee2e2;   --color-urgencia-alta-texto: #991b1b;
+  --color-urgencia-critica-fundo: #7f1d1d;  --color-urgencia-critica-texto: #ffffff;
   --color-atrasada-fundo: #b91c1c;  --color-atrasada-texto: #ffffff;
   --color-interna-fundo: #fffbeb;  --color-interna-texto: #78350f;  --color-interna-rotulo: #92400e;  --color-interna-borda: #d97706;
   /* forma e medida */
@@ -234,18 +257,19 @@ Se o tema padrão do Flowbite 3 for importado, aponte as variáveis de marca del
 
 **Tailwind v3 (`tailwind.config.js`)**, com Flowbite 2: é o mesmo objeto de `theme.extend` de [`mockups/assets/mockup.js`](mockups/assets/mockup.js), mais `plugins: [require('flowbite/plugin')]` e `content: ['./src/**/*.{html,ts}', './node_modules/flowbite/**/*.js']`.
 
-**Pares proibidos** (reprovam AA): `texto-suave` sobre `superficie-sutil`; qualquer `gray-300` ou `gray-400` como borda de controle ou trilho de toggle; texto branco sobre `primaria-foco`; `interna-borda` como texto.
+**Pares proibidos** (reprovam AA): `texto-suave` sobre `superficie-sutil`; qualquer `gray-300` ou `gray-400` como borda de controle ou trilho de toggle; texto branco sobre `primaria-foco`; `interna-borda` como texto. E uma regra de forma: Crítica e Atrasada nunca aparecem sem o ícone, porque a diferença de cor entre os dois fundos é 1.55:1.
 
 ---
 
 ## 3. Componentes: Flowbite e `shared/ui`
 
-**Regra:** as telas usam apenas componentes de `apps/web/src/app/shared/ui`. O Flowbite serve de **referência de marcação e classes** para esses componentes. O **comportamento** (abrir, fechar, foco, `aria-expanded`) fica no Angular, com signals. O `initFlowbite()` não é necessário para nada nesta lista. Motivo: os componentes JS do Flowbite manipulam o DOM fora do ciclo do Angular, se perdem quando a rota troca e não gerenciam o foco como a WCAG exige. Isto revisa a linha "initFlowbite() nos componentes interativos" de `arquitetura-mvp.md`; ver Pendências.
+**Regra ([ADR-006](../adr/006-flowbite-sem-initflowbite.md), status Aceita):** as telas usam apenas componentes de `apps/web/src/app/shared/ui`. O Flowbite serve de **referência de marcação e classes** para esses componentes, e o Flowbite Icons fornece os ícones. O **comportamento** (abrir, fechar, foco, `aria-expanded`) fica no Angular, com signals. O `initFlowbite()` e o JS do Flowbite não são usados. Motivo: os componentes JS do Flowbite manipulam o DOM fora do ciclo do Angular, se perdem quando a rota troca e não gerenciam o foco como a WCAG exige.
 
 Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 
 | Necessidade | Componente `shared/ui` | Base Flowbite | Variantes e entradas | Estados obrigatórios | Notas de acessibilidade |
 |---|---|---|---|---|---|
+| Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/ui/icones`) | `nome`, `tamanho` (16, 20 ou 24px), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
 | Ação | `ui-botao` (também como `a[ui-botao]`) | Buttons | `primario` · `secundario` (contorno `borda-controle`) · `texto` · `perigo` (sólido) · `perigo-contorno`; `bloco` (largura total abaixo de 768px); `icone` (quadrado 44px, exige `rotulo`) | repouso, hover (`primaria-hover` / `superficie-sutil`), foco visível, ativo (= hover), desabilitado (`opacity-50`, `cursor-not-allowed`, `aria-disabled`), **carregando** (spinner + rótulo no gerúndio + `aria-busy`, sem clique duplo) | Altura mínima de 44px. Botão só com ícone exige `aria-label`. Não use `disabled` para esconder um erro de validação: deixe enviar e mostre o erro. |
 | Campo de texto | `ui-campo` | Input field | `tipo` (text, tel, email, password com botão "Mostrar senha"), `rotulo`, `dica`, `erro`, `opcional`, `prefixo` ("#"), `mascara` (telefone) | repouso (borda `borda-controle`), foco (borda `primaria-foco` + anel 2px a 30%), **erro** (borda 2px `perigo-borda` + mensagem `perigo` com ícone), desabilitado (`superficie-sutil`), somente leitura | `<label for>` sempre visível (placeholder não é rótulo). `aria-describedby` = dica + erro. `aria-invalid="true"` no erro. Texto de 16px. |
 | Texto longo | `ui-area-texto` | Textarea | `rotulo`, `dica`, `min`, `max`, `contador` | iguais aos do `ui-campo` + contador `n/max` (`tabular-nums`) | O contador não é `aria-live` a cada tecla. Ele anuncia só ao cruzar o mínimo e ao faltarem 100 para o máximo. |
@@ -255,12 +279,12 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Data | `ui-campo` com `tipo="date"` | — (nativo) | `min` (hoje) | como `ui-campo` | Seletor nativo. Exibição sempre em `dd/mm/aaaa`. |
 | Status | `ui-badge-status` | Badge (pill) | `status` | — (não interativo) | Texto sempre visível; o ponto é `aria-hidden`. |
 | Tipo | `ui-badge-tipo` | Badge (com borda) | `tipo`, `curto` | — | Ícone `aria-hidden`. |
-| Urgência | `ui-badge-urgencia` | Badge | `urgencia` (`null` = Não triada) | — | Prefixo "Urgência" em `sr-only`. **Nunca é renderizado na área do morador.** |
+| Urgência | `ui-badge-urgencia` | Badge | `urgencia` (`null` = Não triada; `BAIXA` a `CRITICA`) | — | Prefixo "Urgência" em `sr-only`. **Nunca é renderizado na área do morador.** |
 | Marcadores | `ui-marcador` | Badge | `atrasada` · `restrita` | — | — |
 | Card de ocorrência | `ui-cartao-ocorrencia` | Card | `contexto: 'feed' \| 'minhas' \| 'admin'` controla quais campos aparecem (ver seção 6) | repouso, hover (borda `gray-300`), foco (anel no card inteiro via `:has(a:focus-visible)`) | O único link é o título (`<a>` com `::after` cobrindo o card); badges e meta não são focáveis. Lista em `<ul>`/`<li>`, card em `<article>`. |
 | Tabela da fila | `ui-tabela` (só a fila no MVP) | Table | colunas fixas (5.15) | linha com hover; foco no link do título | `<caption class="sr-only">`, `<th scope="col">`. Nenhuma linha clicável com `onclick`: o link é o título. |
 | Histórico | `ui-timeline` | Timeline (vertical) | `eventos` (catálogo em 6.3), `visao: 'morador' \| 'admin'` | vazio impossível (sempre há "registrou") | `<ol>` em ordem cronológica. Cada item tem `<time datetime>`. O ícone do evento é `aria-hidden`; o texto diz o que houve. |
-| Comentar | `ui-comentario-form` | Textarea + Button Group | `permiteInterno` (admin) | ocioso, enviando, erro (mantém o texto) | No admin, o grupo "Público / Nota interna" é um `<fieldset>` de radios; a dica e o rótulo do botão mudam com a escolha. |
+| Comentar | `ui-comentario-form` | Textarea + Toggle | `permiteInterno` (admin) | ocioso, enviando, erro (mantém o texto); no admin, modo nota interna (card em tom `interna`) | No admin, o `ui-alternador` "Nota interna" (desligado = público, issue #18) troca a dica (`aria-live`) e o rótulo do botão. |
 | Alerta inline | `ui-alerta` | Alert | `info` · `aviso` · `perigo` · `sucesso`; `titulo`; `acao?` | — | `role="alert"` só para erro que surge depois de uma ação; texto fixo (emergência, anonimato) é `<aside>`/`<p>` simples. |
 | Toast | `ui-toast` + `ToastService` | Toast | `sucesso` · `erro` | entrando, visível, saindo | Região única `aria-live="polite"` (sucesso) e `role="alert"` (erro) no shell. Sucesso fecha em 5s, com pausa no hover e no foco; erro só fecha manualmente. O botão fechar tem 44px. |
 | Modal / bottom sheet | `ui-modal` | Modal (só visual) | `titulo`, `tamanho`, `tipo: 'dialog' \| 'alertdialog'` | abrindo, aberto, enviando (botões desabilitados), erro (dentro do modal) | `<dialog>` + `showModal()`. Abaixo de 768px vira bottom sheet (`rounded-t-2xl`, alinhado à base). Foco inicial no primeiro campo, ou no botão **não destrutivo** em confirmações. Esc fecha. O foco volta ao botão que abriu. |
@@ -276,6 +300,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Paginação | `ui-carregar-mais` | Button | `carregando`, `fim` | ocioso, carregando, fim ("Isso é tudo."), erro (resultado parcial, 5.0) | Depois de carregar, o foco vai para o primeiro item novo. |
 | Contador do painel | `ui-cartao-numero` | Card | `rotulo`, `valor`, `destino`, `tom` | repouso, hover, foco | O card inteiro é um link; o nome acessível é "Não triadas: 3". |
 | Copiar | `ui-copiar` | Clipboard | `valor`, `rotulo` | ocioso, copiado ("Link copiado" por 2s) | O feedback é anunciado em `aria-live`. |
+| QR code | `ui-qrcode` | — (biblioteca `qrcode`, no cliente) | `url`, `tamanho` (240px na tela) | gerando (skeleton quadrado), pronto, erro ("Não foi possível gerar o QR code." + o link continua disponível) | `<img alt="QR code do link de cadastro do {condomínio}">`. A URL sempre aparece em texto ao lado. "Baixar PNG" usa a mesma geração em 1024px |
 
 ---
 
@@ -300,9 +325,13 @@ Largura mínima suportada: 320px, sem rolagem horizontal da página. Só a linha
 |---|---|---|
 | **Público** (`/`, `/cadastrar-condominio`, `/c/:slug/*`, `/trocar-senha`) | Barra de 56px com o nome do produto ou do condomínio; conteúdo em `max-w-conteudo` | Igual, centralizado. Formulários em card branco com `max-w-md` |
 | **Morador** (`/app/*`) | **Telas raiz** (Condomínio, Minhas, Perfil): barra com o nome do condomínio e bottom-nav. **Telas empilhadas** (Nova, Detalhe): barra com voltar ou fechar e o título, sem bottom-nav | Barra superior com o nome do condomínio, links Condomínio · Minhas · Perfil e botão primário "Nova ocorrência". Nas empilhadas, o link "← Minhas ocorrências" ou "← Condomínio" fica acima do h1 |
-| **Admin** (`/admin/*`) | Barra com menu (drawer à esquerda) e o nome do condomínio. Nas empilhadas, o voltar no lugar do menu | ≥ 1024px: sidebar fixa com o condomínio, os itens, a pessoa logada ("Ana Lima · Síndica") e "Sair" |
+| **Admin** (`/admin/*`) | Barra com menu (drawer à esquerda) e o nome do condomínio. Nas empilhadas, o voltar no lugar do menu | ≥ 1024px: sidebar fixa com o condomínio, os itens, a pessoa logada ("Ana Lima · Síndico(a)") e "Sair" |
 
-**Itens da sidebar por papel:** Painel · Ocorrências · Moradores (com contador de pendentes) · Equipe\* · Condomínio\*. \*Só o síndico vê. Para o subsíndico, os itens não existem; não ficam desabilitados.
+**Itens da sidebar por papel:** Painel · Ocorrências · Moradores (com contador de pendentes) · Equipe\* · Condomínio\*\*.
+
+- \*Só o síndico vê Equipe. Para o subsíndico, o item não existe (não fica desabilitado) e o acesso direto a `/admin/equipe` é bloqueado.
+- \*\*Os dois veem Condomínio. O subsíndico entra em **modo leitura** (R6): link, copiar, QR e cartaz, sem o formulário de dados.
+- A pessoa logada aparece como "Ana Lima · Síndico(a)" (R9).
 
 **Na troca de rota:** o `document.title` vira `"{Título da tela} · {Condomínio}"`, o foco vai para o `h1` (`tabindex="-1"`) e a rolagem volta ao topo, exceto no "voltar" para uma lista, que restaura a posição.
 
@@ -339,11 +368,12 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 ### 5.2 Cadastro do condomínio `/cadastrar-condominio` e sucesso
 
 - **Objetivo:** o síndico cria o condomínio e a própria conta.
-- **Conteúdo:** h1 "Cadastre seu condomínio". Fieldset "Condomínio": Nome do condomínio, Endereço do link (slug). Fieldset "Seus dados (síndico)": Nome, Telefone, Bloco, Apartamento, E-mail (opcional), Senha.
+- **Conteúdo:** h1 "Cadastre seu condomínio". Fieldset "Condomínio": Nome do condomínio, Endereço do link (slug). Fieldset "Seus dados (síndico)": Nome, Telefone, E-mail (opcional), Senha (issue #5; o síndico não informa bloco nem apartamento). Por último, o aceite "Li e aceito os [termos de uso] e a [política de privacidade]" (checkbox obrigatório; as páginas chegam com a issue #25).
 - **Slug:**
   - é preenchido a partir do nome (minúsculas, sem acento, hífen) até a pessoa editar;
   - mostra uma prévia "`seudominio/c/jardim-das-flores`";
-  - a disponibilidade é verificada com debounce de 400ms e o resultado aparece abaixo do campo ("Disponível", com ícone de check, em `sucesso-texto`; ou "Já está em uso. Tente outro.");
+  - a disponibilidade é verificada com debounce de 400ms por `GET /public/condominios/:slug`, sem endpoint novo: **404 = disponível**, 200 = em uso. Enquanto verifica, o campo mostra "Verificando…". O resultado aparece abaixo do campo ("Disponível", com ícone de check, em `sucesso-texto`; ou "Endereço já em uso. Tente outro.");
+  - a verificação é só uma ajuda: o 409 no envio continua sendo a fonte da verdade;
   - regras: 3 a 40 caracteres, `a-z`, `0-9` e `-`.
 - **Ações:** "Criar condomínio" (primário, bloco).
 - **Sucesso** (mesma rota, outro estado, foco no h1):
@@ -357,19 +387,20 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 - **Conteúdo:**
   1. Nome do condomínio (h1).
   2. "Registre e acompanhe as ocorrências do condomínio pelo celular."
-  3. Botão primário "Criar meu cadastro".
-  4. Botão secundário "Já tenho cadastro".
+  3. Botão primário "Criar conta" (issue #7).
+  4. Botão secundário "Entrar".
   5. Texto pequeno: "Seu cadastro precisa ser aprovado pela administração."
 - **Estados:** slug inexistente → página "Condomínio não encontrado", com "Confira o link com a administração do seu condomínio." e um link para a landing. Condomínio inativo → mesma mensagem (não revela o status).
 
 ### 5.4 Cadastro do morador `/c/:slug/cadastro`
 
-- **Conteúdo:** h1 "Criar cadastro" e subtítulo com o nome do condomínio. Campos:
+- **Conteúdo:** h1 "Criar conta" e subtítulo com o nome do condomínio. Campos:
   - Nome completo;
   - Telefone (celular): máscara `(11) 91234-5678`, `inputmode="tel"`, `autocomplete="tel-national"`;
   - Bloco e Apartamento, lado a lado mesmo em 375px (2 colunas de 50%);
   - E-mail (opcional), com a dica "Só para contato da administração.";
-  - Senha: com "Mostrar senha" e a dica "Mínimo de 8 caracteres.".
+  - Senha: com "Mostrar senha" e a dica "Mínimo de 8 caracteres.";
+  - aceite dos termos e da política de privacidade, como em 5.2 (issue #25).
 - **Ação:** "Enviar cadastro".
 - **Erro 409 de telefone:** no campo: "Este telefone já tem cadastro neste condomínio. [Entrar]".
 - **Sucesso:** vai para `/c/:slug/aguardando-aprovacao`.
@@ -378,12 +409,12 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 
 - **Conteúdo:** h1 "Entrar", nome do condomínio, Telefone, Senha (com "Mostrar senha") e "Entrar" (primário, bloco). Abaixo:
   - "Esqueceu a senha? Peça à administração do condomínio para redefinir." (texto, não é link: não existe reset por conta própria);
-  - "Ainda não tem cadastro? Criar cadastro".
-- **Erros** (num `ui-alerta perigo` acima do formulário, com foco movido para ele):
+  - "Ainda não tem cadastro? Criar conta".
+- **Erros** (num `ui-alerta perigo` acima do formulário, com foco movido para ele). A mensagem de credencial é genérica e não revela se o telefone existe (issue #6). As mensagens de status só aparecem quando a senha está correta:
 
 | Situação | Mensagem |
 |---|---|
-| Credenciais inválidas | "Telefone ou senha incorretos." |
+| Credenciais inválidas | "Telefone ou senha inválidos." |
 | PENDENTE | "Seu cadastro ainda aguarda aprovação da administração." |
 | RECUSADO | "Seu cadastro não foi aprovado. Fale com a administração do condomínio." |
 | INATIVO | "Seu acesso está desativado. Fale com a administração do condomínio." |
@@ -402,7 +433,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   - campos: Nova senha (com "Mostrar senha");
   - ação: "Salvar e continuar";
   - não há navegação para outras áreas; existe só "Sair".
-- **Modo voluntário** (pelo Perfil): pede também a "Senha atual" e tem "Cancelar".
+- **Troca voluntária:** não usa esta rota. Fica no próprio Perfil (5.12, issue #9), com os campos "Senha atual" e "Nova senha".
 - **Erros:**
   - senha igual à temporária → "Escolha uma senha diferente da temporária.";
   - curta → "A senha precisa ter pelo menos 8 caracteres.".
@@ -413,26 +444,28 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 - **Conteúdo:**
   1. h1 "Ocorrências do condomínio".
   2. Linha de apoio: "Ocorrências públicas dos moradores. Reclamações ficam visíveis só para quem registrou e para a administração."
-  3. Lista de `ui-cartao-ocorrencia contexto="feed"`, das mais recentes para as mais antigas.
-  4. "Carregar mais".
+  3. **Chips de filtro por tipo** (`ui-chips-visao`, issue #14): Todos · Manutenção · Dúvida · Sugestão · Mudança ou obra. Reclamação não entra, porque nunca aparece no feed. Escolha única, refletida na URL (`?tipo=DUVIDA_REGRAS`).
+  4. Lista de `ui-cartao-ocorrencia contexto="feed"`, das mais recentes para as mais antigas.
+  5. "Carregar mais".
 - **Card (ordem):**
   - linha de badges: status, Atrasada (se houver) e tipo curto, com o número `#61` alinhado à direita;
   - título (link, até 2 linhas);
   - trecho da descrição (até 2 linhas, `text-sm`);
   - meta: autor (seção 6.1) · tempo relativo · "Prazo dd/mm" (se houver).
-  - Nas próprias ocorrências, a meta começa com "Sua".
+  - Nas próprias ocorrências (`minha: true`), a meta começa com "Sua".
 - **Estados:**
-  - vazio: "Nenhuma ocorrência pública ainda", com o texto "Dúvidas, melhorias, manutenções e avisos de obra registrados pelos moradores aparecem aqui." e o botão "Registrar ocorrência";
+  - vazio: "Nenhuma ocorrência pública ainda", com o texto "Dúvidas, sugestões, manutenções e comunicados de obra registrados pelos moradores aparecem aqui." e o botão "Registrar ocorrência";
+  - vazio com filtro de tipo: "Nenhuma ocorrência deste tipo." com "Ver todas";
   - erro: "Não foi possível carregar as ocorrências.".
 - **375 vs. desktop:** igual, em coluna de 672px; a partir de 768px a navegação vai para a barra superior.
 
 ### 5.9 Minhas ocorrências `/app/minhas`
 
 - **Conteúdo:** h1 "Minhas ocorrências" e lista com `contexto="minhas"`. É o mesmo card do feed, com duas diferenças:
-  - a meta mostra "Anônima" (ícone) quando for o caso;
+  - a meta mostra "Você (anônimo)", com o ícone de olho cortado, quando for o caso (issue #13);
   - Reclamação ganha o marcador "Restrita".
 - Inclui todas as próprias: reclamações, anônimas e encerradas.
-- **Destaque pós-criação:** ao chegar da Nova ocorrência, o card novo fica no topo com fundo `primaria-suave` por 3s (fade de 600ms; sem animação com movimento reduzido), e o toast "Ocorrência #63 registrada." aparece.
+- Sem destaque de item novo: depois de registrar, a pessoa vai para o detalhe (5.10, issue #12), não para esta lista.
 - **Vazio:** "Você ainda não registrou ocorrências", com "Quando algo precisar de atenção no condomínio, registre por aqui." e "Registrar ocorrência".
 
 ### 5.10 Nova ocorrência `/app/nova` (morador) · mockup [`nova-ocorrencia.html`](mockups/nova-ocorrencia.html)
@@ -448,10 +481,10 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   4. **Título:** com a dica "Resuma em poucas palavras."; de 5 a 100 caracteres.
   5. **Descrição:** com a dica "Conte o que aconteceu, quando e onde. Mínimo de 20 caracteres."; contador `n/2000`.
   6. **Local (opcional):** com a dica "Ex.: garagem G2, hall do bloco B, salão de festas."
-  7. **Anonimato:** card com `ui-alternador` "Registrar como anônima" e a dica "Ninguém vê quem registrou: nem os outros moradores, nem a administração." Ligado, abre logo abaixo um `ui-alerta info` com "**Seu nome não aparece.** Evite se identificar no texto: não cite seu nome, seu apartamento ou detalhes que revelem quem você é."
+  7. **Anonimato:** card com `ui-alternador` "Registrar anonimamente" (issue #12) e a dica "Seu nome fica oculto para os outros moradores e para a administração." (R8). Ligado, abre logo abaixo um `ui-alerta info` com "**Seu nome não aparece.** Evite se identificar no texto: não cite seu nome, seu apartamento ou detalhes que revelem quem você é."
   8. Ações: "Registrar ocorrência" (primário, bloco) e "Cancelar" (texto).
 - **Validação:** ao sair do campo (depois do primeiro toque) e no envio. No envio com erro, o foco vai para o primeiro campo inválido. As mensagens estão em 8.4.
-- **Enviando:** "Registrando…". **Sucesso:** vai para `/app/minhas` com destaque e toast (5.9).
+- **Enviando:** "Registrando…". **Sucesso:** vai para o detalhe da ocorrência criada (`/app/ocorrencias/:id`, issue #12), com o toast "Ocorrência #63 registrada." e o foco no h1.
 - **Descartar:** fechar ou voltar com algum campo preenchido abre o `alertdialog` "Descartar ocorrência?", com "O que você escreveu será perdido." e os botões "Continuar escrevendo" (foco inicial) e "Descartar".
 - **375 vs. desktop:** a partir de 768px, o h1 aparece no conteúdo, o formulário fica em 672px e os botões ficam à direita com largura do conteúdo.
 
@@ -465,14 +498,15 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
      - "Registrada por" (seção 6.1);
      - "Criada em";
      - "Local" (se houver);
-     - "Prazo" (se houver; vermelho com o marcador "Atrasada" quando vencido);
+     - "Prazo" (se houver; em `perigo` com o marcador "Atrasada" quando `atrasada: true`);
      - "Resolvida em" ou "Arquivada em" (se encerrada).
   4. **Aviso de duplicada** (se DUPLICADA), em `ui-alerta info`: "Esta ocorrência foi marcada como duplicada da **#48 · Em andamento**. O acompanhamento continua por lá." O #48 é link quando a principal é visível para quem está vendo. Quando é restrita, aparece só o número e o status, sem link, e o texto termina com "Os detalhes dela não são públicos.".
   5. Descrição, em card, preservando as quebras de linha.
-  6. **Bloco de ação do autor** (só para o autor):
+  6. **Bloco de ação do autor** (só quando `minha: true`):
      - ABERTA: link-botão "Retirar ocorrência" (`perigo-contorno`), que abre um `alertdialog` (`estados.html` #11).
-     - RESOLVIDA/ARQUIVADA dentro de 30 dias: card "O problema continua?", com "Você pode reabrir até dd/mm/aaaa. A ocorrência volta para Aberta e passa por nova análise da administração." e o botão "Reabrir ocorrência", que abre o modal com a justificativa obrigatória (#10).
-     - Depois de 30 dias: no lugar do botão, "O prazo para reabrir terminou em dd/mm/aaaa. Se o problema voltou, registre uma nova ocorrência." (com link).
+     - RESOLVIDA/ARQUIVADA dentro de 30 dias: card "O problema continua?", com "Você pode reabrir até dd/mm/aaaa. A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração." (R4) e o botão "Reabrir ocorrência".
+     - O botão abre o modal com a justificativa obrigatória (#10). A dica da justificativa segue a visibilidade (R1, textos em 8.7): "A administração e os moradores do condomínio veem esta justificativa." ou "Só você e a administração veem esta justificativa."
+     - Depois de 30 dias: no lugar do botão, "Prazo para reabrir encerrado em dd/mm/aaaa. Se o problema voltou, registre uma nova ocorrência." (com link; issue #20).
      - EM_ANDAMENTO e DUPLICADA: nada.
   7. **Histórico** (`ui-timeline visao="morador"`).
   8. **Comentar** (só o autor):
@@ -490,20 +524,23 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   - h1 "Perfil";
   - card com os dados somente leitura: Nome, Telefone, Bloco e apartamento, E-mail;
   - o texto "Para alterar seus dados, fale com a administração.";
-  - botão secundário "Trocar senha" (leva a `/trocar-senha` no modo voluntário);
+  - seção "Senha" com o botão secundário "Trocar senha" (issue #9). Ele expande, na própria página, os campos "Senha atual" e "Nova senha" (com "Mostrar senha"), mais "Salvar nova senha" e "Cancelar". O foco vai para "Senha atual". No sucesso, o toast "Senha alterada." aparece e a seção recolhe;
   - botão texto "Sair", com confirmação.
-- A exclusão de conta fica para a issue #25: o lugar reservado é o fim da página, com o botão `perigo-contorno` "Excluir minha conta".
+- A exclusão de conta fica para a issue #25: o lugar reservado é o fim da página, com o botão `perigo-contorno` "Excluir minha conta" e confirmação dupla.
+  - 1ª confirmação: `alertdialog` "Excluir sua conta?", com "Seus dados pessoais serão apagados. As ocorrências continuam, como 'autor removido'.".
+  - 2ª confirmação: digitar "EXCLUIR" para habilitar o botão final.
 
 ### 5.13 Painel `/admin/painel`
 
-- **Conteúdo:** h1 "Painel" e uma grade de `ui-cartao-numero`, cada um com link para a fila já filtrada:
-  - Em aberto;
-  - Não triadas;
-  - Atrasadas (tom `perigo` quando > 0);
-  - Urgência alta, média e baixa (em aberto);
+- **Conteúdo:** h1 "Painel" e uma grade de `ui-cartao-numero` (issue #22). Cada card é um link para a fila já filtrada, com **o mesmo recorte** que a fila usa, para os números baterem:
+  - Abertas (status ABERTA);
+  - Em andamento (status EM_ANDAMENTO);
+  - Não triadas (R3);
+  - Atrasadas (R2; tom `perigo` quando > 0);
+  - Urgência: Crítica, Alta, Média e Baixa (só ABERTA e EM_ANDAMENTO). Crítica ganha tom sólido quando > 0;
   - Cadastros pendentes (link para Moradores › Pendentes).
 - **Condomínio novo (todos os contadores em 0 e nenhum morador):** substitui a grade por "Primeiros passos", com 3 itens:
-  1. Compartilhe o link ou o QR code (link para Condomínio);
+  1. Compartilhe o link ou o QR code (link para Condomínio; vale para síndico e subsíndico, R6);
   2. Aprove os cadastros;
   3. Convide um subsíndico (opcional; só síndico).
 - **375 vs. desktop:** 2 colunas → 4 colunas a partir de 1024px.
@@ -513,19 +550,23 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 - **Objetivo:** achar o que precisa de ação agora.
 - **Conteúdo:**
   1. h1 "Ocorrências" + botão primário "Nova ocorrência" ("Nova" abaixo de 640px).
-  2. **Visões rápidas** (`ui-chips-visao`), com contadores: **Em aberto** (padrão: ABERTA + EM_ANDAMENTO) · Não triadas · Atrasadas · Encerradas (RESOLVIDA, ARQUIVADA, DUPLICADA) · Todas.
-  3. **Filtros:** Tipo e Urgência (Não triada, Alta, Média, Baixa).
-     - Abaixo de 768px: botão "Filtros" (com "(n)" quando houver filtro ativo) que abre um bottom sheet com "Limpar" e "Ver resultados".
+  2. **Visões rápidas** (`ui-chips-visao`), com contadores: **Em aberto** (padrão: ABERTA + EM_ANDAMENTO) · Não triadas (R3) · Atrasadas (R2) · Encerradas (RESOLVIDA, ARQUIVADA, DUPLICADA) · Todas.
+  3. **Filtros e ordenação** (issue #15):
+     - Tipo;
+     - Urgência: Não triada, Crítica, Alta, Média, Baixa;
+     - Origem: Todas, Moradores, Administração;
+     - Ordenar por: "Mais recentes" (padrão) ou "Urgência" (Crítica → Baixa, e "Não triada" no fim; empate pela mais recente).
+     - Abaixo de 768px: botão "Filtros" (com "(n)" quando houver filtro ativo) que abre um bottom sheet (drawer da base) com "Limpar" e "Ver resultados".
      - A partir de 768px: selects inline que aplicam na hora.
      - O total ("12 ocorrências") fica em `aria-live="polite"`.
   4. **Lista:**
-     - abaixo de 768px, cards `contexto="admin"`: número, status, urgência ou "Não triada", Atrasada / título / tipo · autor · tempo ou prazo;
-     - a partir de 768px, tabela com as colunas Nº · Ocorrência (título-link + tipo) · Status · Urgência · Prazo (data; vermelho + Atrasada se vencido) · Autor (a partir de 1280px) · Criada.
+     - abaixo de 768px, cards `contexto="admin"`: número, status, urgência ou "Não triada", Atrasada, Restrita / título / tipo · autor · tempo ou prazo;
+     - a partir de 768px, tabela com as colunas Nº · Ocorrência (título-link + tipo + "Restrita") · Status · Urgência · Prazo (data; `perigo` + Atrasada quando `atrasada: true`) · Autor (a partir de 1280px) · Criada.
+     - O autor aparece sempre no formato único do admin: "Nome · Bloco B, apto 302", "Anônimo" ou "Administração" (6.1).
   5. "Carregar mais".
-- **Ordem:** mais recentes primeiro (é a ordem do cursor; ver Pendências).
-- **URL:** visão e filtros vivem na query (`?visao=nao-triadas&tipo=RECLAMACAO`), para que voltar do detalhe e o link do painel caiam na mesma lista.
+- **URL:** visão, filtros e ordenação vivem na query (`?visao=nao-triadas&tipo=RECLAMACAO_BARULHO&ordem=urgencia`), para que voltar do detalhe e o link do painel caiam na mesma lista.
 - **Estados:**
-  - vazio sem filtro e sem nenhuma ocorrência: "Nenhuma ocorrência registrada ainda", com "Compartilhe o link do condomínio para os moradores começarem a registrar." e "Ver link e QR code" (síndico) ou nenhum botão (subsíndico);
+  - vazio sem filtro e sem nenhuma ocorrência: "Nenhuma ocorrência registrada ainda", com "Compartilhe o link do condomínio para os moradores começarem a registrar." e "Ver link e QR code" (síndico e subsíndico, R6);
   - vazio com filtro: "Nenhuma ocorrência com esses filtros", com o resumo dos filtros e "Limpar filtros";
   - visão "Não triadas" vazia: "Tudo triado. Nenhuma ocorrência esperando urgência.".
 
@@ -533,64 +574,81 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 
 O mesmo formulário de 5.10, com estas diferenças:
 
-- sem anonimato;
+- sem anonimato (o campo não existe, issue #16);
 - sem orientação de emergência;
 - texto no topo: "A ocorrência fica registrada como da administração. Para os moradores, o autor aparece como 'Administração'.";
+- campo **"Urgência (opcional)"** (select: Crítica, Alta, Média, Baixa), com a dica "Se não escolher, a ocorrência fica como Não triada.";
+- o texto dinâmico de visibilidade abaixo do tipo é escrito para o admin:
+  - tipos públicos: "Todos os moradores ativos vão ver esta ocorrência no feed, com autor 'Administração'.";
+  - Reclamação: "Fica restrita à administração: nenhum morador vê esta ocorrência.";
 - o sucesso vai para o detalhe admin da nova ocorrência, com toast.
 
 ### 5.16 Detalhe da ocorrência `/admin/ocorrencias/:id` · mockup [`detalhe-admin.html`](mockups/detalhe-admin.html)
 
-- **Conteúdo, coluna principal:**
+- **Conteúdo, na ordem do DOM:**
   1. Badges: status, urgência (ou Não triada), Atrasada, tipo e Restrita.
   2. h1.
   3. Lista de definições:
-     - Autor: "Nome · Bloco B, apto 302", com telefone em link `tel:`; "Anônimo" com ícone; ou "Administração";
+     - Autor: "Nome · Bloco B, apto 302" (formato único do admin, 6.1), com o telefone em link `tel:` numa linha própria; "Anônimo" com ícone; "Administração"; ou "Autor removido";
      - Criada em;
      - Local;
      - Prazo;
      - "Visível para": "Todos os moradores" ou "Autor e administração";
      - "Tipo escolhido pelo morador", quando o confirmado difere.
   4. Descrição.
-  5. **Gestão** (abaixo de 1280px fica aqui; a partir de 1280px vai para a coluna lateral, `sticky top-6`).
-  6. Histórico (`visao="admin"`, com notas internas).
-  7. Comentar.
+  5. **Gestão**.
+  6. **Duplicadas vinculadas** (só quando esta é a principal; issue #21): lista "#63 · Aberta · Título", com link para cada uma.
+  7. Histórico (`visao="admin"`, com notas internas).
+  8. Comentar.
+- **Layout:** a Gestão existe **uma única vez no DOM**, sempre depois da descrição. Essa é a ordem de leitura e de foco da seção 9.
+  - Abaixo de 1280px: uma coluna, na ordem acima.
+  - A partir de 1280px: grid `grid-cols-[minmax(0,1fr)_22rem]` com `grid-rows-[auto_auto_auto_auto_auto_1fr]`. A Gestão vai para a coluna 2 ocupando todas as linhas (`row-start-1 row-end-[-1]`, `sticky top-6`, `self-start`); os outros blocos ficam na coluna 1, em linhas explícitas. A última linha `1fr` absorve a altura da Gestão, para não abrir espaço entre os blocos da coluna 1.
+  - Nada é duplicado nem reordenado com `order`.
 - **Gestão:** card com 3 seções.
   - **Triagem:**
-    - "Urgência" (select; placeholder desabilitado "Escolha a urgência" enquanto não triada), com a dica "O morador não vê a urgência.";
+    - "Urgência" (select: Crítica, Alta, Média, Baixa; placeholder desabilitado "Escolha a urgência" enquanto não triada), com a dica "O morador não vê a urgência.";
     - "Tipo" (select, com os 5 tipos), com a dica "Escolhido pelo morador: {tipo}".
     - Ao mudar o tipo, o texto de efeito (`aria-live`) muda:
 
-      | Mudança | Texto de efeito |
-      |---|---|
-      | Para Reclamação | "Ao salvar, a ocorrência sai do feed e fica visível só para o autor e a administração." |
-      | De Reclamação para outro tipo | "Ao salvar, a ocorrência passa a aparecer para todos os moradores ativos." Se for anônima: "O autor continua anônimo." |
+      | Mudança | Texto de efeito | Ao salvar |
+      |---|---|---|
+      | Para Reclamação | "Ao salvar, a ocorrência deixará de ser pública: sai do feed e fica visível só para o autor e a administração." (issue #17) | Salva direto |
+      | De Reclamação para outro tipo | "Ao salvar, a ocorrência passará a ser pública." | **`alertdialog` de confirmação** (R5, `estados.html` #15), com o texto completo de 8.7 |
+      | Entre tipos públicos | nenhum | Salva direto |
 
     - Botão "Salvar triagem" (primário), habilitado só quando há mudança.
-  - **Status:** as ações dependem do status atual (seção 6.4). Cada ação abre um modal quando exige texto: Resolver (comentário público obrigatório), Arquivar (motivo obrigatório, visível para o autor), Duplicada (número da principal com prévia; #13). "Iniciar atendimento" e "Desvincular" executam direto, com toast e evento.
+  - **Status:** as ações dependem do status atual (seção 6.4).
+    - Executam direto, com toast e evento: "Iniciar atendimento", "Reabrir" (limpa o prazo, R4) e "Desvincular".
+    - Abrem modal porque exigem texto:
+      - Resolver: comentário público obrigatório;
+      - Arquivar: motivo obrigatório, com a dica condicional à visibilidade (R1, 8.7; `estados.html` #14);
+      - Duplicada: número da principal, com prévia (#13).
+    - Se a ocorrência é a principal de outras duplicadas, "Marcar como duplicada" não aparece. No lugar, fica o texto "É a principal de {n} duplicadas." Se a API ainda assim recusar, a mensagem de 8.4 aparece.
   - **Prazo:**
     - date `min=hoje` + "Definir" (ou "Alterar" quando já existe), com a dica "Ao definir um prazo, a ocorrência passa para Em andamento." (só quando ABERTA);
     - desabilitado em RESOLVIDA, ARQUIVADA e DUPLICADA, com a dica "Reabra a ocorrência para definir prazo."
 - **Comentar:**
-  - fieldset "Público / Nota interna" (padrão Público);
-  - a dica muda conforme a escolha:
-    - Público: "O autor vê este comentário." (restrita) ou "O autor e os moradores do condomínio veem este comentário." (pública);
-    - Nota interna: "Só a administração vê esta nota.";
+  - `ui-alternador` "Nota interna" (desligado = público; issue #18);
+  - a dica muda conforme o toggle:
+    - desligado: "O autor vê este comentário." (restrita) ou "O autor e os moradores do condomínio veem este comentário." (pública);
+    - ligado: "Só a administração vê esta nota.";
   - o botão muda junto: "Publicar comentário" ou "Salvar nota interna";
-  - com "Nota interna" selecionada, o rótulo fica em tom `interna`, para que o modo seja percebido antes de enviar.
+  - com o toggle ligado, o card inteiro ganha fundo `interna-fundo` e borda `interna-borda`, para que o modo seja percebido antes de enviar. O trilho ligado usa `interna-rotulo`.
 - **Estados:** 409 de versão em qualquer ação da gestão → alerta de conflito no topo do card Gestão (#8).
 
 ### 5.17 Moradores `/admin/moradores`
 
-- **Abas (`ui-abas`):** Pendentes (contador) · Ativos · Inativos · Recusados. A aba Inativos existe porque reativar exige ver os inativos; ver Pendências sobre a issue #8.
+- **Escopo:** lista **só `papel=MORADOR`** (R7). Síndico(a) e subsíndico(a) aparecem apenas em Equipe.
+- **Abas (`ui-abas`, issue #8):** Pendentes (contador) · Ativos · Recusados e inativos. Na terceira aba, cada item mostra o badge de status do usuário ("Recusado" ou "Inativo").
+- **Busca:** campo `type="search"` "Buscar por nome, bloco ou apto", acima da lista, com debounce de 300ms. A busca vale para a aba atual e fica na URL (`?aba=ativos&q=302`). Sem resultado: "Nenhum morador encontrado para '{q}'.", com "Limpar busca".
 - **Item:** nome; bloco e apto; telefone (link `tel:`); data do cadastro. São cards abaixo de 768px e tabela a partir de 768px.
-- **Ações por aba:**
+- **Ações por aba** (todas com confirmação, issue #8):
 
   | Aba | Ações |
   |---|---|
-  | Pendentes | "Aprovar" (primário, executa direto, com toast "Cadastro de {nome} aprovado.") e "Recusar" (secundário; modal com motivo obrigatório: "O motivo fica registrado na auditoria.") |
+  | Pendentes | "Aprovar" (primário; confirmação curta "Aprovar o cadastro de {nome}?", com toast "Cadastro de {nome} aprovado.") e "Recusar" (secundário; modal com motivo obrigatório e a dica "O motivo fica registrado na auditoria.") |
   | Ativos | Menu "Mais ações" (botão ícone de 44px com `aria-expanded`): "Redefinir senha" e "Inativar" (alertdialog: "{nome} perde o acesso na hora. Você pode reativar depois.") |
-  | Inativos | "Reativar" |
-  | Recusados | Só leitura, com o motivo |
+  | Recusados e inativos | Inativo: "Reativar" (confirmação). Recusado: só leitura, com o motivo |
 
 - **Redefinir senha:**
   - o modal de resultado mostra a senha temporária em fonte mono `text-lg`, com `ui-copiar`;
@@ -602,19 +660,22 @@ O mesmo formulário de 5.10, com estas diferenças:
 
 ### 5.18 Equipe `/admin/equipe` (só síndico)
 
-- **Conteúdo:** h1 "Equipe", com o texto "Até 2 administradores: o síndico e um subsíndico." e dois cartões de vaga.
-  - **Síndico:** você.
-  - **Subsíndico** ocupado: nome, telefone, "Redefinir senha" e "Remover do cargo" (alertdialog: "{nome} volta a ser morador e perde o acesso à administração.").
-  - **Subsíndico** vazio: "Nenhum subsíndico", com as ações "Promover um morador" (modal com select de moradores ativos) e "Cadastrar novo" (modal com nome, telefone, bloco e apto; depois, a senha temporária é exibida uma vez, como em 5.17).
-- **Limite:** com a vaga ocupada, as ações de adicionar não aparecem. Se a API devolver 409: toast "O condomínio já tem 2 administradores."
+- **Conteúdo:** h1 "Equipe", com o texto "Até 2 administradores: o(a) síndico(a) e um(a) subsíndico(a)." e dois cartões de vaga.
+  - **Síndico(a):** você.
+  - **Subsíndico(a)** ocupado: nome, telefone, "Redefinir senha" e "Remover do cargo" (alertdialog: "{nome} deixa de ser subsíndico(a). Se tiver apartamento cadastrado, volta a ser morador; se não, fica inativo." — issue #10).
+  - **Subsíndico(a)** vazio: "Nenhum(a) subsíndico(a)", com as ações:
+    - "Promover um morador": modal com select de moradores ativos;
+    - "Cadastrar novo": modal com nome, telefone, bloco (opcional) e apto (opcional). Depois, a senha temporária é exibida uma vez, como em 5.17.
+- **Limite:** com a vaga ocupada, as ações de adicionar não aparecem. Se a API devolver 409: toast "O condomínio já tem subsíndico." (issue #10).
 
-### 5.19 Condomínio `/admin/condominio` (só síndico)
+### 5.19 Condomínio `/admin/condominio` (síndico edita; subsíndico só lê)
 
-- **Dados:** Nome, editável, com "Salvar". O endereço do link (slug) aparece somente leitura, com a dica "Para trocar o endereço, fale com o suporte: os QR codes impressos deixariam de funcionar." (ver Pendências).
+- **Dados** (só síndico; issue #11): Nome, Cidade e UF (select com as 27 UFs), com "Salvar alterações". O endereço do link (slug) aparece somente leitura, com a dica "O endereço não pode ser alterado: os QR codes impressos deixariam de funcionar." (slug não editável no MVP, issue #11).
+- **Subsíndico (R6):** não vê o formulário. No lugar, os dados aparecem como texto (nome, cidade/UF), com a nota "Só o(a) síndico(a) edita os dados do condomínio." O bloco de link abaixo é igual para os dois.
 - **Link de cadastro:**
   - a URL completa em campo somente leitura;
   - "Copiar link";
-  - QR code de 240px, com área de respiro branca de 16px;
+  - QR code de 240px (`ui-qrcode`, biblioteca `qrcode`), com área de respiro branca de 16px;
   - "Baixar QR code (PNG)";
   - "Imprimir cartaz".
 - **Cartaz:** rota ou `@media print` com o nome do condomínio, o QR de 8cm, "Aponte a câmera do celular para se cadastrar e registrar ocorrências" e a URL em texto. Em A4 retrato, preto no branco.
@@ -640,11 +701,13 @@ A UI renderiza o que o presenter devolve. As tabelas abaixo dizem **como** mostr
 
 ### 6.1 Como o autor aparece
 
-| Quem vê ↓ / ocorrência → | De morador, identificada | De morador, anônima | Da administração |
-|---|---|---|---|
-| O próprio autor | "Você · Bloco B" | "Você (anônima)" | — |
-| Outro morador | "Bloco B" | "Anônima" (ícone) | "Administração" |
-| Síndico / subsíndico | "Maria Souza · Bloco B, apto 302" + telefone no detalhe | "Anônimo" (ícone), sem bloco | "Administração" |
+| Quem vê ↓ / ocorrência → | De morador, identificada | De morador, anônima | Da administração | Autor removido (conta excluída, issue #25) |
+|---|---|---|---|---|
+| O próprio autor (`minha: true`) | "Você · Bloco B" | "Você (anônimo)" | — | — |
+| Outro morador | "Bloco B" | "Anônima" (ícone) | "Administração" | "Autor removido" (se era anônima, continua "Anônima") |
+| Síndico(a) / subsíndico(a) | "Maria Souza · Bloco B, apto 302" (formato único em fila, tabela e detalhe) + telefone no detalhe | "Anônimo" (ícone), sem bloco | "Administração" | "Autor removido" (se era anônima, continua "Anônimo") |
+
+Na timeline, o autor anônimo aparece como **"Autor"** para o admin e para os outros moradores (issue #18), e como "Você" para ele mesmo.
 
 ### 6.2 O que cada um vê
 
@@ -652,7 +715,8 @@ A UI renderiza o que o presenter devolve. As tabelas abaixo dizem **como** mostr
 |---|---|---|---|
 | Ocorrência do tipo Reclamação | Sim (com "Restrita") | **Não aparece** | Sim (com "Restrita") |
 | Urgência e "Não triada" | **Não** | **Não** | Sim |
-| Prazo e "Atrasada" | Sim | Sim | Sim |
+| Prazo e "Atrasada" (`atrasada` vem da API, R2) | Sim | Sim | Sim |
+| Motivo de arquivamento e justificativa de reabertura (R1) | Sim | Sim, nas públicas | Sim |
 | Tipo efetivo | Sim | Sim | Sim + "escolhido pelo morador" quando difere |
 | Comentários públicos | Sim | Sim (só nas públicas) | Sim |
 | Notas internas | **Não** | **Não** | Sim |
@@ -663,38 +727,40 @@ A UI renderiza o que o presenter devolve. As tabelas abaixo dizem **como** mostr
 
 `{ator}` é o rótulo de quem fez o evento:
 
-- na visão do morador: "Você", "Síndico", "Subsíndico", "Autor (Bloco B)" ou "Autor anônimo";
-- na visão do admin: os mesmos papéis, e o autor como "Maria Souza" ou "Autor anônimo".
+- na visão do morador: "Você", "Síndico(a)", "Subsíndico(a)", "Autor (Bloco B)" ou "Autor" (anônimo);
+- na visão do admin: os mesmos papéis, e o autor como "Maria Souza" ou "Autor" (anônimo, issue #18).
 
-| Evento | Texto | Ícone e tom | Morador vê |
+Os enums em **negrito** vêm das issues (#12, #17, #20). Os demais são proposta e o nome final fica em `packages/contratos` (Pendências).
+
+| Enum | Texto | Ícone e tom | Morador vê |
 |---|---|---|---|
-| Criada | "{ator} registrou a ocorrência" (admin: "… como {tipo}") | + neutro | Sim |
-| Atendimento iniciado | "{ator} iniciou o atendimento" | relógio, andamento | Sim |
-| Prazo definido / alterado | "{ator} definiu o prazo para {data}" / "{ator} alterou o prazo de {de} para {para}"; se mudou o status, acrescenta "e a ocorrência passou para Em andamento" | calendário, andamento | Sim |
-| Tipo corrigido | "{ator} alterou o tipo de {de} para {para}" | etiqueta, neutro | Sim |
-| Urgência definida | "{ator} definiu a urgência como {nível}" | barras, neutro | **Não** |
-| Comentário | Bolha com {ator}, hora e texto | balão, primária | Sim |
-| Nota interna | Bolha `interna` com "NOTA INTERNA" | cadeado, interna | **Não** |
-| Resolvida | "{ator} marcou como Resolvida" + bolha `sucesso` com o comentário | check, resolvida | Sim |
-| Arquivada | "{ator} arquivou" + bolha com o motivo | arquivo, arquivada | Sim |
-| Retirada | "{ator} retirou a ocorrência" | arquivo, arquivada | Sim |
-| Reaberta pelo autor | "{ator} reabriu a ocorrência" + bolha com a justificativa | seta circular, aberta | Sim |
-| Reaberta pelo admin | "{ator} reabriu a ocorrência e a colocou Em andamento" | seta circular, andamento | Sim |
-| Marcada como duplicada | "{ator} marcou como duplicada da #{n}" | elo, duplicada | Sim |
-| Vínculo desfeito | "{ator} desfez o vínculo com a #{n}" | elo, neutro | Sim |
+| **`CRIADA`** | "{ator} registrou a ocorrência" (admin: "… como {tipo}") | + neutro | Sim |
+| `ASSUMIDA` | "{ator} iniciou o atendimento" | relógio, andamento | Sim |
+| `PRAZO_DEFINIDO` / `PRAZO_ALTERADO` | "{ator} definiu o prazo para {data}" / "{ator} alterou o prazo de {de} para {para}". Se mudou o status, acrescenta "e a ocorrência passou para Em andamento" | calendário, andamento | Sim |
+| **`CLASSIFICACAO_CORRIGIDA`** | Uma linha por campo alterado (`dados` de/para): "{ator} alterou o tipo de {de} para {para}" e "{ator} definiu a urgência como {nível}" / "alterou a urgência de {de} para {para}" | etiqueta, neutro | **Só a parte do tipo.** Se o evento mudou só a urgência, ele não chega ao morador (filtro no presenter, não no template) |
+| `COMENTARIO` (`interno: false`) | Bolha com {ator}, hora e texto | balão, primária | Sim |
+| `COMENTARIO` (`interno: true`) | Bolha `interna` com "NOTA INTERNA" | cadeado, interna | **Não** |
+| `RESOLVIDA` | "{ator} marcou como Resolvida" + bolha `sucesso` com o comentário | check, resolvida | Sim |
+| `ARQUIVADA` | "{ator} arquivou" + bolha com o motivo (R1) | arquivo, arquivada | Sim, quando a ocorrência é visível para ele |
+| **`RETIRADA_PELO_AUTOR`** | "{ator} retirou a ocorrência" | arquivo, arquivada | Sim |
+| **`REABERTA_PELO_AUTOR`** | "{ator} reabriu a ocorrência" + bolha com a justificativa (R1). Para o admin, acrescenta "Prazo e urgência foram removidos." (R4) | seta circular, aberta | Sim (sem a menção à urgência) |
+| `REABERTA` (admin) | "{ator} reabriu a ocorrência e a colocou Em andamento. O prazo foi removido." (R4) | seta circular, andamento | Sim |
+| `MARCADA_DUPLICADA` | "{ator} marcou como duplicada da #{n}" | elo, duplicada | Sim |
+| `DUPLICADA_DESVINCULADA` | "{ator} desfez o vínculo com a #{n}" | elo, neutro | Sim |
 
 ### 6.4 Ações por status
 
 | Status | Admin | Autor (morador) |
 |---|---|---|
-| ABERTA | Iniciar atendimento · Definir prazo · Marcar como duplicada · Arquivar | Retirar |
-| EM_ANDAMENTO | **Resolver** (primário) · Alterar prazo · Marcar como duplicada · Arquivar | — |
-| RESOLVIDA | Reabrir | Reabrir (até 30 dias) |
-| ARQUIVADA | Reabrir | Reabrir (até 30 dias) |
+| ABERTA | Iniciar atendimento · Definir prazo · Marcar como duplicada\* · Arquivar | Retirar |
+| EM_ANDAMENTO | **Resolver** (primário) · Alterar prazo · Marcar como duplicada\* · Arquivar | — |
+| RESOLVIDA | Reabrir (vai para Em andamento e limpa o prazo) | Reabrir em até 30 dias (vai para Aberta e limpa prazo e urgência) |
+| ARQUIVADA | Reabrir (vai para Em andamento e limpa o prazo) | Reabrir em até 30 dias (vai para Aberta e limpa prazo e urgência) |
 | DUPLICADA | Desvincular | — |
 
-Triagem e comentário do admin ficam disponíveis em qualquer status.
+\*Não aparece quando a ocorrência é a principal de outras duplicadas (issue #21).
 
+Triagem e comentário do admin ficam disponíveis em qualquer status.
 ---
 
 ## 7. Fluxos principais
@@ -714,10 +780,10 @@ flowchart LR
 ```mermaid
 flowchart TD
   Q["QR ou link"] --> P["/c/:slug"]
-  P -->|Criar meu cadastro| C["/c/:slug/cadastro"]
+  P -->|Criar conta| C["/c/:slug/cadastro"]
   C -->|Enviar cadastro| W["/c/:slug/aguardando-aprovacao"]
   W -.->|admin aprova em /admin/moradores| L["/c/:slug/entrar"]
-  P -->|Já tenho cadastro| L
+  P -->|Entrar| L
   L -->|senha temporária| T["/trocar-senha"]
   L -->|morador| F["/app/ocorrencias"]
   L -->|admin| AP["/admin/painel"]
@@ -736,10 +802,10 @@ stateDiagram-v2
   EM_ANDAMENTO --> RESOLVIDA: Resolver + comentário (admin)
   EM_ANDAMENTO --> ARQUIVADA: Arquivar + motivo (admin)
   EM_ANDAMENTO --> DUPLICADA: Marcar como duplicada (admin)
-  RESOLVIDA --> EM_ANDAMENTO: Reabrir (admin)
-  ARQUIVADA --> EM_ANDAMENTO: Reabrir (admin)
-  RESOLVIDA --> ABERTA: Reabrir + justificativa, até 30 dias (autor)
-  ARQUIVADA --> ABERTA: Reabrir + justificativa, até 30 dias (autor)
+  RESOLVIDA --> EM_ANDAMENTO: Reabrir, limpa prazo (admin)
+  ARQUIVADA --> EM_ANDAMENTO: Reabrir, limpa prazo (admin)
+  RESOLVIDA --> ABERTA: Reabrir + justificativa, até 30 dias, limpa prazo e urgência (autor)
+  ARQUIVADA --> ABERTA: Reabrir + justificativa, até 30 dias, limpa prazo e urgência (autor)
   DUPLICADA --> EM_ANDAMENTO: Desvincular (admin)
 ```
 
@@ -748,11 +814,11 @@ stateDiagram-v2
 1. Síndico cadastra o condomínio (5.2).
 2. Morador A se cadastra pelo QR (5.3, 5.4).
 3. Síndico aprova (5.17).
-4. A registra uma Reclamação anônima: o texto dinâmico avisa "Só você e a administração…" e o alerta de anonimato aparece (5.10).
+4. A registra uma Reclamação anônima: o texto dinâmico avisa "Só você e a administração…" e o alerta de anonimato aparece (5.10). Depois do envio, A cai no detalhe.
 5. A registra uma Dúvida; B vê no feed só "Bloco A" (5.8).
 6. Síndico tria e define o prazo; vê "Anônimo" na reclamação (5.16).
 7. Síndico resolve, com comentário.
-8. A reabre, com justificativa (5.11).
+8. A reabre, com justificativa (5.11): volta para Aberta, sem prazo e "Não triada" na fila.
 
 ---
 
@@ -765,8 +831,8 @@ stateDiagram-v2
 | Enum | Rótulo |
 |---|---|
 | `ABERTA` · `EM_ANDAMENTO` · `RESOLVIDA` · `ARQUIVADA` · `DUPLICADA` | Aberta · Em andamento · Resolvida · Arquivada · Duplicada |
-| urgência `null` · `BAIXA` · `MEDIA` · `ALTA` | Não triada · Baixa · Média · Alta |
-| papel `SINDICO` · `SUBSINDICO` · `MORADOR` | Síndico · Subsíndico · Morador (o gênero segue o cadastro quando a UI exibe a pessoa: "Ana Lima · Síndica") |
+| urgência `null` · `BAIXA` · `MEDIA` · `ALTA` · `CRITICA` | Não triada · Baixa · Média · Alta · Crítica |
+| papel `SINDICO` · `SUBSINDICO` · `MORADOR` | Síndico(a) · Subsíndico(a) · Morador (o modelo não tem gênero, R9: "Ana Lima · Síndico(a)") |
 | status de usuário `PENDENTE` · `ATIVO` · `INATIVO` · `RECUSADO` | Pendente · Ativo · Inativo · Recusado |
 
 ### 8.2 Tipos no formulário
@@ -776,8 +842,8 @@ stateDiagram-v2
 | Manutenção em área comum | Algo quebrado ou com defeito: elevador, portão, iluminação, vazamento. |
 | Reclamação | Barulho, conduta de vizinho ou de funcionário, uso indevido de área comum. + "Visível só para você e para a administração" |
 | Dúvida | Pergunta sobre regras, horários ou funcionamento do condomínio. |
-| Melhoria | Sugestão para deixar o condomínio melhor. |
-| Mudança ou obra | Aviso ou pedido sobre mudança ou obra em unidade. |
+| Sugestão de melhoria | Sugestão para deixar o condomínio melhor. |
+| Comunicado de mudança ou obra | Aviso de mudança ou de obra em unidade, com datas e horários. |
 
 ### 8.3 Datas e números
 
@@ -790,7 +856,7 @@ stateDiagram-v2
   - depois: `dd/mm/aaaa`.
 - O `<time datetime>` sempre carrega o ISO, e o `title` traz a data completa.
 - **No detalhe:** `dd/mm/aaaa às HH:mm`. Fuso: `America/Sao_Paulo`.
-- **Prazo:** só data (`dd/mm/aaaa`; nas listas, `dd/mm` quando é do ano corrente). Fica atrasado a partir do dia seguinte ao prazo.
+- **Prazo:** só data (`dd/mm/aaaa`; nas listas, `dd/mm` quando é do ano corrente). "Atrasada" vem pronto da API (`atrasada`, R2): a UI não compara datas.
 - **Número:** sempre `#57`; o leitor de tela lê "número 57" via `aria-label` no contexto do título da página ("Ocorrência número 57").
 - **Telefone:** exibido `(11) 91234-5678`.
 
@@ -804,13 +870,13 @@ stateDiagram-v2
 | Justificativa (reabrir) | obrigatório; ≥ 10 | "Conte por que está reabrindo." |
 | Comentário de resolução | obrigatório | "Escreva o que foi feito para resolver." |
 | Motivo (arquivar / recusar) | obrigatório | "Informe o motivo." |
-| Número da duplicada | obrigatório; existente; ≠ a própria; não duplicada | "Informe o número da ocorrência principal." / "Não encontramos a ocorrência #{n}." / "Escolha uma ocorrência diferente desta." / "A #{n} já é duplicada da #{m}. Vincule à #{m}." |
+| Número da duplicada | obrigatório; existente; ≠ a própria; não duplicada; esta não pode ser principal de outras (issue #21) | "Informe o número da ocorrência principal." / "Não encontramos a ocorrência #{n}." / "Escolha uma ocorrência diferente desta." / "A #{n} já é duplicada da #{m}. Vincule à #{m}." / "Esta ocorrência é a principal de outras duplicadas e não pode virar duplicada." |
 | Nome | obrigatório | "Informe seu nome." |
 | Telefone | celular BR válido | "Informe um celular com DDD, como (11) 91234-5678." |
-| Bloco / Apartamento | obrigatório | "Informe o bloco." / "Informe o apartamento." |
+| Bloco / Apartamento | obrigatório para morador; opcional para subsíndico(a) novo | "Informe o bloco." / "Informe o apartamento." |
 | E-mail | formato, se preenchido | "Confira o e-mail." |
 | Senha | ≥ 8 | "A senha precisa ter pelo menos 8 caracteres." |
-| Slug | 3–40, `a-z0-9-`, único | "Use só letras minúsculas, números e hífen." / "Já está em uso. Tente outro." |
+| Slug | 3–40, `a-z0-9-`, único | "Use só letras minúsculas, números e hífen." / "Endereço já em uso. Tente outro." |
 | Prazo | ≥ hoje | "Escolha uma data a partir de hoje." |
 
 ### 8.5 Erros de requisição (fora de campo)
@@ -825,7 +891,7 @@ stateDiagram-v2
 | 409 (versão) | "Esta ocorrência foi alterada por outra pessoa. Recarregue para ver a versão atual e tente de novo." |
 | 409 (transição inválida) | "Esta ação não está mais disponível para esta ocorrência. Recarregue para ver o status atual." |
 | 409 (reabrir fora da janela) | "O prazo de 30 dias para reabrir já terminou." |
-| 409 (limite de admins) | "O condomínio já tem 2 administradores." |
+| 409 (limite de admins) | "O condomínio já tem subsíndico." |
 | 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." |
 
 ### 8.6 Toasts de sucesso
@@ -853,9 +919,23 @@ stateDiagram-v2
 ### 8.7 Textos fixos de regra (não editar sem revisar com produto)
 
 - **Emergência:** "Risco imediato? Fogo, vazamento de gás, alagamento ou pessoa ferida: acione a portaria ou ligue 193 (Bombeiros). Este canal não tem atendimento em tempo real."
-- **Anonimato** (dica): "Ninguém vê quem registrou: nem os outros moradores, nem a administração." **Anonimato** (aviso ligado): "Seu nome não aparece. Evite se identificar no texto: não cite seu nome, seu apartamento ou detalhes que revelem quem você é."
+- **Anonimato** (dica, R8): "Seu nome fica oculto para os outros moradores e para a administração." **Anonimato** (aviso ligado): "Seu nome não aparece. Evite se identificar no texto: não cite seu nome, seu apartamento ou detalhes que revelem quem você é."
 - **Reclamação:** "Visível só para você e para a administração."
 - **Urgência** (admin): "O morador não vê a urgência."
+- **Motivo de arquivamento** (R1, dica no modal do admin):
+  - ocorrência pública: "O autor e os moradores do condomínio veem este motivo. Para detalhes sensíveis, use uma nota interna."
+  - ocorrência restrita: "Só o autor e a administração veem este motivo. Para detalhes sensíveis, use uma nota interna."
+- **Justificativa de reabertura** (R1, dica no modal do morador):
+  - pública: "A administração e os moradores do condomínio veem esta justificativa."
+  - restrita: "Só você e a administração veem esta justificativa."
+- **Comentário de resolução** (dica no modal): "Comentário público: quem vê a ocorrência lê este texto."
+- **Triagem que restringe** (aviso inline, issue #17): "Ao salvar, a ocorrência deixará de ser pública: sai do feed e fica visível só para o autor e a administração."
+- **Triagem que torna pública** (R5, `alertdialog`):
+  - título: "Tornar a ocorrência #{n} pública?";
+  - identificada: "Ao mudar de Reclamação para {tipo}, todos os moradores ativos passam a ver a ocorrência no feed: o bloco do autor, a descrição e os comentários públicos. Notas internas continuam só com a administração.";
+  - anônima: "Ao mudar de Reclamação para {tipo}, todos os moradores ativos passam a ver a ocorrência no feed: a descrição e os comentários públicos. O autor continua anônimo. Notas internas continuam só com a administração.";
+  - botões: "Manter restrita" (foco inicial) e "Tornar pública".
+- **Reabrir** (morador): "A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração." Depois da janela: "Prazo para reabrir encerrado em {data}. Se o problema voltou, registre uma nova ocorrência."
 - **Nota interna:** "Só a administração vê esta nota."
 
 ---
@@ -884,7 +964,7 @@ Piso: **WCAG 2.2 AA**. Os itens abaixo valem para revisão de PR.
 **Teclado**
 - Tudo operável com Tab, Shift+Tab, Enter, Espaço, Esc e setas (nos radios).
 - O primeiro item de toda página é o link "Pular para o conteúdo".
-- A ordem do DOM é a ordem visual. Na coluna de gestão em `xl`, o DOM mantém a gestão **depois** da descrição, como no celular.
+- A ordem do DOM é a ordem visual. No detalhe do admin, a Gestão existe uma só vez no DOM, **depois** da descrição, como no celular. Em `xl`, ela vai para a coluna lateral por posicionamento de grid (5.16), sem `order` e sem duplicar marcação.
 
 **Alvos de toque**
 - ≥ 44 × 44px em todo controle (`min-h-toque`).
@@ -930,22 +1010,24 @@ Piso: **WCAG 2.2 AA**. Os itens abaixo valem para revisão de PR.
 
 **Fazer**
 1. Criar os tokens da seção 2.7 **antes** de qualquer tela (issue #3) e os componentes de `shared/ui` da seção 3 na ordem em que as issues pedem:
-   - #3: botão, campo, select, alerta, toast, modal, bottom-nav, barra, sidebar e estados;
+   - #3: tokens, ícone (Flowbite Icons), botão, campo, select, alerta, toast, modal, bottom-nav, barra, sidebar e estados;
    - #12: opções-cartão, alternador e área de texto;
-   - #13: badges, cartão de ocorrência e timeline.
+   - #13: badges, cartão de ocorrência e timeline;
+   - #11: QR code (biblioteca `qrcode`).
 2. Mapear enum → rótulo, ícone e token num único lugar (ex.: `shared/ui/dominio.ts`), consumindo `packages/contratos`. Os badges recebem o enum, nunca a string pronta.
 3. Toda chamada remota numa tela passa pelos 4 estados de 5.0. O "carregando" do botão bloqueia o clique duplo.
-4. Formulários reativos com as mensagens da seção 8.4. Erro 422 da API mapeado para o campo correspondente.
-5. Guardar a visão e os filtros da fila na URL, e a rolagem ao voltar do detalhe.
-6. Registrar nesta especificação qualquer componente, token ou texto novo no mesmo PR que o introduz.
+4. Regras derivadas vêm prontas da API: `atrasada` (R2), `minha` (autor), `podeReabrirAte` e o recorte de "Não triada" (R3). A UI não recalcula datas nem status.
+5. Formulários reativos com as mensagens da seção 8.4. Erro 422 da API mapeado para o campo correspondente.
+6. Guardar a visão, os filtros e a ordenação da fila (e os chips do feed) na URL, e a rolagem ao voltar do detalhe.
+7. Registrar nesta especificação qualquer componente, token ou texto novo no mesmo PR que o introduz.
 
 **Não fazer**
 - Classe de cor crua do Tailwind ou valor arbitrário (`bg-[#…]`, `p-[13px]`) fora de `shared/ui`.
 - Renderizar urgência, nota interna ou dados do autor anônimo **condicionando só no template**. Se o campo não veio da API, ele não existe; a UI não "esconde" dado recebido.
 - Usar a borda `gray-300` do Flowbite em controles, ou `outline-none` sem anel.
-- Usar `initFlowbite()` ou o JS do Flowbite em modal, drawer, dropdown e tabs.
+- Usar `initFlowbite()` ou qualquer JS do Flowbite (ADR-006).
 - Bottom-nav em tela empilhada; mais de um botão primário por bloco.
-- Fonte, biblioteca de ícones ou de componentes nova sem aprovação (ver Pendências: ícones e QR code).
+- Fonte ou biblioteca nova sem aprovação. As aprovadas para a UI são: Flowbite (marcação e classes), Flowbite Icons (SVG inline) e `qrcode`.
 
 ---
 
@@ -956,13 +1038,13 @@ Piso: **WCAG 2.2 AA**. Os itens abaixo valem para revisão de PR.
 | Arquivo | Tela | Cenário |
 |---|---|---|
 | `nova-ocorrencia.html` | 5.10 | Reclamação selecionada, anonimato ligado (aviso visível) |
-| `feed.html` | 5.8 | 5 cards: em andamento + atrasada, anônima, da própria pessoa, resolvida, arquivada |
-| `detalhe-morador.html` | 5.11 | Ocorrência própria RESOLVIDA dentro da janela de reabertura, timeline com prazo, comentários e resolução |
-| `fila-admin.html` | 5.14 | Visão "Em aberto"; cards abaixo de 768px, tabela acima; o bottom sheet de filtros e o drawer de menu abrem de verdade (`<dialog>`) |
-| `detalhe-admin.html` | 5.16 | Reclamação anônima ABERTA não triada, com nota interna; o seletor Público/Nota interna troca a dica e o botão |
-| `estados.html` | 5.0 | Skeleton, vazios, erro, parcial, validação, toasts, conflito, avisos do detalhe e 4 modais |
+| `feed.html` | 5.8 | Chips por tipo e 5 cards: em andamento + atrasada, anônima, da própria pessoa, resolvida, arquivada |
+| `detalhe-morador.html` | 5.11 | Ocorrência própria RESOLVIDA dentro da janela de reabertura, com linha de prazo e timeline com prazo, comentários e resolução |
+| `fila-admin.html` | 5.14 | Visão "Em aberto", com Crítica + Atrasada lado a lado e Restrita nas reclamações. Cards abaixo de 768px, tabela acima. Filtros de tipo, urgência, origem e ordenação. O bottom sheet de filtros e o drawer de menu abrem de verdade (`<dialog>`) |
+| `detalhe-admin.html` | 5.16 | Reclamação anônima ABERTA não triada, com nota interna. A Gestão é única no DOM (coluna lateral em 1280px por grid). O toggle "Nota interna" troca a dica, o botão e o tom do card |
+| `estados.html` | 5.0 | Skeleton, vazios, erro, parcial, validação, toasts, conflito, avisos do detalhe, 6 modais (inclui arquivar com dica condicional e a confirmação de tornar pública) e a legenda de badges |
 
-Os ícones dos mockups são um sprite SVG próprio e provisório (ver Pendências).
+Os ícones dos mockups são um sprite SVG próprio e provisório. Na implementação, eles vêm do Flowbite Icons, exceto as barras de urgência (1 a 4), que são SVG próprio.
 
 ---
 
@@ -970,18 +1052,22 @@ Os ícones dos mockups são um sprite SVG próprio e provisório (ver Pendência
 
 | # | Pendência | Por que importa | Quem decide |
 |---|---|---|---|
-| 1 | **Enum de urgência.** A proposta é `BAIXA`, `MEDIA` e `ALTA`; o plano não fixa os níveis | Badges, filtros e painel dependem disso | `beckenbauer` em `packages/contratos` (issue #17), com produto |
-| 2 | **Nomes dos enums de tipo e de evento** da timeline (6.3) | A UI mapeia enum → rótulo; nomes diferentes quebram o mapeamento | `beckenbauer` (issues #12, #13) |
-| 3 | **Prazo e "Atrasada" visíveis ao morador.** A especificação assume que sim, por transparência; o plano não diz | Se não forem visíveis, saem do card e do detalhe do morador e o presenter não os envia | Produto |
-| 4 | **Campos que a UI precisa no presenter do morador:** `ehAutor` (ações, "Sua", "Você"), `podeReabrirAte` (data-limite da janela) e o número e status da principal quando DUPLICADA | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
-| 5 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (validação da API é a fonte) |
-| 6 | **Bloco/apto do síndico profissional**, que pode não morar no condomínio | O cadastro do condomínio (5.2) pede bloco e apto | Produto |
-| 7 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
-| 8 | **Slug editável.** A especificação o deixa somente leitura no MVP | Trocar o slug invalida os QR codes impressos | Produto |
-| 9 | **Aba "Inativos" em Moradores.** A issue #8 cita só Pendentes, Ativos e Recusados | Sem ela, não há onde reativar | Produto / issue #8 |
-| 10 | **`initFlowbite()` vs. comportamento no Angular** (seção 3). O plano diz para usar `initFlowbite()` | Acessibilidade de modal e drawer | `beckham` + `guardiola` |
-| 11 | **Biblioteca de ícones:** proposta de SVG inline copiado do Flowbite Icons (MIT, sem pacote npm) ou manter o sprite próprio dos mockups | Regra: nenhuma biblioteca nova sem aprovação | Você (aprovação) |
-| 12 | **Biblioteca de QR code** para gerar e baixar o PNG (issue #11) | Não existe no stack aprovado | Você (aprovação) / `beckham` |
-| 13 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
-| 14 | **Tema escuro**, fora do MVP | Os tokens já são semânticos; custo estimado: mais uma coluna de valores e uma nova rodada de contraste | Produto, pós-MVP |
-| 15 | **Ordenação da fila:** só "mais recentes", por causa do cursor `(criado_em, id)` | Pode ser útil "prazo mais próximo" ou "urgência" | Produto / `beckenbauer`, pós-MVP |
+| 1 | **Nomes de enum de evento que as issues não citam:** `ASSUMIDA`, `PRAZO_DEFINIDO`, `PRAZO_ALTERADO`, `RESOLVIDA`, `ARQUIVADA`, `REABERTA`, `MARCADA_DUPLICADA`, `DUPLICADA_DESVINCULADA`, `COMENTARIO` (6.3) | A UI mapeia enum → texto; nomes diferentes quebram o mapeamento | `beckenbauer`, em `packages/contratos` |
+| 2 | **Campos que a UI precisa nos presenters:** `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
+| 3 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte) |
+| 4 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
+| 5 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
+| 6 | **Tema escuro**, fora do MVP | Os tokens já são semânticos; custo estimado: mais uma coluna de valores e uma nova rodada de contraste | Produto, pós-MVP |
+
+### 12.1 Divergências com as issues
+
+A especificação mantém estas decisões, diferentes do texto das issues. As issues precisam ser atualizadas.
+
+| Issue | O que a issue diz | O que a especificação define | Motivo |
+|---|---|---|---|
+| #19 | "Resolver sem comentário → botão desabilitado" | O botão fica habilitado. Ao enviar vazio, aparece o erro "Escreva o que foi feito para resolver." no campo, com o foco nele (`ui-botao`, seção 3) | Botão desabilitado não explica o que falta, não recebe foco e o leitor de tela não anuncia o motivo |
+| #19 | Prazo num **modal**, com **datepicker Flowbite** | `<input type="date">` nativo, **inline** na seção "Prazo" da Gestão, com "Definir" e "Alterar" (5.16) | Seletor nativo é melhor no toque e no leitor de tela, não exige JS (ADR-006) e economiza um passo |
+| #19 | "Atrasada" = prazo < hoje **e não fechada** | Só ABERTA ou EM_ANDAMENTO com prazo < hoje, no fuso do condomínio; DUPLICADA também não é atrasada. Vem pronto da API como `atrasada` (R2) | Decisão do orquestrador; recorte idêntico em painel e fila |
+| #19 | "Reabrir → EM_ANDAMENTO" | Além disso, a reabertura **limpa o prazo** (R4) | Decisão do orquestrador; um prazo antigo marcaria a reaberta como atrasada na hora |
+| #20 | Reabrir pelo autor zera a urgência | Igual, e também **limpa o prazo** (R4) | Decisão do orquestrador |
+| #11 | "Subsíndico vê só o link e o QR" | Vê também o cartaz e os dados do condomínio como texto, sem editar (R6) | Decisão do orquestrador; o subsíndico também divulga o link |

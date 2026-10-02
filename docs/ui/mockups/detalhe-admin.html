@@ -27,7 +27,7 @@
       </ul>
     </nav>
     <div class="border-t border-borda p-3">
-      <p class="px-3 text-sm font-semibold">Ana Lima</p><p class="px-3 text-xs text-texto-secundario">Síndica</p>
+      <p class="px-3 text-sm font-semibold">Ana Lima</p><p class="px-3 text-xs text-texto-secundario">Síndico(a)</p>
       <button type="button" class="mt-2 flex min-h-toque w-full items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-sair"/></svg>Sair</button>
     </div>
   </aside>
@@ -53,155 +53,120 @@
       </div>
       <h1 tabindex="-1" class="mt-2 text-xl font-bold leading-7 md:text-2xl md:leading-8">Som alto depois das 22h no bloco B</h1>
 
-      <div class="mt-5 xl:grid xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start xl:gap-8">
-        <!-- Coluna principal -->
-        <div class="space-y-5">
-          <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm leading-5">
-            <dt class="text-texto-suave">Autor</dt>
-            <dd class="flex items-center gap-1.5"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</dd>
-            <dt class="text-texto-suave">Criada em</dt><dd><time datetime="2026-10-02T13:50">02/10/2026 às 13:50</time></dd>
-            <dt class="text-texto-suave">Local</dt><dd class="text-texto-suave">Não informado</dd>
-            <dt class="text-texto-suave">Visível para</dt><dd>Autor e administração</dd>
-          </dl>
+      <!--
+        Um único bloco "Gestão" no DOM. Ordem do DOM (= ordem de foco e de leitura):
+        dados → descrição → gestão → histórico → comentar.
+        Abaixo de 1280px: uma coluna, nessa ordem. A partir de 1280px: grid de 2 colunas; a gestão vai
+        para a coluna 2 ocupando todas as linhas (a última linha é 1fr e absorve a altura extra),
+        sem mudar a ordem do DOM.
+      -->
+      <div class="mt-5 space-y-5 xl:grid xl:grid-cols-[minmax(0,1fr)_22rem] xl:grid-rows-[auto_auto_auto_auto_1fr] xl:gap-x-8 xl:gap-y-5 xl:space-y-0">
+        <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm leading-5 xl:col-start-1 xl:row-start-1">
+          <dt class="text-texto-suave">Autor</dt>
+          <dd class="flex items-center gap-1.5"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-anonimo"/></svg>Anônimo</dd>
+          <dt class="text-texto-suave">Criada em</dt><dd><time datetime="2026-10-02T13:50">02/10/2026 às 13:50</time></dd>
+          <dt class="text-texto-suave">Local</dt><dd class="text-texto-suave">Não informado</dd>
+          <dt class="text-texto-suave">Visível para</dt><dd>Autor e administração</dd>
+        </dl>
 
-          <p class="whitespace-pre-line rounded-cartao border border-borda bg-superficie p-4 text-base leading-6">Desde a semana passada há música alta depois das 22h vindo de um dos andares altos. Ontem foi até 1h da manhã.</p>
+        <p class="whitespace-pre-line rounded-cartao border border-borda bg-superficie p-4 text-base leading-6 xl:col-start-1 xl:row-start-2">Desde a semana passada há música alta depois das 22h vindo de um dos andares altos. Ontem foi até 1h da manhã.</p>
 
-          <!-- Gestão: em < 1280px fica aqui, entre descrição e histórico -->
-          <section aria-labelledby="gestao-titulo" class="rounded-cartao border border-borda bg-superficie xl:hidden" id="gestao-mobile">
-            <h2 id="gestao-titulo" class="border-b border-borda px-4 py-3 text-base font-semibold">Gestão</h2>
-            <div class="divide-y divide-borda">
-              <form class="space-y-4 p-4" aria-labelledby="triagem-titulo">
-                <h3 id="triagem-titulo" class="text-sm font-semibold uppercase tracking-wide text-texto-secundario">Triagem</h3>
-                <div>
-                  <label for="urgencia" class="block text-sm font-semibold">Urgência</label>
-                  <p id="urgencia-dica" class="mt-0.5 text-sm text-texto-secundario">O morador não vê a urgência.</p>
-                  <select id="urgencia" aria-describedby="urgencia-dica" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
-                    <option selected disabled>Escolha a urgência</option><option>Alta</option><option>Média</option><option>Baixa</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="tipo" class="block text-sm font-semibold">Tipo</label>
-                  <p id="tipo-dica" class="mt-0.5 text-sm text-texto-secundario">Escolhido pelo morador: Reclamação.</p>
-                  <select id="tipo" aria-describedby="tipo-dica tipo-efeito" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
-                    <option>Manutenção em área comum</option><option selected>Reclamação</option><option>Dúvida</option><option>Melhoria</option><option>Mudança ou obra</option>
-                  </select>
-                  <p id="tipo-efeito" aria-live="polite" class="mt-2 text-sm text-texto-secundario">Reclamação fica visível só para o autor e para a administração.</p>
-                </div>
-                <button type="submit" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Salvar triagem</button>
-              </form>
-
-              <div class="space-y-3 p-4">
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-texto-secundario">Status</h3>
-                <div class="grid gap-2">
-                  <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil">Iniciar atendimento</button>
-                  <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-link"/></svg>Marcar como duplicada</button>
-                  <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-perigo-texto hover:bg-perigo-suave"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-arquivo"/></svg>Arquivar</button>
-                </div>
-              </div>
-
-              <form class="space-y-2 p-4">
-                <label for="prazo" class="block text-sm font-semibold uppercase tracking-wide text-texto-secundario">Prazo</label>
-                <p id="prazo-dica" class="text-sm text-texto-secundario">Ao definir um prazo, a ocorrência passa para Em andamento.</p>
-                <div class="flex gap-2">
-                  <input id="prazo" type="date" aria-describedby="prazo-dica" min="2026-10-02" class="block min-h-toque min-w-0 flex-1 rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
-                  <button type="submit" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil">Definir</button>
-                </div>
-              </form>
-            </div>
-          </section>
-
-          <!-- Histórico completo (inclui nota interna) -->
-          <section aria-labelledby="historico-titulo" class="pt-3">
-            <h2 id="historico-titulo" class="text-lg font-semibold leading-7">Histórico</h2>
-            <ol class="relative ml-3 mt-4 border-l border-borda">
-              <li class="mb-6 ml-6">
-                <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-superficie-sutil text-texto-secundario ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-mais"/></svg></span>
-                <p class="text-sm leading-5"><strong class="font-semibold">Autor anônimo</strong> registrou a ocorrência como <strong class="font-semibold">Reclamação</strong></p>
-                <time datetime="2026-10-02T13:50" class="text-sm text-texto-suave">02/10/2026 às 13:50</time>
-              </li>
-              <li class="ml-6">
-                <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-interna-fundo text-interna-rotulo ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-cadeado"/></svg></span>
-                <div class="rounded-cartao border border-l-4 border-interna-borda/40 border-l-interna-borda bg-interna-fundo p-3">
-                  <p class="flex flex-wrap items-baseline gap-x-2 text-sm">
-                    <span class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-interna-rotulo"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Nota interna</span>
-                    <strong class="font-semibold text-texto">Subsíndico</strong><time datetime="2026-10-02T14:05" class="text-texto-suave">14:05</time>
-                  </p>
-                  <p class="mt-1 text-base leading-6 text-interna-texto">Outros moradores do 8º andar já comentaram o mesmo com a portaria. Vou pedir o registro de ocorrências do porteiro da noite.</p>
-                </div>
-              </li>
-            </ol>
-          </section>
-
-          <!-- Comentário do admin: público ou nota interna -->
-          <form class="rounded-cartao border border-borda bg-superficie p-4" novalidate>
-            <fieldset>
-              <legend class="text-sm font-semibold">Novo comentário</legend>
-              <div class="mt-2 grid grid-cols-2 gap-2" role="radiogroup">
-                <label class="flex min-h-toque cursor-pointer items-center justify-center gap-2 rounded-controle border border-borda-controle px-3 text-sm font-semibold has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:text-primaria">
-                  <input type="radio" name="visibilidade" value="publico" checked class="accent-primaria">Público
-                </label>
-                <label class="flex min-h-toque cursor-pointer items-center justify-center gap-2 rounded-controle border border-borda-controle px-3 text-sm font-semibold has-[:checked]:border-interna-borda has-[:checked]:bg-interna-fundo has-[:checked]:text-interna-rotulo">
-                  <input type="radio" name="visibilidade" value="interno" class="accent-amber-600">Nota interna
-                </label>
-              </div>
-            </fieldset>
-            <label for="comentario" class="sr-only">Comentário</label>
-            <p id="comentario-dica" class="mt-3 text-sm text-texto-secundario">O autor vê este comentário.</p>
-            <textarea id="comentario" rows="3" maxlength="2000" aria-describedby="comentario-dica" class="mt-2 block w-full rounded-controle border border-borda-controle bg-superficie px-3 py-2.5 text-base leading-6 focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
-            <div class="mt-3 flex justify-end">
-              <button type="submit" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover md:w-auto">Publicar comentário</button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Gestão em coluna lateral a partir de 1280px (mesmo conteúdo do bloco acima) -->
-        <aside class="sticky top-6 hidden rounded-cartao border border-borda bg-superficie xl:block" aria-labelledby="gestao-titulo-lateral">
-          <h2 id="gestao-titulo-lateral" class="border-b border-borda px-4 py-3 text-base font-semibold">Gestão</h2>
+        <!-- Gestão: único no DOM -->
+        <section aria-labelledby="gestao-titulo" class="rounded-cartao border border-borda bg-superficie xl:sticky xl:top-6 xl:col-start-2 xl:row-start-1 xl:row-end-6 xl:self-start">
+          <h2 id="gestao-titulo" class="border-b border-borda px-4 py-3 text-base font-semibold">Gestão</h2>
           <div class="divide-y divide-borda">
-            <form class="space-y-4 p-4">
-              <h3 class="text-sm font-semibold uppercase tracking-wide text-texto-secundario">Triagem</h3>
+            <form class="space-y-4 p-4" aria-labelledby="triagem-titulo">
+              <h3 id="triagem-titulo" class="text-sm font-semibold uppercase tracking-wide text-texto-secundario">Triagem</h3>
               <div>
-                <label for="urgencia-l" class="block text-sm font-semibold">Urgência</label>
-                <p class="mt-0.5 text-sm text-texto-secundario">O morador não vê a urgência.</p>
-                <select id="urgencia-l" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-sm"><option selected disabled>Escolha a urgência</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+                <label for="urgencia" class="block text-sm font-semibold">Urgência</label>
+                <p id="urgencia-dica" class="mt-0.5 text-sm text-texto-secundario">O morador não vê a urgência.</p>
+                <select id="urgencia" aria-describedby="urgencia-dica" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+                  <option selected disabled>Escolha a urgência</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option>
+                </select>
               </div>
               <div>
-                <label for="tipo-l" class="block text-sm font-semibold">Tipo</label>
-                <p class="mt-0.5 text-sm text-texto-secundario">Escolhido pelo morador: Reclamação.</p>
-                <select id="tipo-l" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-sm"><option>Manutenção em área comum</option><option selected>Reclamação</option><option>Dúvida</option><option>Melhoria</option><option>Mudança ou obra</option></select>
+                <label for="tipo" class="block text-sm font-semibold">Tipo</label>
+                <p id="tipo-dica" class="mt-0.5 text-sm text-texto-secundario">Escolhido pelo morador: Reclamação.</p>
+                <select id="tipo" aria-describedby="tipo-dica tipo-efeito" class="mt-2 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+                  <option>Manutenção em área comum</option><option selected>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option>
+                </select>
+                <p id="tipo-efeito" aria-live="polite" class="mt-2 text-sm text-texto-secundario">Reclamação fica visível só para o autor e para a administração.</p>
               </div>
               <button type="submit" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Salvar triagem</button>
             </form>
+
             <div class="space-y-3 p-4">
               <h3 class="text-sm font-semibold uppercase tracking-wide text-texto-secundario">Status</h3>
               <div class="grid gap-2">
-                <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil">Iniciar atendimento</button>
-                <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-link"/></svg>Marcar como duplicada</button>
-                <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle px-4 text-sm font-semibold text-perigo-texto hover:bg-perigo-suave"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-arquivo"/></svg>Arquivar</button>
+                <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil">Iniciar atendimento</button>
+                <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-link"/></svg>Marcar como duplicada</button>
+                <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-perigo-texto hover:bg-perigo-suave"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-arquivo"/></svg>Arquivar</button>
               </div>
             </div>
+
             <form class="space-y-2 p-4">
-              <label for="prazo-l" class="block text-sm font-semibold uppercase tracking-wide text-texto-secundario">Prazo</label>
-              <p class="text-sm text-texto-secundario">Ao definir um prazo, a ocorrência passa para Em andamento.</p>
+              <label for="prazo" class="block text-sm font-semibold uppercase tracking-wide text-texto-secundario">Prazo</label>
+              <p id="prazo-dica" class="text-sm text-texto-secundario">Ao definir um prazo, a ocorrência passa para Em andamento.</p>
               <div class="flex gap-2">
-                <input id="prazo-l" type="date" class="block min-h-toque min-w-0 flex-1 rounded-controle border border-borda-controle px-3 text-sm">
-                <button type="submit" class="inline-flex min-h-toque items-center rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil">Definir</button>
+                <input id="prazo" type="date" aria-describedby="prazo-dica" min="2026-10-02" class="block min-h-toque min-w-0 flex-1 rounded-controle border border-borda-controle bg-superficie px-3 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+                <button type="submit" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold hover:bg-superficie-sutil">Definir</button>
               </div>
             </form>
           </div>
-        </aside>
+        </section>
+
+        <!-- Histórico completo (inclui nota interna) -->
+        <section aria-labelledby="historico-titulo" class="pt-3 xl:col-start-1 xl:row-start-3 xl:pt-0">
+          <h2 id="historico-titulo" class="text-lg font-semibold leading-7">Histórico</h2>
+          <ol class="relative ml-3 mt-4 border-l border-borda">
+            <li class="mb-6 ml-6">
+              <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-superficie-sutil text-texto-secundario ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-mais"/></svg></span>
+              <p class="text-sm leading-5"><strong class="font-semibold">Autor</strong> registrou a ocorrência como <strong class="font-semibold">Reclamação</strong></p>
+              <time datetime="2026-10-02T13:50" class="text-sm text-texto-suave">02/10/2026 às 13:50</time>
+            </li>
+            <li class="ml-6">
+              <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-interna-fundo text-interna-rotulo ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-cadeado"/></svg></span>
+              <div class="rounded-cartao border border-l-4 border-interna-borda/40 border-l-interna-borda bg-interna-fundo p-3">
+                <p class="flex flex-wrap items-baseline gap-x-2 text-sm">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-interna-rotulo"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Nota interna</span>
+                  <strong class="font-semibold text-texto">Subsíndico(a)</strong><time datetime="2026-10-02T14:05" class="text-texto-suave">14:05</time>
+                </p>
+                <p class="mt-1 text-base leading-6 text-interna-texto">Outros moradores do 8º andar já comentaram o mesmo com a portaria. Vou pedir o registro de ocorrências do porteiro da noite.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Comentário do admin: toggle "Nota interna" (issue #18) -->
+        <form id="form-comentario" class="rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido has-[#nota-interna:checked]:border-interna-borda has-[#nota-interna:checked]:bg-interna-fundo xl:col-start-1 xl:row-start-4" novalidate>
+          <div class="flex items-start justify-between gap-4">
+            <label for="comentario" class="pt-2.5 text-sm font-semibold">Novo comentário</label>
+            <label for="nota-interna" class="flex min-h-toque cursor-pointer items-center gap-3">
+              <span class="text-sm font-semibold">Nota interna</span>
+              <span class="relative inline-flex shrink-0 items-center">
+                <input id="nota-interna" type="checkbox" role="switch" aria-describedby="comentario-dica" class="peer sr-only">
+                <span class="h-7 w-12 rounded-full bg-borda-controle transition-colors duration-rapido peer-checked:bg-interna-rotulo peer-focus-visible:ring-2 peer-focus-visible:ring-primaria-foco peer-focus-visible:ring-offset-2"></span>
+                <span class="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-rapido peer-checked:translate-x-5"></span>
+              </span>
+            </label>
+          </div>
+          <p id="comentario-dica" aria-live="polite" class="mt-1 flex items-center gap-1.5 text-sm text-texto-secundario">O autor vê este comentário.</p>
+          <textarea id="comentario" rows="3" maxlength="2000" aria-describedby="comentario-dica" class="mt-2 block w-full rounded-controle border border-borda-controle bg-superficie px-3 py-2.5 text-base leading-6 focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
+          <div class="mt-3 flex justify-end">
+            <button id="comentario-enviar" type="submit" class="inline-flex min-h-toque w-full items-center justify-center rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover md:w-auto">Publicar comentário</button>
+          </div>
+        </form>
       </div>
     </main>
   </div>
 
   <script>
-    // Só para o mockup: a dica e o botão acompanham a escolha Público / Nota interna.
-    document.querySelectorAll('input[name="visibilidade"]').forEach((r) => r.addEventListener('change', () => {
-      const interno = r.value === 'interno' && r.checked;
+    // Só para o mockup: a dica e o botão acompanham o toggle "Nota interna".
+    document.getElementById('nota-interna').addEventListener('change', (e) => {
+      const interno = e.target.checked;
       document.getElementById('comentario-dica').textContent = interno ? 'Só a administração vê esta nota.' : 'O autor vê este comentário.';
-      const btn = document.getElementById('comentario').closest('form').querySelector('button[type=submit]');
-      btn.textContent = interno ? 'Salvar nota interna' : 'Publicar comentário';
-    }));
+      document.getElementById('comentario-enviar').textContent = interno ? 'Salvar nota interna' : 'Publicar comentário';
+    });
   </script>
 </body>
 </html>

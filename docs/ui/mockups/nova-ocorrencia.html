@@ -55,14 +55,14 @@
         <legend class="text-sm font-semibold leading-5">Tipo da ocorrência</legend>
         <div class="mt-2 space-y-2">
           <label class="flex min-h-toque cursor-pointer gap-3 rounded-controle border border-borda bg-superficie p-3 hover:border-gray-300 has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:ring-1 has-[:checked]:ring-primaria">
-            <input type="radio" name="tipo" value="MANUTENCAO" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
+            <input type="radio" name="tipo" value="MANUTENCAO_AREA_COMUM" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
             <span class="flex-1">
               <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção em área comum</span>
               <span class="mt-0.5 block text-sm text-texto-secundario">Algo quebrado ou com defeito: elevador, portão, iluminação, vazamento.</span>
             </span>
           </label>
           <label class="flex min-h-toque cursor-pointer gap-3 rounded-controle border border-borda bg-superficie p-3 hover:border-gray-300 has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:ring-1 has-[:checked]:ring-primaria">
-            <input type="radio" name="tipo" value="RECLAMACAO" checked class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
+            <input type="radio" name="tipo" value="RECLAMACAO_BARULHO" checked class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
             <span class="flex-1">
               <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span>
               <span class="mt-0.5 block text-sm text-texto-secundario">Barulho, conduta de vizinho ou de funcionário, uso indevido de área comum.</span>
@@ -70,24 +70,24 @@
             </span>
           </label>
           <label class="flex min-h-toque cursor-pointer gap-3 rounded-controle border border-borda bg-superficie p-3 hover:border-gray-300 has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:ring-1 has-[:checked]:ring-primaria">
-            <input type="radio" name="tipo" value="DUVIDA" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
+            <input type="radio" name="tipo" value="DUVIDA_REGRAS" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
             <span class="flex-1">
               <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-duvida"/></svg>Dúvida</span>
               <span class="mt-0.5 block text-sm text-texto-secundario">Pergunta sobre regras, horários ou funcionamento do condomínio.</span>
             </span>
           </label>
           <label class="flex min-h-toque cursor-pointer gap-3 rounded-controle border border-borda bg-superficie p-3 hover:border-gray-300 has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:ring-1 has-[:checked]:ring-primaria">
-            <input type="radio" name="tipo" value="MELHORIA" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
+            <input type="radio" name="tipo" value="SUGESTAO_MELHORIA" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
             <span class="flex-1">
-              <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-melhoria"/></svg>Melhoria</span>
+              <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão de melhoria</span>
               <span class="mt-0.5 block text-sm text-texto-secundario">Sugestão para deixar o condomínio melhor.</span>
             </span>
           </label>
           <label class="flex min-h-toque cursor-pointer gap-3 rounded-controle border border-borda bg-superficie p-3 hover:border-gray-300 has-[:checked]:border-primaria has-[:checked]:bg-primaria-suave has-[:checked]:ring-1 has-[:checked]:ring-primaria">
-            <input type="radio" name="tipo" value="MUDANCA_OBRA" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
+            <input type="radio" name="tipo" value="COMUNICADO_MUDANCA_OBRA" class="mt-0.5 h-5 w-5 shrink-0 border-borda-controle accent-primaria">
             <span class="flex-1">
-              <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-obra"/></svg>Mudança ou obra</span>
-              <span class="mt-0.5 block text-sm text-texto-secundario">Aviso ou pedido sobre mudança ou obra em unidade.</span>
+              <span class="flex items-center gap-2 text-sm font-semibold"><svg class="h-5 w-5 text-texto-secundario" aria-hidden="true"><use href="#i-obra"/></svg>Comunicado de mudança ou obra</span>
+              <span class="mt-0.5 block text-sm text-texto-secundario">Aviso de mudança ou de obra em unidade, com datas e horários.</span>
             </span>
           </label>
         </div>
@@ -127,8 +127,8 @@
       <div class="rounded-cartao border border-borda bg-superficie p-4">
         <label for="anonima" class="flex min-h-toque cursor-pointer items-start justify-between gap-4">
           <span>
-            <span class="block text-sm font-semibold leading-5">Registrar como anônima</span>
-            <span id="anonima-dica" class="mt-0.5 block text-sm text-texto-secundario">Ninguém vê quem registrou: nem os outros moradores, nem a administração.</span>
+            <span class="block text-sm font-semibold leading-5">Registrar anonimamente</span>
+            <span id="anonima-dica" class="mt-0.5 block text-sm text-texto-secundario">Seu nome fica oculto para os outros moradores e para a administração.</span>
           </span>
           <span class="relative mt-0.5 inline-flex shrink-0 items-center">
             <input id="anonima" type="checkbox" role="switch" checked aria-describedby="anonima-dica anonima-aviso" class="peer sr-only">

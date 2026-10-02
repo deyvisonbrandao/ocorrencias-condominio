@@ -14,7 +14,7 @@
   <!-- Tela empilhada (sem bottom-nav). Cenário: ocorrência da própria pessoa, RESOLVIDA, dentro da janela de 30 dias. -->
   <header class="sticky top-0 z-30 border-b border-borda bg-superficie">
     <div class="mx-auto flex h-14 max-w-conteudo items-center gap-1 px-2 md:hidden">
-      <a href="feed.html" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil hover:text-texto" aria-label="Voltar">
+      <a href="feed.html" class="inline-flex h-toque w-toque items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil hover:text-texto" aria-label="Voltar para ocorrências">
         <svg class="h-6 w-6" aria-hidden="true"><use href="#i-voltar"/></svg>
       </a>
       <p class="truncate text-base font-semibold">Ocorrência #57</p>
@@ -48,6 +48,7 @@
       <dt class="text-texto-suave">Registrada por</dt><dd class="text-texto">Você · Bloco B</dd>
       <dt class="text-texto-suave">Criada em</dt><dd><time datetime="2026-09-30T19:40">30/09/2026 às 19:40</time></dd>
       <dt class="text-texto-suave">Local</dt><dd>Hall do térreo, bloco B</dd>
+      <dt class="text-texto-suave">Prazo</dt><dd><time datetime="2026-10-03">03/10/2026</time></dd>
       <dt class="text-texto-suave">Resolvida em</dt><dd><time datetime="2026-10-02T10:30">02/10/2026 às 10:30</time></dd>
     </dl>
 
@@ -56,7 +57,7 @@
     <!-- Ação do autor: reabrir (só RESOLVIDA ou ARQUIVADA, até 30 dias após o fechamento) -->
     <section aria-labelledby="reabrir-titulo" class="mt-4 rounded-cartao border border-borda bg-superficie p-4">
       <h2 id="reabrir-titulo" class="text-sm font-semibold leading-5">O problema continua?</h2>
-      <p class="mt-1 text-sm leading-5 text-texto-secundario">Você pode reabrir até <time datetime="2026-11-01">01/11/2026</time>. A ocorrência volta para Aberta e passa por nova análise da administração.</p>
+      <p class="mt-1 text-sm leading-5 text-texto-secundario">Você pode reabrir até <time datetime="2026-11-01">01/11/2026</time>. A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração.</p>
       <button type="button" class="mt-3 inline-flex min-h-toque w-full items-center justify-center gap-2 rounded-controle border border-borda-controle bg-superficie px-4 text-sm font-semibold text-texto hover:bg-superficie-sutil md:w-auto">
         <svg class="h-5 w-5" aria-hidden="true"><use href="#i-reabrir"/></svg>Reabrir ocorrência
       </button>
@@ -73,13 +74,13 @@
         </li>
         <li class="mb-6 ml-6">
           <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-status-andamento-fundo text-status-andamento-texto ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-calendario"/></svg></span>
-          <p class="text-sm leading-5"><strong class="font-semibold">Síndico</strong> definiu o prazo para <strong class="font-semibold">03/10/2026</strong> e a ocorrência passou para <strong class="font-semibold">Em andamento</strong></p>
+          <p class="text-sm leading-5"><strong class="font-semibold">Síndico(a)</strong> definiu o prazo para <strong class="font-semibold">03/10/2026</strong> e a ocorrência passou para <strong class="font-semibold">Em andamento</strong></p>
           <time datetime="2026-10-01T08:12" class="text-sm text-texto-suave">01/10/2026 às 08:12</time>
         </li>
         <li class="mb-6 ml-6">
           <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-primaria-suave text-primaria ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-balao"/></svg></span>
           <div class="rounded-cartao border border-borda bg-superficie p-3">
-            <p class="flex flex-wrap items-baseline gap-x-2 text-sm"><strong class="font-semibold">Síndico</strong><time datetime="2026-10-01T08:13" class="text-texto-suave">01/10 às 08:13</time></p>
+            <p class="flex flex-wrap items-baseline gap-x-2 text-sm"><strong class="font-semibold">Síndico(a)</strong><time datetime="2026-10-01T08:13" class="text-texto-suave">01/10 às 08:13</time></p>
             <p class="mt-1 text-base leading-6">Já chamamos o eletricista. Ele deve vir amanhã de manhã.</p>
           </div>
         </li>
@@ -92,7 +93,7 @@
         </li>
         <li class="ml-6">
           <span class="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-status-resolvida-fundo text-status-resolvida-texto ring-4 ring-superficie-app" aria-hidden="true"><svg class="h-3.5 w-3.5"><use href="#i-check"/></svg></span>
-          <p class="text-sm leading-5"><strong class="font-semibold">Síndico</strong> marcou como <strong class="font-semibold">Resolvida</strong></p>
+          <p class="text-sm leading-5"><strong class="font-semibold">Síndico(a)</strong> marcou como <strong class="font-semibold">Resolvida</strong></p>
           <div class="mt-2 rounded-cartao border border-sucesso-linha bg-sucesso-suave p-3">
             <p class="text-base leading-6 text-texto">Lâmpadas do térreo e do 2º andar trocadas hoje às 10h.</p>
           </div>

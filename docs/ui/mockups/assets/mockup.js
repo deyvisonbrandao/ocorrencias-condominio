@@ -4,6 +4,8 @@
  *
  * 1. Configura o Tailwind Play CDN com os tokens de docs/ui/especificacao.md (seção 2).
  * 2. Injeta o sprite de ícones SVG usado pelos mockups (<svg><use href="#i-..."/></svg>).
+ *    O sprite é provisório e só ilustra a função de cada ícone. Na implementação, os ícones
+ *    vêm do Flowbite Icons, em SVG inline, por um componente de ícone (seção 3 da especificação).
  */
 tailwind.config = {
   theme: {
@@ -28,6 +30,7 @@ tailwind.config = {
           'baixa-fundo': '#f3f4f6', 'baixa-texto': '#374151',
           'media-fundo': '#ffedd5', 'media-texto': '#9a3412',
           'alta-fundo': '#fee2e2', 'alta-texto': '#991b1b',
+          'critica-fundo': '#7f1d1d', 'critica-texto': '#ffffff',
         },
         atrasada: { fundo: '#b91c1c', texto: '#ffffff' },
         interna: { fundo: '#fffbeb', texto: '#78350f', rotulo: '#92400e', borda: '#d97706' },
@@ -82,10 +85,11 @@ const SPRITE = `
     <symbol id="i-manutencao" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.3 5.3L3.5 17.5l3 3 5.9-5.9a4 4 0 0 0 5.3-5.3l-2.4 2.4-2.3-.6-.6-2.3 2.3-2.5z"/></symbol>
     <symbol id="i-obra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
     <symbol id="i-reclamacao" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 10v4h3l6 4.5V5.5L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
-    <!-- Urgência: barras -->
-    <symbol id="i-urg-1" viewBox="0 0 16 16"><rect x="1" y="10" width="3.5" height="5" rx="1" fill="currentColor"/><rect x="6.25" y="6" width="3.5" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.25"/><rect x="11.5" y="2" width="3.5" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.25"/></symbol>
-    <symbol id="i-urg-2" viewBox="0 0 16 16"><rect x="1" y="10" width="3.5" height="5" rx="1" fill="currentColor"/><rect x="6.25" y="6" width="3.5" height="9" rx="1" fill="currentColor"/><rect x="11.5" y="2" width="3.5" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.25"/></symbol>
-    <symbol id="i-urg-3" viewBox="0 0 16 16"><rect x="1" y="10" width="3.5" height="5" rx="1" fill="currentColor"/><rect x="6.25" y="6" width="3.5" height="9" rx="1" fill="currentColor"/><rect x="11.5" y="2" width="3.5" height="13" rx="1" fill="currentColor"/></symbol>
+    <!-- Urgência: 4 barras, preenchidas conforme o nível (1 = Baixa ... 4 = Crítica) -->
+    <symbol id="i-urg-1" viewBox="0 0 19 16"><rect x="0.5" y="11" width="3.5" height="4" rx="1" fill="currentColor"/><rect x="5.75" y="8.5" width="2.5" height="6" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/><rect x="10.5" y="5.5" width="2.5" height="9" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/><rect x="15.25" y="2.5" width="2.5" height="12" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/></symbol>
+    <symbol id="i-urg-2" viewBox="0 0 19 16"><rect x="0.5" y="11" width="3.5" height="4" rx="1" fill="currentColor"/><rect x="5.25" y="8" width="3.5" height="7" rx="1" fill="currentColor"/><rect x="10.5" y="5.5" width="2.5" height="9" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/><rect x="15.25" y="2.5" width="2.5" height="12" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/></symbol>
+    <symbol id="i-urg-3" viewBox="0 0 19 16"><rect x="0.5" y="11" width="3.5" height="4" rx="1" fill="currentColor"/><rect x="5.25" y="8" width="3.5" height="7" rx="1" fill="currentColor"/><rect x="10" y="5" width="3.5" height="10" rx="1" fill="currentColor"/><rect x="15.25" y="2.5" width="2.5" height="12" rx="0.75" fill="none" stroke="currentColor" stroke-width="1"/></symbol>
+    <symbol id="i-urg-4" viewBox="0 0 19 16"><rect x="0.5" y="11" width="3.5" height="4" rx="1" fill="currentColor"/><rect x="5.25" y="8" width="3.5" height="7" rx="1" fill="currentColor"/><rect x="10" y="5" width="3.5" height="10" rx="1" fill="currentColor"/><rect x="14.75" y="2" width="3.5" height="13" rx="1" fill="currentColor"/></symbol>
   </defs>
 </svg>`;
 

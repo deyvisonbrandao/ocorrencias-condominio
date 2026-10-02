@@ -45,7 +45,7 @@
           <div class="flex flex-col items-center rounded-cartao border border-dashed border-gray-300 bg-superficie px-6 py-10 text-center">
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-primaria-suave text-primaria" aria-hidden="true"><svg class="h-6 w-6"><use href="#i-lista"/></svg></span>
             <h3 class="mt-4 text-base font-semibold">Nenhuma ocorrência pública ainda</h3>
-            <p class="mt-1 text-sm text-texto-secundario">Dúvidas, melhorias, manutenções e avisos de obra registrados pelos moradores aparecem aqui.</p>
+            <p class="mt-1 text-sm text-texto-secundario">Dúvidas, sugestões, manutenções e comunicados de obra registrados pelos moradores aparecem aqui.</p>
             <a href="nova-ocorrencia.html" class="mt-5 inline-flex min-h-toque items-center gap-2 rounded-controle bg-primaria px-5 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-mais"/></svg>Registrar ocorrência</a>
           </div>
         </div>
@@ -163,7 +163,7 @@
             <p>Esta ocorrência foi marcada como duplicada da <strong class="font-semibold">#48 · Em andamento</strong>. Os detalhes dela não são públicos.</p>
           </div>
           <div class="rounded-cartao border border-borda bg-superficie p-3 text-sm text-texto-secundario">
-            O prazo para reabrir terminou em 01/11/2026. Se o problema voltou, <a href="nova-ocorrencia.html" class="font-semibold text-primaria underline">registre uma nova ocorrência</a>.
+            Prazo para reabrir encerrado em 01/11/2026. Se o problema voltou, <a href="nova-ocorrencia.html" class="font-semibold text-primaria underline">registre uma nova ocorrência</a>.
           </div>
           <div class="rounded-cartao border border-borda bg-superficie p-3 text-sm text-texto-secundario">
             Só quem registrou e a administração podem comentar nesta ocorrência.
@@ -180,9 +180,9 @@
               <h3 id="m10-t" class="pt-2 text-base font-semibold">Reabrir ocorrência #57</h3>
               <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
             </div>
-            <p class="mt-1 text-sm text-texto-secundario">Ela volta para Aberta e a administração analisa de novo.</p>
+            <p class="mt-1 text-sm text-texto-secundario">Ela volta para Aberta, sem prazo, e a administração analisa de novo.</p>
             <label for="m10-j" class="mt-4 block text-sm font-semibold">Por que você está reabrindo?</label>
-            <textarea id="m10-j" rows="3" class="mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">A lâmpada voltou a queimar ontem.</textarea>
+            <p id="m10-d" class="mt-0.5 text-sm text-texto-secundario">A administração e os moradores do condomínio veem esta justificativa.</p>"mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">A lâmpada voltou a queimar ontem.</textarea>
             <div class="mt-4 flex flex-col-reverse gap-2">
               <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
               <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Reabrir ocorrência</button>
@@ -249,6 +249,70 @@
               <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Vincular à #48</button>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- 14. Modal: arquivar (admin), motivo segue a visibilidade da ocorrência -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e14">
+        <h2 id="e14" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">14 · Modal: arquivar (admin, ocorrência pública)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="dialog" aria-modal="true" aria-labelledby="m14-t" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <div class="flex items-start justify-between gap-3">
+              <h3 id="m14-t" class="pt-2 text-base font-semibold">Arquivar ocorrência #60</h3>
+              <button type="button" class="inline-flex h-toque w-toque shrink-0 items-center justify-center rounded-controle text-texto-secundario hover:bg-superficie-sutil" aria-label="Fechar"><svg class="h-6 w-6" aria-hidden="true"><use href="#i-fechar"/></svg></button>
+            </div>
+            <label for="m14-m" class="mt-3 block text-sm font-semibold">Motivo do arquivamento</label>
+            <p id="m14-d" class="mt-0.5 text-sm text-texto-secundario">O autor e os moradores do condomínio veem este motivo. Para detalhes sensíveis, use uma nota interna.</p>
+            <textarea id="m14-m" rows="3" aria-describedby="m14-d" class="mt-2 block w-full rounded-controle border border-borda-controle px-3 py-2.5 text-base focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"></textarea>
+            <p class="mt-2 text-xs text-texto-secundario">Variante restrita: "Só o autor e a administração veem este motivo. Para detalhes sensíveis, use uma nota interna."</p>
+            <div class="mt-4 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle px-4 text-sm font-semibold text-texto-secundario hover:bg-superficie-sutil">Cancelar</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center gap-2 rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-arquivo"/></svg>Arquivar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. Alertdialog: triagem que torna pública uma Reclamação -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e15">
+        <h2 id="e15" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">15 · Confirmação: tornar pública (triagem)</h2>
+        <div class="flex min-h-[420px] items-end rounded-cartao bg-gray-900/50 p-0 ring-1 ring-borda">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="m15-t" aria-describedby="m15-d" class="w-full rounded-t-2xl bg-superficie p-4 shadow-xl">
+            <h3 id="m15-t" class="pt-2 text-base font-semibold">Tornar a ocorrência #59 pública?</h3>
+            <p id="m15-d" class="mt-1 text-sm text-texto-secundario">Ao mudar de Reclamação para Dúvida, todos os moradores ativos passam a ver a ocorrência no feed: o bloco do autor, a descrição e os comentários públicos. Notas internas continuam só com a administração.</p>
+            <p class="mt-2 text-xs text-texto-secundario">Variante anônima: "…passam a ver a ocorrência no feed: a descrição e os comentários públicos. O autor continua anônimo."</p>
+            <div class="mt-5 flex flex-col-reverse gap-2">
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold hover:bg-superficie-sutil">Manter restrita</button>
+              <button type="button" class="inline-flex min-h-toque items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Tornar pública</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. Legenda de badges -->
+      <section class="w-full max-w-[375px] justify-self-center" aria-labelledby="e16">
+        <h2 id="e16" class="mb-2 text-xs font-semibold uppercase tracking-wide text-texto-secundario">16 · Badges: status, urgência e marcadores</h2>
+        <div class="space-y-4 rounded-cartao bg-superficie p-4 ring-1 ring-borda">
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-resolvida-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-resolvida-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-resolvida-ponto" aria-hidden="true"></span>Resolvida</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-arquivada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-arquivada-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-arquivada-ponto" aria-hidden="true"></span>Arquivada</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-status-duplicada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-duplicada-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-duplicada-ponto" aria-hidden="true"></span>Duplicada</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center rounded-full border border-dashed border-borda-controle bg-superficie px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-alta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-alta-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-3"/></svg><span class="sr-only">Urgência </span>Alta</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center gap-1 rounded-full bg-atrasada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span>
+            <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
+            <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span>
+          </div>
+          <p class="text-xs text-texto-secundario">Crítica e Atrasada são os dois badges sólidos. Distinguem-se pelo ícone (4 barras × relógio) e pelo texto, não pela cor.</p>
         </div>
       </section>
 

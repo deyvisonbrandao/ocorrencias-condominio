@@ -34,7 +34,7 @@
     </nav>
     <div class="border-t border-borda p-3">
       <p class="px-3 text-sm font-semibold">Ana Lima</p>
-      <p class="px-3 text-xs text-texto-secundario">Síndica</p>
+      <p class="px-3 text-xs text-texto-secundario">Síndico(a)</p>
       <button type="button" class="mt-2 flex min-h-toque w-full items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario hover:bg-superficie-sutil hover:text-texto"><svg class="h-5 w-5" aria-hidden="true"><use href="#i-sair"/></svg>Sair</button>
     </div>
   </aside>
@@ -76,21 +76,28 @@
           <svg class="h-5 w-5" aria-hidden="true"><use href="#i-filtro"/></svg>Filtros
         </button>
       </div>
-      <form class="mt-4 hidden items-end gap-3 md:flex" aria-label="Filtros">
+      <form class="mt-4 hidden flex-wrap items-end gap-3 md:flex" aria-label="Filtros">
         <div>
           <label for="f-tipo" class="block text-sm font-semibold">Tipo</label>
-          <select id="f-tipo" class="mt-1 block min-h-toque w-48 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
-            <option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Melhoria</option><option>Mudança ou obra</option>
+          <select id="f-tipo" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option>
           </select>
         </div>
         <div>
           <label for="f-urgencia" class="block text-sm font-semibold">Urgência</label>
-          <select id="f-urgencia" class="mt-1 block min-h-toque w-44 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
-            <option>Todas</option><option>Não triada</option><option>Alta</option><option>Média</option><option>Baixa</option>
+          <select id="f-urgencia" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30">
+            <option>Todas</option><option>Não triada</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option>
           </select>
         </div>
-        <p class="ml-auto self-center text-sm text-texto-secundario" aria-live="polite">12 ocorrências</p>
-      </form>
+        <div>
+          <label for="f-origem" class="block text-sm font-semibold">Origem</label>
+          <select id="f-origem" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"><option>Todas</option><option>Moradores</option><option>Administração</option></select>
+        </div>
+        <div>
+          <label for="f-ordem" class="block text-sm font-semibold">Ordenar por</label>
+          <select id="f-ordem" class="mt-1 block min-h-toque w-40 rounded-controle border border-borda-controle bg-superficie px-3 text-sm focus:border-primaria-foco focus:outline-none focus:ring-2 focus:ring-primaria-foco/30"><option>Mais recentes</option><option>Urgência</option></select>
+        </div>
+        <p class="ml-auto self-center text-sm text-texto-secundario" aria-live="polite">12 ocorrências</p>      </form>
 
       <!-- Lista em cartões abaixo de 768px -->
       <ul class="mt-4 space-y-3 md:hidden" aria-label="Ocorrências">
@@ -100,6 +107,7 @@
               <span class="mr-1 text-sm font-semibold text-texto-secundario">#62</span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span>
               <span class="inline-flex items-center rounded-full border border-dashed border-borda-controle bg-superficie px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
             </div>
             <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Som alto depois das 22h no bloco B</a></h2>
             <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
@@ -113,13 +121,13 @@
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="mr-1 text-sm font-semibold text-texto-secundario">#61</span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
-              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-alta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-alta-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-3"/></svg><span class="sr-only">Urgência </span>Alta</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span>
               <span class="inline-flex items-center gap-1 rounded-full bg-atrasada-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span>
             </div>
             <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Portão da garagem não fecha sozinho</a></h2>
             <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
               <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span><span aria-hidden="true">·</span>
-              <span>Carlos Pereira, A-12</span><span aria-hidden="true">·</span><span class="font-medium text-perigo-texto">Prazo 01/10</span>
+              <span>Carlos Pereira · Bloco A, apto 12</span><span aria-hidden="true">·</span><span class="font-medium text-perigo-texto">Prazo 01/10</span>
             </p>
           </article>
         </li>
@@ -142,12 +150,13 @@
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="mr-1 text-sm font-semibold text-texto-secundario">#59</span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
-              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg><span class="sr-only">Urgência </span>Média</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span>
             </div>
             <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Carro estacionado na vaga de visitante há uma semana</a></h2>
             <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
               <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span><span aria-hidden="true">·</span>
-              <span>Joana Ribeiro, C-41</span><span aria-hidden="true">·</span><span>Prazo 08/10</span>
+              <span>Joana Ribeiro · Bloco C, apto 41</span><span aria-hidden="true">·</span><span>Prazo 08/10</span>
             </p>
           </article>
         </li>
@@ -156,11 +165,11 @@
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="mr-1 text-sm font-semibold text-texto-secundario">#54</span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span>
-              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg><span class="sr-only">Urgência </span>Baixa</span>
             </div>
             <h2 class="mt-2 text-base font-semibold leading-6"><a href="detalhe-admin.html" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">Repintar faixa de pedestres da garagem</a></h2>
             <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-texto-suave">
-              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Melhoria</span><span aria-hidden="true">·</span>
+              <span class="inline-flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</span><span aria-hidden="true">·</span>
               <span>Administração</span><span aria-hidden="true">·</span><span>Sem prazo</span>
             </p>
           </article>
@@ -185,7 +194,7 @@
           <tbody class="divide-y divide-borda">
             <tr class="hover:bg-superficie-app">
               <td class="px-4 py-3 font-semibold text-texto-secundario">#62</td>
-              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Som alto depois das 22h no bloco B</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span></td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Som alto depois das 22h no bloco B</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação<span aria-hidden="true">·</span><svg class="h-4 w-4" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span></td>
               <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-aberta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-aberta-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-aberta-ponto" aria-hidden="true"></span>Aberta</span></td>
               <td class="px-4 py-3"><span class="inline-flex whitespace-nowrap rounded-full border border-dashed border-borda-controle px-2.5 py-0.5 text-xs font-semibold leading-5 text-texto-secundario">Não triada</span></td>
               <td class="px-4 py-3 text-texto-suave">—</td>
@@ -196,9 +205,9 @@
               <td class="px-4 py-3 font-semibold text-texto-secundario">#61</td>
               <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Portão da garagem não fecha sozinho</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</span></td>
               <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
-              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-alta-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-alta-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-3"/></svg>Alta</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-critica-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-critica-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-4"/></svg><span class="sr-only">Urgência </span>Crítica</span></td>
               <td class="px-4 py-3"><span class="block whitespace-nowrap font-medium text-perigo-texto">01/10/2026</span><span class="mt-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-atrasada-fundo px-2 py-0.5 text-xs font-semibold text-atrasada-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-relogio"/></svg>Atrasada</span></td>
-              <td class="hidden px-4 py-3 xl:table-cell">Carlos Pereira<span class="block text-texto-secundario">Bloco A, 12</span></td>
+              <td class="hidden px-4 py-3 xl:table-cell">Carlos Pereira · Bloco A, apto 12</td>
               <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-29T12:10">29/09/2026</time></td>
             </tr>
             <tr class="hover:bg-superficie-app">
@@ -212,18 +221,18 @@
             </tr>
             <tr class="hover:bg-superficie-app">
               <td class="px-4 py-3 font-semibold text-texto-secundario">#59</td>
-              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Carro estacionado na vaga de visitante há uma semana</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação</span></td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Carro estacionado na vaga de visitante há uma semana</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-reclamacao"/></svg>Reclamação<span aria-hidden="true">·</span><svg class="h-4 w-4" aria-hidden="true"><use href="#i-cadeado"/></svg>Restrita</span></td>
               <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
-              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-2"/></svg>Média</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-media-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-media-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-2"/></svg>Média</span></td>
               <td class="whitespace-nowrap px-4 py-3">08/10/2026</td>
-              <td class="hidden px-4 py-3 xl:table-cell">Joana Ribeiro<span class="block text-texto-secundario">Bloco C, 41</span></td>
+              <td class="hidden px-4 py-3 xl:table-cell">Joana Ribeiro · Bloco C, apto 41</td>
               <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-27T18:00">27/09/2026</time></td>
             </tr>
             <tr class="hover:bg-superficie-app">
               <td class="px-4 py-3 font-semibold text-texto-secundario">#54</td>
-              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Repintar faixa de pedestres da garagem</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Melhoria</span></td>
+              <td class="px-4 py-3"><a href="detalhe-admin.html" class="font-semibold text-texto hover:text-primaria hover:underline">Repintar faixa de pedestres da garagem</a><span class="mt-0.5 flex items-center gap-1 text-texto-secundario"><svg class="h-4 w-4" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</span></td>
               <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-status-andamento-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-andamento-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-andamento-ponto" aria-hidden="true"></span>Em andamento</span></td>
-              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-urg-1"/></svg>Baixa</span></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-urgencia-baixa-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-urgencia-baixa-texto"><svg class="h-3.5 w-4" aria-hidden="true"><use href="#i-urg-1"/></svg>Baixa</span></td>
               <td class="px-4 py-3 text-texto-suave">Sem prazo</td>
               <td class="hidden px-4 py-3 xl:table-cell">Administração</td>
               <td class="whitespace-nowrap px-4 py-3 text-texto-secundario"><time datetime="2026-09-25T10:00">25/09/2026</time></td>
@@ -248,15 +257,22 @@
       <div class="space-y-5 overflow-y-auto px-4 py-4">
         <div>
           <label for="m-tipo" class="block text-sm font-semibold">Tipo</label>
-          <select id="m-tipo" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Melhoria</option><option>Mudança ou obra</option></select>
+          <select id="m-tipo" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todos os tipos</option><option>Manutenção em área comum</option><option>Reclamação</option><option>Dúvida</option><option>Sugestão de melhoria</option><option>Comunicado de mudança ou obra</option></select>
         </div>
         <div>
           <label for="m-urgencia" class="block text-sm font-semibold">Urgência</label>
-          <select id="m-urgencia" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todas</option><option>Não triada</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+          <select id="m-urgencia" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todas</option><option>Não triada</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+        </div>
+        <div>
+          <label for="m-origem" class="block text-sm font-semibold">Origem</label>
+          <select id="m-origem" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Todas</option><option>Moradores</option><option>Administração</option></select>
+        </div>
+        <div>
+          <label for="m-ordem" class="block text-sm font-semibold">Ordenar por</label>
+          <select id="m-ordem" class="mt-1 block min-h-toque w-full rounded-controle border border-borda-controle bg-superficie px-3 text-base"><option>Mais recentes</option><option>Urgência</option></select>
         </div>
       </div>
-      <div class="flex gap-3 border-t border-borda px-4 py-3">
-        <button value="limpar" class="inline-flex min-h-toque flex-1 items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold">Limpar</button>
+      <div class="flex gap-3 border-t border-borda px-4 py-3">        <button value="limpar" class="inline-flex min-h-toque flex-1 items-center justify-center rounded-controle border border-borda-controle px-4 text-sm font-semibold">Limpar</button>
         <button value="aplicar" class="inline-flex min-h-toque flex-1 items-center justify-center rounded-controle bg-primaria px-4 text-sm font-semibold text-white hover:bg-primaria-hover">Ver resultados</button>
       </div>
     </form>

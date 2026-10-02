@@ -35,7 +35,18 @@
       Ocorrências públicas dos moradores. Reclamações ficam visíveis só para quem registrou e para a administração.
     </p>
 
-    <ul class="mt-5 space-y-3" aria-label="Ocorrências">
+    <!-- Chips de filtro por tipo (issue #14). Reclamação não entra: nunca aparece no feed. Refletidos na URL (?tipo=...). -->
+    <nav aria-label="Filtrar por tipo" class="-mx-4 mt-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
+      <ul class="flex w-max gap-2">
+        <li><a href="#" aria-current="true" class="inline-flex min-h-toque items-center rounded-full bg-texto px-4 text-sm font-semibold text-white">Todos</a></li>
+        <li><a href="#" class="inline-flex min-h-toque items-center gap-1.5 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium hover:bg-superficie-sutil"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-manutencao"/></svg>Manutenção</a></li>
+        <li><a href="#" class="inline-flex min-h-toque items-center gap-1.5 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium hover:bg-superficie-sutil"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-duvida"/></svg>Dúvida</a></li>
+        <li><a href="#" class="inline-flex min-h-toque items-center gap-1.5 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium hover:bg-superficie-sutil"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</a></li>
+        <li><a href="#" class="inline-flex min-h-toque items-center gap-1.5 rounded-full border border-borda-controle bg-superficie px-4 text-sm font-medium hover:bg-superficie-sutil"><svg class="h-4 w-4 text-texto-secundario" aria-hidden="true"><use href="#i-obra"/></svg>Mudança ou obra</a></li>
+      </ul>
+    </nav>
+
+    <ul class="mt-4 space-y-3" aria-label="Ocorrências">
       <!-- Card: em andamento + atrasada -->
       <li>
         <article class="relative rounded-cartao border border-borda bg-superficie p-4 transition-colors duration-rapido hover:border-gray-300 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-primaria-foco [&:has(a:focus-visible)]:ring-offset-2">
@@ -103,7 +114,7 @@
           <div class="flex items-start justify-between gap-3">
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="inline-flex items-center gap-1.5 rounded-full bg-status-resolvida-fundo px-2.5 py-0.5 text-xs font-semibold leading-5 text-status-resolvida-texto"><span class="h-1.5 w-1.5 rounded-full bg-status-resolvida-ponto" aria-hidden="true"></span>Resolvida</span>
-              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-melhoria"/></svg>Melhoria</span>
+              <span class="inline-flex items-center gap-1 rounded-full border border-borda bg-superficie px-2 py-0.5 text-xs font-medium leading-5 text-texto-secundario"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="#i-melhoria"/></svg>Sugestão</span>
             </div>
             <span class="shrink-0 text-sm font-medium text-texto-suave">#58</span>
           </div>
