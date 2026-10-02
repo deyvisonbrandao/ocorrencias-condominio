@@ -15,7 +15,8 @@ O morador quer poder relatar sem se expor ao síndico ou aos vizinhos. Ao mesmo 
 - O `autor_id` nunca sai na API. O autor reconhece a própria ocorrência por um indicador booleano calculado no servidor a partir da sessão.
 - Para outros moradores, de uma ocorrência não anônima sai só o bloco do autor; de uma anônima, nada do autor.
 - Controllers separados por papel (`/ocorrencias` e `/admin/ocorrencias`), para que um endpoint de admin não reaproveite por acidente o presenter do morador, nem o contrário.
-- Logs e eventos da timeline seguem a mesma regra: evento de ocorrência anônima não expõe o autor nos dados devolvidos.
+- Eventos da timeline seguem a mesma regra: evento de ocorrência anônima não expõe o autor nos dados devolvidos.
+- **Logs nunca contêm o `autor_id` nem qualquer dado de identidade (nome, telefone, id de usuário) ligado a uma ocorrência anônima**, inclusive em log de erro e de requisição. Isso casa com a política de logs sem PII da issue #23.
 - Um e2e de substring verifica que nenhuma resposta sobre ocorrência anônima contém id, nome ou telefone do autor.
 
 ## Consequências
