@@ -1,6 +1,17 @@
 node_modules/
 dist/
+out-tsc/
 .env
+.env.*
+!.env.example
 .angular/
 coverage/
 *.log
+*.tsbuildinfo
+
+.idea/
+.DS_Store
+Thumbs.db
+
+.claude/worktrees/
+.claude/settings.local.json
