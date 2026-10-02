@@ -1,12 +1,14 @@
 import {
+  type ArgumentsHost,
   BadRequestException,
   HttpException,
   HttpStatus,
+  Logger,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ErroApi } from './erro-api.js';
-import { montarCorpoErro } from './filtro-erros.js';
+import { FiltroErros, montarCorpoErro } from './filtro-erros.js';
 
 describe('montarCorpoErro', () => {
   it('preserva code, message e details de ErroApi', () => {
@@ -49,6 +51,21 @@ describe('montarCorpoErro', () => {
     );
   });
 
+  it('só repassa o corpo de ErroApi, não de qualquer HttpException', () => {
+    const corpo = montarCorpoErro(
+      new HttpException(
+        { code: 'QUALQUER', message: 'detalhe interno', extra: 1 },
+        400,
+      ),
+    );
+
+    expect(corpo).toEqual({
+      statusCode: 400,
+      code: 'REQUISICAO_INVALIDA',
+      message: 'A requisição é inválida.',
+    });
+  });
+
   it('usa código genérico para status sem mapeamento', () => {
     expect(montarCorpoErro(new HttpException('teapot', 418)).code).toBe(
       'HTTP_418',
@@ -83,5 +100,44 @@ describe('montarCorpoErro', () => {
     expect(montarCorpoErro({ status: 400, expose: false }).statusCode).toBe(
       500,
     );
+  });
+});
+
+describe('FiltroErros', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function hostCom(headersSent: boolean) {
+    const resposta = { headersSent, status: vi.fn(), json: vi.fn() };
+    resposta.status.mockReturnValue(resposta);
+    const host = {
+      switchToHttp: () => ({
+        getRequest: () => ({ method: 'GET', path: '/api/v1/x' }),
+        getResponse: () => resposta,
+      }),
+    } as unknown as ArgumentsHost;
+    return { host, resposta };
+  }
+
+  it('escreve o corpo padronizado', () => {
+    const { host, resposta } = hostCom(false);
+
+    new FiltroErros().catch(new NotFoundException(), host);
+
+    expect(resposta.status).toHaveBeenCalledWith(404);
+    expect(resposta.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'NAO_ENCONTRADO' }),
+    );
+  });
+
+  it('não tenta responder de novo quando os headers já foram enviados', () => {
+    vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const { host, resposta } = hostCom(true);
+
+    new FiltroErros().catch(new Error('falhou no meio do stream'), host);
+
+    expect(resposta.status).not.toHaveBeenCalled();
+    expect(resposta.json).not.toHaveBeenCalled();
   });
 });

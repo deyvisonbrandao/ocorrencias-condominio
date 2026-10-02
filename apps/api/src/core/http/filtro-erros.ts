@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { CorpoErroApi } from './erro-api.js';
+import { type CorpoErroApi, ErroApi } from './erro-api.js';
 
 const PADROES: Record<number, { code: string; message: string }> = {
   400: { code: 'REQUISICAO_INVALIDA', message: 'A requisição é inválida.' },
@@ -60,15 +60,6 @@ function padraoDoStatus(statusCode: number): { code: string; message: string } {
   );
 }
 
-function ehCorpoErroApi(valor: unknown): valor is CorpoErroApi {
-  return (
-    typeof valor === 'object' &&
-    valor !== null &&
-    typeof (valor as CorpoErroApi).code === 'string' &&
-    typeof (valor as CorpoErroApi).message === 'string'
-  );
-}
-
 // Erros do body-parser (JSON malformado, corpo grande demais) chegam como http-errors, não como HttpException.
 function statusDeErroHttpCliente(erro: unknown): number | undefined {
   if (typeof erro !== 'object' || erro === null) return undefined;
@@ -82,12 +73,15 @@ function statusDeErroHttpCliente(erro: unknown): number | undefined {
 }
 
 export function montarCorpoErro(erro: unknown): CorpoErroApi {
+  if (erro instanceof ErroApi) {
+    return {
+      ...(erro.getResponse() as CorpoErroApi),
+      statusCode: erro.getStatus(),
+    };
+  }
+
   if (erro instanceof HttpException) {
     const statusCode = erro.getStatus();
-    const resposta = erro.getResponse();
-    if (ehCorpoErroApi(resposta)) {
-      return { ...resposta, statusCode };
-    }
     return { statusCode, ...padraoDoStatus(statusCode) };
   }
 
@@ -124,6 +118,9 @@ export class FiltroErros implements ExceptionFilter {
       }
     }
 
+    if (resposta.headersSent) {
+      return;
+    }
     resposta.status(corpo.statusCode).json(corpo);
   }
 }
