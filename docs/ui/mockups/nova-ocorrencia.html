@@ -131,7 +131,7 @@
             <span id="anonima-dica" class="mt-0.5 block text-sm text-texto-secundario">Seu nome fica oculto para os outros moradores e para a administração.</span>
           </span>
           <span class="relative mt-0.5 inline-flex shrink-0 items-center">
-            <input id="anonima" type="checkbox" role="switch" checked aria-describedby="anonima-dica anonima-aviso" class="peer sr-only">
+            <input id="anonima" type="checkbox" role="switch" checked aria-describedby="anonima-dica anonima-aviso" onchange="document.getElementById('anonima-aviso').hidden = !this.checked" class="peer sr-only">
             <span class="h-7 w-12 rounded-full bg-borda-controle transition-colors duration-rapido peer-checked:bg-primaria peer-focus-visible:ring-2 peer-focus-visible:ring-primaria-foco peer-focus-visible:ring-offset-2"></span>
             <span class="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-rapido peer-checked:translate-x-5"></span>
           </span>
