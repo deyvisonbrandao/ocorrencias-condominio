@@ -17,10 +17,13 @@ import {
 export const AMBIENTES = ['development', 'test', 'production'] as const;
 export type Ambiente = (typeof AMBIENTES)[number];
 
+const LIMITE_CONEXOES_PADRAO = 10;
+
 class VariaveisAmbiente {
-  @IsOptional()
-  @IsIn(AMBIENTES, { message: `deve ser um de: ${AMBIENTES.join(', ')}` })
-  NODE_ENV?: Ambiente;
+  @IsIn(AMBIENTES, {
+    message: `é obrigatória e deve ser um de: ${AMBIENTES.join(', ')}`,
+  })
+  NODE_ENV!: Ambiente;
 
   @IsOptional()
   @Type(() => Number)
@@ -45,11 +48,20 @@ class VariaveisAmbiente {
   JWT_SECRET?: string;
 }
 
+export interface ConexaoBanco {
+  host: string;
+  porta: number;
+  usuario: string;
+  senha: string;
+  banco: string;
+  limiteConexoes: number;
+}
+
 export class AppConfig {
   constructor(
     readonly ambiente: Ambiente,
     readonly porta: number,
-    readonly databaseUrl: string,
+    readonly banco: ConexaoBanco,
     readonly swaggerHabilitado: boolean,
     readonly jwtSecret: string | undefined,
   ) {}
@@ -78,6 +90,41 @@ export function carregarArquivoEnv(caminho = ARQUIVO_ENV_RAIZ): void {
   }
 }
 
+const PROBLEMA_URL_INVALIDA =
+  'DATABASE_URL: URL inválida (codifique caracteres especiais da senha, ex.: %23 para #)';
+
+// Nunca repassar o erro original: a mensagem do TypeError/URIError traz a URL inteira, com a senha.
+function lerConexaoBanco(databaseUrl: string): ConexaoBanco | string {
+  let conexao: ConexaoBanco;
+  try {
+    const url = new URL(databaseUrl);
+    conexao = {
+      host: url.hostname,
+      porta: url.port ? Number(url.port) : 3306,
+      usuario: decodeURIComponent(url.username),
+      senha: decodeURIComponent(url.password),
+      banco: decodeURIComponent(url.pathname.slice(1)),
+      limiteConexoes: LIMITE_CONEXOES_PADRAO,
+    };
+    if (url.protocol !== 'mysql:' || !conexao.host || !conexao.banco) {
+      return PROBLEMA_URL_INVALIDA;
+    }
+    const limite = url.searchParams.get('connection_limit');
+    if (limite !== null) {
+      conexao.limiteConexoes = Number(limite);
+      if (
+        !Number.isInteger(conexao.limiteConexoes) ||
+        conexao.limiteConexoes < 1
+      ) {
+        return 'DATABASE_URL: connection_limit deve ser um inteiro positivo';
+      }
+    }
+  } catch {
+    return PROBLEMA_URL_INVALIDA;
+  }
+  return conexao;
+}
+
 export function carregarConfig(env: NodeJS.ProcessEnv): AppConfig {
   const preenchidas = Object.fromEntries(
     Object.entries(env).filter(
@@ -86,16 +133,27 @@ export function carregarConfig(env: NodeJS.ProcessEnv): AppConfig {
   );
   const variaveis = plainToInstance(VariaveisAmbiente, preenchidas);
   const erros = validateSync(variaveis);
-  if (erros.length > 0) {
-    throw new ConfigInvalidaError(
-      erros.map(
-        (erro) =>
-          `${erro.property}: ${[...new Set(Object.values(erro.constraints ?? {}))].join('; ')}`,
-      ),
-    );
+  const problemas = erros.map(
+    (erro) =>
+      `${erro.property}: ${[...new Set(Object.values(erro.constraints ?? {}))].join('; ')}`,
+  );
+
+  const urlValidada = !erros.some((erro) => erro.property === 'DATABASE_URL');
+  const banco = urlValidada
+    ? lerConexaoBanco(variaveis.DATABASE_URL)
+    : undefined;
+  if (typeof banco === 'string') {
+    problemas.push(banco);
+  }
+  if (
+    problemas.length > 0 ||
+    banco === undefined ||
+    typeof banco === 'string'
+  ) {
+    throw new ConfigInvalidaError(problemas);
   }
 
-  const ambiente = variaveis.NODE_ENV ?? 'development';
+  const ambiente = variaveis.NODE_ENV;
   const swaggerHabilitado =
     variaveis.SWAGGER_ENABLED === undefined
       ? ambiente !== 'production'
@@ -104,7 +162,7 @@ export function carregarConfig(env: NodeJS.ProcessEnv): AppConfig {
   return new AppConfig(
     ambiente,
     variaveis.API_PORT ?? 3000,
-    variaveis.DATABASE_URL,
+    banco,
     swaggerHabilitado,
     variaveis.JWT_SECRET,
   );

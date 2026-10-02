@@ -174,7 +174,14 @@ describe('Swagger desligado (e2e)', () => {
             new AppConfig(
               'production',
               3000,
-              'mysql://u:p@localhost:3306/b',
+              {
+                host: 'localhost',
+                porta: 3306,
+                usuario: 'u',
+                senha: 'p',
+                banco: 'b',
+                limiteConexoes: 1,
+              },
               false,
               undefined,
             ),

@@ -10,9 +10,7 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
 
   constructor(config: AppConfig) {
     super({
-      adapter: new PrismaMariaDb(
-        opcoesPool(config.databaseUrl, config.ambiente),
-      ),
+      adapter: new PrismaMariaDb(opcoesPool(config.banco, config.ambiente)),
     });
   }
 
