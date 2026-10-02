@@ -249,7 +249,7 @@ A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, 
   --radius-controle: 0.5rem;  --radius-cartao: 0.75rem;
   --spacing-toque: 2.75rem;  --spacing-barra-inferior: 4rem;
   --container-conteudo: 42rem;  --container-admin: 72rem;
-  --default-transition-duration: 150ms;
+  --default-transition-duration: 150ms;  --transition-duration-rapido: 150ms;  --transition-duration-medio: 200ms;
 }
 ```
 
