@@ -44,7 +44,7 @@
 | Cor primária | Azul `#1d4ed8` (Tailwind `blue-700`), igual ao padrão do Flowbite | Cor de marca própria: não há guia de marca. O azul padrão evita sobrescrever cada exemplo do Flowbite e é trocável pelo token `primaria` quando houver marca. |
 | Fonte | Pilha do sistema (`font-sans` padrão do Tailwind) | Inter (sugerida pela doc do Flowbite): seria fonte nova, sem aprovação, e custa download no 4G. |
 | Tema escuro | Fora do MVP. `color-scheme: light` | Dobraria a verificação de contraste. Os tokens são semânticos, então dá para adicionar o tema depois sem trocar classe nas telas. |
-| Cor do tipo | Badge neutro com ícone | Uma cor por tipo: com 5 status, 3 urgências e 5 tipos, a paleta deixaria de ter significado. |
+| Cor do tipo | Badge neutro com ícone | Uma cor por tipo: com 5 status, 4 urgências e 5 tipos, a paleta deixaria de ter significado. |
 | Urgência | Quatro níveis (`BAIXA`, `MEDIA`, `ALTA`, `CRITICA`), com ícone de 1 a 4 barras, e "Não triada" com borda tracejada. Crítica é sólida | Escala numérica: menos legível. Só cor: reprova "cor nunca é o único portador". |
 | Badges sólidos | Só dois: **Crítica** (`#7f1d1d`, 4 barras) e **Atrasada** (`#b91c1c`, relógio). Os dois se distinguem pelo ícone e pelo texto, nunca pela cor (contraste entre os dois fundos: 1.55) | Atrasada como único sólido: com 4 níveis, a Crítica precisa pesar mais que a Alta tintada. |
 | Modais e drawers | `<dialog>` nativo com `showModal()`, estilizado com classes Flowbite ([ADR-006](../adr/006-flowbite-sem-initflowbite.md)) | Modal JS do Flowbite: não move o foco para dentro, não devolve o foco ao fechar e não prende o Tab. O `<dialog>` faz tudo isso nativamente e sem biblioteca. |
@@ -66,7 +66,7 @@ Decididas na revisão do PR #28 (pelo usuário e pelo orquestrador). A UI só ex
 | R2 | **"Atrasada"** = status ABERTA ou EM_ANDAMENTO **e** `prazo < hoje` no fuso do condomínio. A API calcula e envia `atrasada: boolean` no presenter; **a UI não calcula** | Cards, tabela, detalhe, painel |
 | R3 | **"Não triada"** = `urgencia` nula **e** status ABERTA ou EM_ANDAMENTO. Painel e fila usam o mesmo recorte, então os números batem | 5.13, 5.14 |
 | R4 | **Reabrir limpa o prazo**, seja pelo autor, seja pelo admin. A reabertura pelo autor também zera a urgência (volta para "Não triada") | 5.11, 5.16, 6.3, 6.4 |
-| R5 | Triagem que **torna pública uma Reclamação** pede confirmação em `alertdialog`, com o aviso completo, inclusive no caso identificado | 5.16, 8.7 |
+| R5 | Triagem que **torna pública uma Reclamação** pede confirmação em `alertdialog`, com o aviso completo (todo o histórico público, inclusive o bloco no caso identificado e o motivo e a justificativa, se houver) | 5.16, 8.7 |
 | R6 | O **subsíndico acessa Condomínio em modo leitura**: link, copiar, QR e cartaz, sem editar | 4.2, 5.13, 5.19 |
 | R7 | A tela **Moradores lista só `papel=MORADOR`**. Admins aparecem apenas em Equipe | 5.17 |
 | R8 | O texto do anonimato não faz promessa absoluta: "Seu nome fica oculto para os outros moradores e para a administração." | 5.10, 8.7 |
@@ -505,7 +505,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   6. **Bloco de ação do autor** (só quando `minha: true`):
      - ABERTA: link-botão "Retirar ocorrência" (`perigo-contorno`), que abre um `alertdialog` (`estados.html` #11).
      - RESOLVIDA/ARQUIVADA dentro de 30 dias: card "O problema continua?", com "Você pode reabrir até dd/mm/aaaa. A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração." (R4) e o botão "Reabrir ocorrência".
-     - O botão abre o modal com a justificativa obrigatória (#10). A dica da justificativa segue a visibilidade (R1, textos em 8.7): "A administração e os moradores do condomínio veem esta justificativa." ou "Só você e a administração veem esta justificativa."
+     - O botão abre o modal com a justificativa obrigatória (#10). A dica da justificativa segue a visibilidade (R1, textos em 8.7): "A administração e os moradores do condomínio veem esta justificativa." ou "Hoje, só você e a administração veem esta justificativa. Se a ocorrência ficar pública, ela também aparece."
      - Depois de 30 dias: no lugar do botão, "Prazo para reabrir encerrado em dd/mm/aaaa. Se o problema voltou, registre uma nova ocorrência." (com link; issue #20).
      - EM_ANDAMENTO e DUPLICADA: nada.
   7. **Histórico** (`ui-timeline visao="morador"`).
@@ -924,16 +924,16 @@ stateDiagram-v2
 - **Urgência** (admin): "O morador não vê a urgência."
 - **Motivo de arquivamento** (R1, dica no modal do admin):
   - ocorrência pública: "O autor e os moradores do condomínio veem este motivo. Para detalhes sensíveis, use uma nota interna."
-  - ocorrência restrita: "Só o autor e a administração veem este motivo. Para detalhes sensíveis, use uma nota interna."
+  - ocorrência restrita: "Hoje, só o autor e a administração veem este motivo. Se a ocorrência ficar pública, ele também aparece. Para detalhes sensíveis, use uma nota interna."
 - **Justificativa de reabertura** (R1, dica no modal do morador):
   - pública: "A administração e os moradores do condomínio veem esta justificativa."
-  - restrita: "Só você e a administração veem esta justificativa."
+  - restrita: "Hoje, só você e a administração veem esta justificativa. Se a ocorrência ficar pública, ela também aparece."
 - **Comentário de resolução** (dica no modal): "Comentário público: quem vê a ocorrência lê este texto."
 - **Triagem que restringe** (aviso inline, issue #17): "Ao salvar, a ocorrência deixará de ser pública: sai do feed e fica visível só para o autor e a administração."
 - **Triagem que torna pública** (R5, `alertdialog`):
   - título: "Tornar a ocorrência #{n} pública?";
-  - identificada: "Ao mudar de Reclamação para {tipo}, todos os moradores ativos passam a ver a ocorrência no feed: o bloco do autor, a descrição e os comentários públicos. Notas internas continuam só com a administração.";
-  - anônima: "Ao mudar de Reclamação para {tipo}, todos os moradores ativos passam a ver a ocorrência no feed: a descrição e os comentários públicos. O autor continua anônimo. Notas internas continuam só com a administração.";
+  - identificada: "Ao mudar de Reclamação para {tipo}, a ocorrência entra no feed e todos os moradores ativos passam a ver todo o histórico público: o bloco do autor, a descrição, os comentários públicos e, se houver, o motivo de arquivamento e a justificativa de reabertura. Notas internas continuam só com a administração.";
+  - anônima: "Ao mudar de Reclamação para {tipo}, a ocorrência entra no feed e todos os moradores ativos passam a ver todo o histórico público: a descrição, os comentários públicos e, se houver, o motivo de arquivamento e a justificativa de reabertura. O autor continua anônimo. Notas internas continuam só com a administração.";
   - botões: "Manter restrita" (foco inicial) e "Tornar pública".
 - **Reabrir** (morador): "A ocorrência volta para Aberta, sem prazo, e passa por nova análise da administração." Depois da janela: "Prazo para reabrir encerrado em {data}. Se o problema voltou, registre uma nova ocorrência."
 - **Nota interna:** "Só a administração vê esta nota."
@@ -1053,11 +1053,11 @@ Os ícones dos mockups são um sprite SVG próprio e provisório. Na implementa�
 | # | Pendência | Por que importa | Quem decide |
 |---|---|---|---|
 | 1 | **Nomes de enum de evento que as issues não citam:** `ASSUMIDA`, `PRAZO_DEFINIDO`, `PRAZO_ALTERADO`, `RESOLVIDA`, `ARQUIVADA`, `REABERTA`, `MARCADA_DUPLICADA`, `DUPLICADA_DESVINCULADA`, `COMENTARIO` (6.3) | A UI mapeia enum → texto; nomes diferentes quebram o mapeamento | `beckenbauer`, em `packages/contratos` |
-| 2 | **Campos que a UI precisa nos presenters:** `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
-| 3 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte) |
-| 4 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
-| 5 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
-| 6 | **Tema escuro**, fora do MVP | Os tokens já são semânticos; custo estimado: mais uma coluna de valores e uma nova rodada de contraste | Produto, pós-MVP |
+| 2 | **Ordenação por urgência na fila (#15)** exige cursor composto `(rank_urgencia, criado_em, id)`, com rank Crítica 1 → Baixa 4 e **não triadas no fim** (rank 5, não `NULL` na comparação). Sem isso, "Carregar mais" repete ou pula itens. Vale também para o índice `(condominio_id, status, urgencia, criado_em)` do plano | A fila ordenada por urgência e a paginação dependem disso | `beckenbauer` | `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
+| 4 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte) |
+| 5 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
+| 6 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
+| 7 | **Tema escuro**, fora do MVP | Os tokens já são semânticos; custo estimado: mais uma coluna de valores e uma nova rodada de contraste | Produto, pós-MVP |
 
 ### 12.1 Divergências com as issues
 
