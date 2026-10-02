@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  qualidade:
+    name: Lint, testes e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes unitários
+        run: npm test
+
+      - name: Build de contratos, API e web
+        run: npm run build
+
+  e2e-api:
+    name: e2e da API (MySQL 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: mysql://ocorrencias:ocorrencias-ci@127.0.0.1:3306/ocorrencias
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root-ci
+          MYSQL_DATABASE: ocorrencias
+          MYSQL_USER: ocorrencias
+          MYSQL_PASSWORD: ocorrencias-ci
+          TZ: UTC
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -u root -proot-ci --silent"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+          --health-start-period 30s
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Service container não aceita `command`, então os parâmetros do docker-compose.yml são aplicados por SQL.
+      - name: Alinhar MySQL ao docker-compose (charset, collation e fuso)
+        env:
+          MYSQL_CONTAINER: ${{ job.services.mysql.id }}
+        run: |
+          docker exec -e MYSQL_PWD=root-ci "$MYSQL_CONTAINER" mysql -uroot -e "
+            SET PERSIST character_set_server = 'utf8mb4';
+            SET PERSIST collation_server = 'utf8mb4_0900_ai_ci';
+            SET PERSIST time_zone = '+00:00';
+            ALTER DATABASE ocorrencias CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+          atual=$(docker exec -e MYSQL_PWD=root-ci "$MYSQL_CONTAINER" mysql -uroot -N -B -e \
+            "SELECT CONCAT_WS(' ', VERSION(), @@character_set_server, @@collation_server, @@global.time_zone)")
+          echo "MySQL: $atual"
+          [[ "$atual" == 8.4.*" utf8mb4 utf8mb4_0900_ai_ci +00:00" ]]
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar migrações
+        run: npm run prisma:migrate:deploy -w @ocorrencias/api
+
+      - name: Testes e2e da API
+        run: npm run test:e2e -w @ocorrencias/api
