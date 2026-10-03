@@ -80,6 +80,17 @@ export class CondominiosPublicoService {
     return { id: condominio.id, nome: condominio.nome, slug: condominio.slug };
   }
 
+  async slugDisponivel(slug: string): Promise<{ disponivel: boolean }> {
+    if (!slugValido(slug)) {
+      return { disponivel: false };
+    }
+    const condominio = await this.sistema.condominio.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    return { disponivel: !condominio };
+  }
+
   async executarNoCondominio<T>(
     slug: string,
     bloco: (condominio: CondominioPublico & { id: string }) => Promise<T>,

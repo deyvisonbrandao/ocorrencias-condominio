@@ -90,13 +90,37 @@ export class CondominiosPublicoController {
     return this.servico.cadastrar(dto);
   }
 
+  @Get(':slug/disponibilidade')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary: 'Verifica se um endereço de condomínio está disponível',
+    description:
+      'Considera ocupado qualquer slug reservado, inclusive de condomínios inativos. Não revela dados do condomínio.',
+  })
+  @ApiParam({
+    name: 'slug',
+    example: 'jardim-das-flores',
+    description: `${REGRAS_SLUG.min} a ${REGRAS_SLUG.max} caracteres: a-z, 0-9 e hífen.`,
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: { disponivel: { type: 'boolean', example: true } },
+      required: ['disponivel'],
+    },
+  })
+  verificarDisponibilidade(
+    @Param('slug') slug: string,
+  ): Promise<{ disponivel: boolean }> {
+    return this.servico.slugDisponivel(slug);
+  }
+
   @Get(':slug')
   @Header('Cache-Control', 'no-store')
   @ApiOperation({
     summary: 'Dados públicos do condomínio pelo endereço',
     description:
-      'Usado pela página `/c/:slug` e pela verificação de endereço disponível no autocadastro (404 = disponível). ' +
-      'Condomínio inexistente, inativo ou slug fora do formato respondem o mesmo 404.',
+      'Usado pela página `/c/:slug`. Condomínio inexistente, inativo ou slug fora do formato respondem o mesmo 404.',
   })
   @ApiParam({
     name: 'slug',
