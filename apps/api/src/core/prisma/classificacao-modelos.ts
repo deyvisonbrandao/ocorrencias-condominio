@@ -1,8 +1,5 @@
 import { Prisma } from '../../generated/prisma/client.js';
 
-// escopado: tabela de dado de condomínio, filtrada por condominioId.
-// raiz: o próprio condomínio, filtrado pelo id igual ao do contexto.
-// global: sem dono, passa sem filtro.
 export type Classificacao = 'escopado' | 'raiz' | 'global';
 
 export const CAMPO_CONDOMINIO = 'condominioId';
