@@ -13,8 +13,7 @@ export default [
       {
         path: 'cadastrar-condominio',
         title: 'Cadastre seu condomínio',
-        component: PaginaProvisoria,
-        data: { issue: 5 },
+        loadComponent: () => import('./cadastro-condominio/cadastro-condominio').then((m) => m.CadastroCondominio),
       },
       { path: 'c/:slug', title: 'Condomínio', component: PaginaProvisoria, data: { issue: 7 } },
       { path: 'c/:slug/cadastro', title: 'Criar conta', component: PaginaProvisoria, data: { issue: 7 } },
