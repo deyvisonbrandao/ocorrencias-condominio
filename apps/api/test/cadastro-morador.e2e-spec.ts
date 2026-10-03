@@ -206,9 +206,12 @@ describe('Cadastro do morador (e2e): regras', () => {
       status: 'RECUSADO',
       nome: 'Nome antigo',
     });
-    const antes = await prismaDeTeste().usuario.findUniqueOrThrow({
+    const pedidoAntigo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+    const antes = await prismaDeTeste().usuario.update({
       where: { id },
+      data: { criadoEm: pedidoAntigo },
     });
+    const inicio = Date.now();
 
     const resposta = await cadastrar(
       corpo({ bloco: 'Torre 2', apto: '12', email: '' }),
@@ -233,7 +236,9 @@ describe('Cadastro do morador (e2e): regras', () => {
       status: 'PENDENTE',
       versaoSessao: antes.versaoSessao + 1,
     });
-    expect(depois.criadoEm).toEqual(antes.criadoEm);
+    expect(depois.criadoEm.getTime()).toBeGreaterThanOrEqual(inicio - 1000);
+    expect(depois.criadoEm.getTime()).toBeLessThanOrEqual(Date.now() + 1000);
+    expect(depois.criadoEm).not.toEqual(pedidoAntigo);
 
     const login = (senha: string) =>
       http().post(LOGIN).send({ slug: 'jardim-a', telefone: TELEFONE, senha });

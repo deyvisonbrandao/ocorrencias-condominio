@@ -37,6 +37,8 @@ export function dadosDaReabertura(dados: DadosDoCadastro) {
     status: 'PENDENTE' as const,
     senhaTemporaria: false,
     versaoSessao: { increment: 1 },
+    // criado_em é a data do pedido na fila de Pendentes; o histórico da recusa fica na auditoria.
+    criadoEm: new Date(),
   };
 }
 

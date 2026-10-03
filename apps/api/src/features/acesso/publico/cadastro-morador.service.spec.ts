@@ -158,6 +158,7 @@ describe('CadastroMoradorService', () => {
       status: 'RECUSADO',
     });
 
+    const antes = Date.now();
     await servico.cadastrar('residencial-a', DTO);
 
     expect(usuario.create).not.toHaveBeenCalled();
@@ -174,6 +175,8 @@ describe('CadastroMoradorService', () => {
       senhaTemporaria: false,
       versaoSessao: { increment: 1 },
     });
+    expect(data.criadoEm).toBeInstanceOf(Date);
+    expect((data.criadoEm as Date).getTime()).toBeGreaterThanOrEqual(antes);
     expect(data).not.toHaveProperty('telefone');
     expect(data).not.toHaveProperty('papel');
     await expect(
