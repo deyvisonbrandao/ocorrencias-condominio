@@ -16,7 +16,7 @@ function criarServico(): PrismaSistema {
         limiteConexoes: 1,
       },
       false,
-      undefined,
+      'x'.repeat(32),
     ),
   );
 }

@@ -42,10 +42,9 @@ class VariaveisAmbiente {
   @IsIn(['true', 'false'], { message: 'deve ser true ou false' })
   SWAGGER_ENABLED?: 'true' | 'false';
 
-  @IsOptional()
-  @IsString()
+  @IsString({ message: 'é obrigatória (gere com 32+ caracteres aleatórios)' })
   @MinLength(32, { message: 'deve ter pelo menos 32 caracteres' })
-  JWT_SECRET?: string;
+  JWT_SECRET!: string;
 }
 
 export interface ConexaoBanco {
@@ -63,7 +62,7 @@ export class AppConfig {
     readonly porta: number,
     readonly banco: ConexaoBanco,
     readonly swaggerHabilitado: boolean,
-    readonly jwtSecret: string | undefined,
+    readonly jwtSecret: string,
   ) {}
 
   get producao(): boolean {

@@ -215,7 +215,7 @@ describe('criarPrismaEscopado (sem banco)', () => {
           limiteConexoes: 1,
         },
         false,
-        undefined,
+        'x'.repeat(32),
       ),
     );
     escopado = criarPrismaEscopado(sistema);
