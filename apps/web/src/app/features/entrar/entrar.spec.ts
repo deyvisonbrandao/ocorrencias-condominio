@@ -202,6 +202,24 @@ describe('Entrar', () => {
       expect(TestBed.inject(Router).url).toBe('/trocar-senha');
     });
 
+    it.each<[string, () => Promise<boolean>]>([
+      ['é cancelada', () => Promise.resolve(false)],
+      ['falha (ex.: módulo da tela não carrega)', () => Promise.reject(new Error('chunk 404'))],
+    ])('se a navegação depois do login %s, reabilita o formulário e mostra o erro', async (_caso, resultado) => {
+      sessao.entrar.mockReturnValue(of(usuario('SINDICO')));
+      await abrir();
+      vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockImplementation(resultado);
+
+      await entrarCom();
+
+      const botao = raiz.querySelector('button[type="submit"]') as HTMLButtonElement;
+      expect(botao.getAttribute('aria-busy')).toBeNull();
+      expect(botao.textContent?.trim()).toBe('Entrar');
+      expect(campo('Senha').disabled).toBe(false);
+      expect(alerta()?.textContent?.trim()).toBe('Algo deu errado do nosso lado. Tente de novo em instantes.');
+      expect(document.activeElement).toBe(alerta());
+    });
+
     it('envio vazio: mostra os erros nos campos, foca o primeiro e não chama a API', async () => {
       await abrir();
 

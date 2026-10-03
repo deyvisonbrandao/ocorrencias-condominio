@@ -166,7 +166,14 @@ export class Entrar {
       .subscribe({
         next: (usuario) => {
           const voltar = this.rota.snapshot.queryParamMap.get('voltar');
-          void this.router.navigateByUrl(destinoAposLogin(usuario, voltar));
+          this.router.navigateByUrl(destinoAposLogin(usuario, voltar)).then(
+            (navegou) => {
+              if (!navegou) {
+                this.falhar(null);
+              }
+            },
+            () => this.falhar(null),
+          );
         },
         error: (erro: unknown) => this.falhar(erro),
       });
