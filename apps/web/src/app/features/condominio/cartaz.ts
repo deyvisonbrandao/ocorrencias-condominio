@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subject, startWith } from 'rxjs';
 import { ORIGEM_DO_APP } from '../../core/config/origem-do-app';
@@ -48,8 +48,14 @@ export const TAMANHO_QR_CARTAZ_PX = 302;
           <ui-icone nome="voltar" />
           Voltar para Condomínio
         </a>
-        @if (link()) {
-          <button type="button" ui-botao (click)="imprimir()">
+        @if (link() && estadoQr() !== 'erro') {
+          <button
+            type="button"
+            ui-botao
+            rotuloCarregando="Gerando QR code…"
+            [carregando]="estadoQr() !== 'pronto'"
+            (click)="imprimir()"
+          >
             <ui-icone nome="imprimir" />
             Imprimir
           </button>
@@ -111,6 +117,8 @@ export class Cartaz {
     const estado = this.estado();
     return estado.tipo === 'pronto' ? linkPublico(this.origem, estado.condominio.slug) : '';
   });
+  private readonly qr = viewChild(QrCode);
+  protected readonly estadoQr = computed(() => this.qr()?.estado());
 
   protected tentarDeNovo(): void {
     this.tentouDeNovo.set(true);

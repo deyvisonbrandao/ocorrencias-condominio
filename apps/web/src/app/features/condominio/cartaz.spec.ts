@@ -18,6 +18,8 @@ describe('Cartaz', () => {
 
   const botao = (rotulo: string) =>
     [...raiz.querySelectorAll<HTMLElement>('button, a')].find((item) => item.textContent?.trim() === rotulo);
+  const botaoImprimir = () =>
+    [...raiz.querySelectorAll<HTMLButtonElement>('button')].find((item) => item.textContent?.includes('Imprimir'));
 
   async function criar(): Promise<void> {
     fixture = TestBed.createComponent(Cartaz);
@@ -66,6 +68,45 @@ describe('Cartaz', () => {
 
     botao('Imprimir')?.click();
 
+    expect(imprimir).toHaveBeenCalledTimes(1);
+  });
+
+  it('com o QR ainda gerando, o botão fica bloqueado em "Gerando QR code…" e não imprime', async () => {
+    const imprimir = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    let concluir: (imagem: string) => void = () => undefined;
+    qrcode.gerar.mockReturnValue(new Promise<string>((resolver) => (concluir = resolver)));
+    fixture = TestBed.createComponent(Cartaz);
+    raiz = fixture.nativeElement as HTMLElement;
+    await new Promise((resolver) => setTimeout(resolver, 0));
+    fixture.detectChanges();
+
+    const gerando = botaoImprimir();
+    expect(gerando?.textContent).toContain('Gerando QR code…');
+    expect(gerando?.getAttribute('aria-disabled')).toBe('true');
+    gerando?.click();
+    expect(imprimir).not.toHaveBeenCalled();
+
+    concluir('data:image/png;base64,QR');
+    await fixture.whenStable();
+
+    expect(botaoImprimir()?.getAttribute('aria-disabled')).toBeNull();
+    botao('Imprimir')?.click();
+    expect(imprimir).toHaveBeenCalledTimes(1);
+  });
+
+  it('se a geração do QR falha, não oferece imprimir e permite tentar de novo', async () => {
+    const imprimir = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    qrcode.gerar.mockRejectedValueOnce(new Error('falhou'));
+    await criar();
+
+    expect(botaoImprimir()).toBeUndefined();
+    expect(raiz.querySelector('ui-qrcode [role="alert"]')?.textContent).toContain('Não foi possível gerar o QR code.');
+
+    botao('Tentar de novo')?.click();
+    await fixture.whenStable();
+
+    expect(qrcode.gerar).toHaveBeenCalledTimes(2);
+    botao('Imprimir')?.click();
     expect(imprimir).toHaveBeenCalledTimes(1);
   });
 

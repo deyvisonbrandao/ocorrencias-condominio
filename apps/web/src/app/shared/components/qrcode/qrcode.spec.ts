@@ -51,13 +51,43 @@ describe('ui-qrcode', () => {
     expect(imagem()?.getAttribute('src')).toBe('data:image/png;base64,QR');
   });
 
-  it('quando a geração falha, mostra a mensagem de erro no lugar do QR', async () => {
+  it('expõe o estado: gerando enquanto a geração está pendente e pronto com a imagem', async () => {
+    let concluir: (imagem: string) => void = () => undefined;
+    qrcode.gerar.mockReturnValue(new Promise<string>((resolver) => (concluir = resolver)));
+
+    montar();
+    await new Promise((resolver) => setTimeout(resolver, 0));
+
+    expect(fixture.componentInstance.estado()).toBe('gerando');
+
+    concluir('data:image/png;base64,QR');
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.estado()).toBe('pronto');
+  });
+
+  it('quando a geração falha, anuncia o erro no lugar do QR e expõe o estado erro', async () => {
     qrcode.gerar.mockRejectedValue(new Error('falhou'));
 
     await criar();
 
     expect(imagem()).toBeNull();
-    expect(raiz.textContent).toContain(MENSAGEM_FALHA_QRCODE);
+    expect(raiz.querySelector('[role="alert"]')?.textContent).toContain(MENSAGEM_FALHA_QRCODE);
+    expect(fixture.componentInstance.estado()).toBe('erro');
+  });
+
+  it('"Tentar de novo" gera outra vez e mostra a imagem quando dá certo', async () => {
+    qrcode.gerar.mockRejectedValueOnce(new Error('falhou'));
+    await criar();
+
+    const tentar = [...raiz.querySelectorAll('button')].find((botao) => botao.textContent?.trim() === 'Tentar de novo');
+    tentar?.click();
+    await fixture.whenStable();
+
+    expect(qrcode.gerar).toHaveBeenCalledTimes(2);
+    expect(imagem()?.getAttribute('src')).toBe('data:image/png;base64,https://exemplo.com/c/jardim');
+    expect(raiz.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.componentInstance.estado()).toBe('pronto');
   });
 
   it('gera de novo quando a URL ou o tamanho mudam', async () => {
