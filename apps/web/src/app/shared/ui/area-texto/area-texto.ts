@@ -51,7 +51,7 @@ export class AreaTexto extends ControleDeValor {
   protected readonly anuncio = signal('');
 
   protected readonly classes = computed(() =>
-    classesControle(!!this.erro(), 'rounded-controle leading-6'),
+    classesControle(!!this.erro(), 'rounded-controle pr-3 leading-6'),
   );
 
   protected aoDigitar(evento: Event): void {

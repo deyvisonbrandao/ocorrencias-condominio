@@ -83,7 +83,7 @@ export class Campo extends ControleDeValor {
 
   protected readonly classes = computed(() => {
     const arredondamento = this.prefixo() ? 'rounded-r-controle' : 'rounded-controle';
-    const folgaSenha = this.tipo() === 'password' ? 'pr-12' : '';
+    const folgaSenha = this.tipo() === 'password' ? 'pr-12' : 'pr-3';
     const leitura = this.somenteLeitura() ? 'bg-superficie-app' : '';
     return classesControle(!!this.erro(), `min-h-toque ${arredondamento} ${folgaSenha} ${leitura}`);
   });

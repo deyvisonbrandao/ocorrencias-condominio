@@ -48,6 +48,6 @@ export class Select extends ControleDeValor {
   readonly placeholder = input<string>();
 
   protected readonly classes = computed(() =>
-    classesControle(!!this.erro(), 'min-h-toque rounded-controle'),
+    classesControle(!!this.erro(), 'min-h-toque rounded-controle pr-10'),
   );
 }
