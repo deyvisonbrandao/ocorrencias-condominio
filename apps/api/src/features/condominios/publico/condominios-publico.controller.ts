@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -16,6 +17,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { REGRAS_SLUG } from '@ocorrencias/contratos';
@@ -25,6 +27,7 @@ import {
   CondominioCriadoDto,
   CondominioPublicoDto,
 } from '../dto/condominio-publico.dto.js';
+import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')
@@ -34,6 +37,7 @@ export class CondominiosPublicoController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(LimiteCadastroPublicoInterceptor)
   @ApiOperation({
     summary: 'Autocadastro do condomínio e do síndico',
     description:
@@ -69,6 +73,17 @@ export class CondominiosPublicoController {
       code: 'SLUG_EM_USO',
       message: 'Endereço já em uso. Tente outro.',
       details: { campo: 'slug' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description:
+      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 429,
+      code: 'MUITAS_REQUISICOES',
+      message: 'Muitas requisições. Tente de novo em instantes.',
     },
   })
   cadastrar(@Body() dto: CadastrarCondominioDto): Promise<CondominioCriadoDto> {
