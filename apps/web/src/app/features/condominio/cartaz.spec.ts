@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { CondominioAdmin } from '@ocorrencias/contratos';
 import { Observable, of, throwError } from 'rxjs';
+import { ORIGEM_DO_APP } from '../../core/config/origem-do-app';
 import { QrCodeService } from '../../shared/services/qrcode.service';
 import { Cartaz, INSTRUCAO_CARTAZ, TAMANHO_QR_CARTAZ_PX } from './cartaz';
 import { CondominioAdminService } from './services/condominio-admin.service';
-import { ORIGEM_DO_APP } from './services/link-publico';
 
 const CONDOMINIO: CondominioAdmin = { nome: 'Residencial Jardim', slug: 'jardim', cidade: 'Campinas', uf: 'SP' };
 

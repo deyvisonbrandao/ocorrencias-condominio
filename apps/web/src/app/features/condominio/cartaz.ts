@@ -2,15 +2,16 @@ import { DOCUMENT } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subject, startWith } from 'rxjs';
+import { ORIGEM_DO_APP } from '../../core/config/origem-do-app';
 import { Botao } from '../../shared/components/botao/botao';
 import { EstadoErro } from '../../shared/components/estados/estado-erro';
 import { Skeleton } from '../../shared/components/estados/skeleton';
 import { Icone } from '../../shared/components/icone/icone';
 import { PularConteudo } from '../../shared/components/pular-conteudo/pular-conteudo';
 import { QrCode } from '../../shared/components/qrcode/qrcode';
-import { carregarCondominio } from './carregamento';
+import { linkPublico } from '../../shared/utils/link-publico';
+import { carregarCondominio } from './services/carregamento';
 import { CondominioAdminService } from './services/condominio-admin.service';
-import { linkPublico, ORIGEM_DO_APP } from './services/link-publico';
 
 export const INSTRUCAO_CARTAZ = 'Aponte a câmera do celular para se cadastrar e registrar ocorrências';
 

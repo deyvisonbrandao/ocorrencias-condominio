@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -10,8 +9,10 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CondominioCriado } from '@ocorrencias/contratos';
+import { ORIGEM_DO_APP } from '../../../../core/config/origem-do-app';
 import { Botao } from '../../../../shared/components/botao/botao';
 import { Copiar } from '../../../../shared/components/copiar/copiar';
+import { linkPublico } from '../../../../shared/utils/link-publico';
 
 @Component({
   selector: 'app-confirmacao-cadastro',
@@ -43,10 +44,10 @@ import { Copiar } from '../../../../shared/components/copiar/copiar';
 export class ConfirmacaoCadastro {
   readonly condominio = input.required<CondominioCriado>();
 
-  private readonly origem = inject(DOCUMENT).location.origin;
+  private readonly origem = inject(ORIGEM_DO_APP);
   private readonly titulo = viewChild.required<ElementRef<HTMLElement>>('titulo');
 
-  protected readonly link = computed(() => `${this.origem}/c/${this.condominio().slug}`);
+  protected readonly link = computed(() => linkPublico(this.origem, this.condominio().slug));
 
   constructor() {
     afterNextRender(() => this.titulo().nativeElement.focus());

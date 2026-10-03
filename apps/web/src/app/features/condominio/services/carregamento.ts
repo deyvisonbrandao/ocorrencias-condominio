@@ -2,9 +2,7 @@ import { Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CondominioAdmin } from '@ocorrencias/contratos';
 import { catchError, map, merge, Observable, of, startWith, switchMap, take, takeWhile, timer } from 'rxjs';
-import { ESPERA_ANTES_DO_SKELETON_MS } from '../../shared/components/estados/skeleton';
-
-export const ESPERA_LONGA_MS = 10_000;
+import { ESPERA_ANTES_DO_SKELETON_MS, ESPERA_LONGA_MS } from '../../../shared/components/estados/skeleton';
 
 export type FaseDaEspera = 'curta' | 'skeleton' | 'longa';
 

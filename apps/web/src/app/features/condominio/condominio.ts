@@ -1,15 +1,17 @@
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { CondominioAdmin } from '@ocorrencias/contratos';
 import { Subject, startWith } from 'rxjs';
+import { ORIGEM_DO_APP } from '../../core/config/origem-do-app';
 import { SessaoService } from '../../core/services/sessao.service';
 import { EstadoErro } from '../../shared/components/estados/estado-erro';
 import { Skeleton } from '../../shared/components/estados/skeleton';
 import { Icone } from '../../shared/components/icone/icone';
-import { carregarCondominio } from './carregamento';
+import { linkPublico } from '../../shared/utils/link-publico';
 import { DadosCondominio } from './components/dados-condominio/dados-condominio';
 import { LinkDeCadastro } from './components/link-de-cadastro/link-de-cadastro';
+import { carregarCondominio } from './services/carregamento';
 import { CondominioAdminService } from './services/condominio-admin.service';
-import { linkPublico, ORIGEM_DO_APP, textoCidade } from './services/link-publico';
+import { textoCidade } from './services/texto-cidade';
 
 export const NOTA_SOMENTE_SINDICO = 'Só o(a) síndico(a) edita os dados do condomínio.';
 

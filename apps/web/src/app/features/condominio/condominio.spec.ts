@@ -4,12 +4,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { CondominioAdmin, CondominioPublico, Papel, UsuarioSessao } from '@ocorrencias/contratos';
 import { NEVER, Observable, of, throwError } from 'rxjs';
+import { ORIGEM_DO_APP } from '../../core/config/origem-do-app';
 import { SessaoService } from '../../core/services/sessao.service';
+import { ESPERA_LONGA_MS } from '../../shared/components/estados/skeleton';
 import { QrCodeService } from '../../shared/services/qrcode.service';
-import { ESPERA_LONGA_MS } from './carregamento';
 import { Condominio, NOTA_SOMENTE_SINDICO } from './condominio';
 import { CondominioAdminService } from './services/condominio-admin.service';
-import { ORIGEM_DO_APP } from './services/link-publico';
 
 const CONDOMINIO: CondominioAdmin = { nome: 'Residencial Jardim', slug: 'jardim', cidade: 'Campinas', uf: 'SP' };
 
