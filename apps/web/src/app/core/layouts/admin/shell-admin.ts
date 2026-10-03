@@ -1,9 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { NOME_PRODUTO } from '../../config/marca';
+import { ContagemMoradoresService } from '../../services/contagem-moradores.service';
 import { dadosDaTelaAtual } from '../../services/rota-atual';
 import { SessaoService } from '../../services/sessao.service';
 import { Alerta } from '../../../shared/components/alerta/alerta';
@@ -16,11 +17,12 @@ import { ItemNavegacao, Sidebar } from '../../../shared/components/sidebar/sideb
 import { ROTULO_PAPEL } from '../../../shared/utils/dominio';
 
 const ROTA_EQUIPE = '/admin/equipe';
+const ROTA_MORADORES = '/admin/moradores';
 
 const ITENS: readonly ItemNavegacao[] = [
   { rotulo: 'Painel', rota: '/admin/painel', icone: 'painel' },
   { rotulo: 'Ocorrências', rota: '/admin/ocorrencias', icone: 'lista' },
-  { rotulo: 'Moradores', rota: '/admin/moradores', icone: 'usuarios' },
+  { rotulo: 'Moradores', rota: ROTA_MORADORES, icone: 'usuarios' },
   { rotulo: 'Equipe', rota: ROTA_EQUIPE, icone: 'escudo' },
   { rotulo: 'Condomínio', rota: '/admin/condominio', icone: 'predio' },
 ];
@@ -130,12 +132,26 @@ export class ShellAdmin {
     const usuario = this.sessao.usuario();
     return usuario ? `${usuario.nome} · ${ROTULO_PAPEL[usuario.papel]}` : null;
   });
-  protected readonly itens = computed(() =>
-    this.sessao.usuario()?.papel === 'SINDICO' ? ITENS : ITENS.filter((item) => item.rota !== ROTA_EQUIPE),
-  );
+  private readonly contagem = inject(ContagemMoradoresService);
+  protected readonly itens = computed(() => {
+    const doPapel =
+      this.sessao.usuario()?.papel === 'SINDICO' ? ITENS : ITENS.filter((item) => item.rota !== ROTA_EQUIPE);
+    const pendentes = this.contagem.pendentes();
+    return doPapel.map((item) =>
+      item.rota === ROTA_MORADORES
+        ? {
+            ...item,
+            contador: pendentes,
+            rotuloContador: pendentes === 1 ? 'cadastro pendente' : 'cadastros pendentes',
+          }
+        : item,
+    );
+  });
   private readonly gaveta = viewChild.required<Drawer>('menu');
 
   constructor() {
+    this.contagem.recarregar();
+    inject(DestroyRef).onDestroy(() => this.contagem.limpar());
     inject(Router)
       .events.pipe(
         filter((evento) => evento instanceof NavigationEnd),

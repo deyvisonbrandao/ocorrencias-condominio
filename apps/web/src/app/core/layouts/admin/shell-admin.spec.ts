@@ -1,12 +1,14 @@
 import { ViewportScroller } from '@angular/common';
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { PainelAdmin, Papel, UsuarioSessao } from '@ocorrencias/contratos';
+import { ContagemMoradores, PaginaMoradores, PainelAdmin, Papel, UsuarioSessao } from '@ocorrencias/contratos';
 import { NEVER, Observable, of } from 'rxjs';
 import { restaurarDialogoNativo, simularDialogoNativo } from '../../../../testes/dialogo-nativo';
+import { MoradoresService } from '../../../features/moradores/services/moradores.service';
 import { PainelService } from '../../../features/painel/services/painel.service';
+import { ContagemMoradoresService } from '../../services/contagem-moradores.service';
 import { focarTituloERolarAoNavegar } from '../../services/foco-na-navegacao';
 import { SessaoService } from '../../services/sessao.service';
 import rotasAdmin from './admin.routes';
@@ -33,6 +35,13 @@ describe('ShellAdmin', () => {
     descartarErroAoSair: vi.fn(),
     carregar: () => of(sessao.usuario()),
   };
+  const valorDaContagem = signal<ContagemMoradores | null>(null);
+  const contagem = {
+    contagem: valorDaContagem.asReadonly(),
+    pendentes: computed(() => valorDaContagem()?.pendentes ?? 0),
+    recarregar: vi.fn(),
+    limpar: vi.fn(),
+  };
 
   const gaveta = () => raiz.querySelector('ui-drawer dialog') as HTMLDialogElement;
   const botaoMenu = () => raiz.querySelector('button[aria-label="Abrir menu"]') as HTMLButtonElement;
@@ -49,12 +58,17 @@ describe('ShellAdmin', () => {
     sessao.usuario.set(usuario('SINDICO'));
     sessao.erroAoSair.set(null);
     sessao.sair.mockReset();
+    valorDaContagem.set(null);
+    contagem.recarregar.mockReset();
+    contagem.limpar.mockReset();
     simularDialogoNativo();
     TestBed.configureTestingModule({
       providers: [
         provideRouter([{ path: 'admin', children: rotasAdmin }]),
         { provide: SessaoService, useValue: sessao },
         { provide: PainelService, useValue: { obter: (): Observable<PainelAdmin> => NEVER } },
+        { provide: MoradoresService, useValue: { listar: (): Observable<PaginaMoradores> => NEVER } },
+        { provide: ContagemMoradoresService, useValue: contagem },
         {
           provide: ViewportScroller,
           useValue: {
@@ -174,6 +188,38 @@ describe('ShellAdmin', () => {
     await harness.navigateByUrl('/admin/equipe');
 
     expect(TestBed.inject(Router).url).toBe(destino);
+  });
+
+  it('ao entrar na área admin, busca a contagem de moradores', () => {
+    expect(contagem.recarregar).toHaveBeenCalled();
+  });
+
+  it('mostra os cadastros pendentes no item Moradores, com texto para o leitor de tela', async () => {
+    valorDaContagem.set({ pendentes: 3, ativos: 2, recusados: 0, inativos: 0 });
+    await harness.fixture.whenStable();
+
+    const moradores = [...raiz.querySelectorAll<HTMLAnchorElement>('aside nav a')].find((a) =>
+      a.textContent?.includes('Moradores'),
+    ) as HTMLAnchorElement;
+
+    expect(moradores.querySelector('span[aria-hidden="true"]')?.textContent?.trim()).toBe('3');
+    expect(moradores.querySelector('.sr-only')?.textContent?.trim()).toBe('3 cadastros pendentes');
+  });
+
+  it('um único pendente usa o singular, e sem pendentes o contador some', async () => {
+    valorDaContagem.set({ pendentes: 1, ativos: 0, recusados: 0, inativos: 0 });
+    await harness.fixture.whenStable();
+    const moradores = () =>
+      [...raiz.querySelectorAll<HTMLAnchorElement>('aside nav a')].find((a) =>
+        a.textContent?.includes('Moradores'),
+      ) as HTMLAnchorElement;
+
+    expect(moradores().querySelector('.sr-only')?.textContent?.trim()).toBe('1 cadastro pendente');
+
+    valorDaContagem.set({ pendentes: 0, ativos: 1, recusados: 0, inativos: 0 });
+    await harness.fixture.whenStable();
+
+    expect(moradores().querySelector('.sr-only')).toBeNull();
   });
 
   it('o subsíndico lê /admin/condominio (não é bloqueado)', async () => {

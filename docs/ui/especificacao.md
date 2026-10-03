@@ -138,6 +138,15 @@ Os contrastes foram calculados pela fórmula de luminância relativa da WCAG 2.x
 | `ALTA` | Alta | `urgencia-alta-fundo` `#fee2e2` | `urgencia-alta-texto` `#991b1b` | 3 de 4 barras | **6.80** |
 | `CRITICA` | Crítica | **sólido** `urgencia-critica-fundo` `#7f1d1d` | `urgencia-critica-texto` `#ffffff` | 4 de 4 barras | **10.02**; o fundo sobre a página: **10.02** (branco) e **9.59** (`superficie-app`) |
 
+**Status do usuário** (`ui-badge-status-usuario`, issue #8: mesmo formato do badge de status, com ponto decorativo; só pares já verificados em 2.1)
+
+| Status | Rótulo | Fundo · texto | Contraste |
+|---|---|---|---|
+| `PENDENTE` | Pendente | `aviso-suave` · `aviso-texto` | **6.88** |
+| `ATIVO` | Ativo | `sucesso-suave` · `sucesso-texto` | **6.81** |
+| `INATIVO` | Inativo | `superficie-sutil` · `texto-secundario` | **6.87** |
+| `RECUSADO` | Recusado | `perigo-suave` · `perigo-texto` | **7.60** |
+
 **Marcadores**
 
 | Marcador | Aparência | Contraste | Onde |
@@ -279,6 +288,8 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Liga/desliga | `ui-alternador` | Toggle | `rotulo`, `dica` | desligado (trilho `borda-controle`), ligado (`primaria`), foco (anel no trilho), desabilitado | `<input type="checkbox" role="switch">`. Toda a linha (rótulo + trilho) é o alvo de 44px. |
 | Data | `ui-campo` com `tipo="date"` | — (nativo) | `min` (hoje) | como `ui-campo` | Seletor nativo. Exibição sempre em `dd/mm/aaaa`. |
 | Status | `ui-badge-status` | Badge (pill) | `status` | — (não interativo) | Texto sempre visível; o ponto é `aria-hidden`. |
+| Status do usuário | `ui-badge-status-usuario` | Badge (pill) | `status` (`StatusUsuario`, cores em 2.2) | — (não interativo) | Igual ao `ui-badge-status`. |
+| Menu de ações | `ui-menu-acoes` + `button[ui-item-menu]` | Dropdown (só visual) | `rotulo` (nome acessível com o objeto: "Mais ações para {nome}"); itens projetados; `perigo` no item destrutivo | fechado, aberto (`shadow-lg`, nível 1) | Padrão *disclosure*: botão ícone de 44px com `aria-expanded` e `aria-controls`, sem `role="menu"`. Abrir leva o foco ao primeiro item; setas percorrem os itens; Esc fecha e devolve o foco ao botão; clicar fora ou sair com Tab fecha. Escolher um item devolve o foco ao botão antes da ação, para o diálogo aberto por ela voltar a ele. |
 | Tipo | `ui-badge-tipo` | Badge (com borda) | `tipo`, `curto` | — | Ícone `aria-hidden`. |
 | Urgência | `ui-badge-urgencia` | Badge | `urgencia` (`null` = Não triada; `BAIXA` a `CRITICA`) | — | Prefixo "Urgência" em `sr-only`. **Nunca é renderizado na área do morador.** |
 | Marcadores | `ui-marcador` | Badge | `atrasada` · `restrita` | — | — |
@@ -299,7 +310,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Vazio | `ui-estado-vazio` | — | `icone`, `titulo`, `texto`, `acao?` | — | O título é um `<h2>`/`<h3>` conforme a tela. |
 | Erro de carga | `ui-estado-erro` | Alert | `titulo`, `texto`, `tentarDeNovo()` | — | `role="alert"`. O botão "Tentar de novo" recebe o foco se o erro surgiu depois de uma ação. |
 | Carregando | `ui-skeleton` | Skeleton | `forma: 'cartao' \| 'linha-tabela' \| 'detalhe'`, `quantidade` | — | Contêiner com `aria-busy="true"` + texto `sr-only` "Carregando…". Formas `aria-hidden`. |
-| Paginação | `ui-carregar-mais` | Button | `carregando`, `fim` | ocioso, carregando, fim ("Isso é tudo."), erro (resultado parcial, 5.0) | Depois de carregar, o foco vai para o primeiro item novo. |
+| Paginação | `ui-carregar-mais` | Button | `carregando`, `fim`, `erro`, `mensagemErro` | ocioso, carregando, fim ("Isso é tudo."), erro (resultado parcial, 5.0) | Depois de carregar, o foco vai para o primeiro item novo. |
 | Contador do painel | `ui-cartao-numero` | Card | `rotulo`, `valor`, `destino`, `tom` | repouso, hover, foco | O card inteiro é um link; o nome acessível é "Não triadas: 3". |
 | Copiar | `ui-copiar` | Clipboard | `valor`, `rotulo`, `rotuloCopiado`, `bloco` | ocioso, copiado ("Link copiado" por 2s), erro ("Não foi possível copiar. Selecione o link e copie.", quando o navegador nega a área de transferência) | O feedback é anunciado em `aria-live`. Sem toast: o retorno fica no próprio botão. |
 | QR code | `ui-qrcode` | — (biblioteca `qrcode`, no cliente) | `url`, `tamanho` (240px na tela) | gerando (skeleton quadrado), pronto, erro ("Não foi possível gerar o QR code." + o link continua disponível) | `<img alt="QR code do link de cadastro do {condomínio}">`. A URL sempre aparece em texto ao lado. "Baixar PNG" usa a mesma geração em 1024px |
@@ -668,7 +679,16 @@ O mesmo formulário de 5.10, com estas diferenças:
   - botão único "Já anotei".
 - **Vazio por aba:**
   - Pendentes: "Nenhum cadastro esperando aprovação.";
-  - Ativos: "Nenhum morador ativo ainda. Compartilhe o link do condomínio.".
+  - Ativos: "Nenhum morador ativo ainda. Compartilhe o link do condomínio.", com "Ver link e QR code";
+  - Recusados e inativos: "Nenhum morador recusado ou inativo.".
+- **Implementação (issue #8):**
+  - URL: Pendentes é `/admin/moradores` (sem `aba`); as outras são `?aba=ativos` e `?aba=recusados-inativos`. Aba desconhecida volta para a URL canônica. A busca vai para `q` com `replaceUrl` e acompanha a troca de aba.
+  - Contador: só na aba Pendentes e no item Moradores do menu ("3 cadastros pendentes" / "1 cadastro pendente" em `sr-only`). Recarrega ao entrar na área admin, ao abrir Moradores e depois de cada ação ou conflito. Sem polling.
+  - Item: unidade como "Bloco B, apto 302"; data como "Cadastro: há 2 h" (8.3); recusado mostra "Motivo da recusa: …". Os botões de ação levam o nome em `sr-only` ("Aprovar Ana Lima").
+  - Confirmações: Aprovar (`alertdialog`) "Aprovar o cadastro de {nome}?" / "{nome} passa a ter acesso ao condomínio com o telefone e a senha que cadastrou."; Recusar (`dialog`) "Recusar o cadastro de {nome}?" com o campo "Motivo"; Inativar (`alertdialog`) "Inativar {nome}?"; Reativar (`alertdialog`) "Reativar {nome}?" / "{nome} volta a ter acesso ao condomínio.". Botões no gerúndio ao enviar ("Aprovando…", "Recusando…", "Inativando…", "Reativando…").
+  - Depois da ação, o item sai da aba e o foco vai ao item seguinte (ou ao h1, se a aba esvaziou). 409 e 404: o diálogo fecha, um `ui-alerta` `aviso` com a mensagem (8.5) recebe o foco e a lista e a contagem recarregam.
+  - Busca com resultado: anúncio `polite` "{n} moradores encontrados." (ou "Mais de {n} moradores encontrados." quando há próxima página).
+  - O menu "Mais ações" dos ativos tem hoje só "Inativar"; "Redefinir senha" entra com a issue #9.
 
 ### 5.18 Equipe `/admin/equipe` (só síndico)
 
@@ -910,6 +930,8 @@ stateDiagram-v2
 | 404 (ocorrência) | "Ocorrência não encontrada." |
 | 409 (versão) | "Esta ocorrência foi alterada por outra pessoa. Recarregue para ver a versão atual e tente de novo." |
 | 409 (transição inválida) | "Esta ação não está mais disponível para esta ocorrência. Recarregue para ver o status atual." |
+| 409 (transição de morador) | "Esta ação não está mais disponível para este morador. Recarregue para ver o status atual." |
+| 404 (morador) | "Morador não encontrado." |
 | 409 (reabrir fora da janela) | "O prazo de 30 dias para reabrir já terminou." |
 | 409 (limite de admins) | "O condomínio já tem subsíndico." |
 | 409 (principal não vira duplicada) | "Esta ocorrência é a principal de outras duplicadas e não pode virar duplicada." |

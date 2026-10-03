@@ -34,7 +34,11 @@ export default [
         component: PaginaProvisoria,
         data: { issue: 15, pilha: VOLTAR_PARA_FILA },
       },
-      { path: 'moradores', title: 'Moradores', component: PaginaProvisoria, data: { issue: 8 } },
+      {
+        path: 'moradores',
+        title: 'Moradores',
+        loadComponent: () => import('../../../features/moradores/moradores').then((m) => m.Moradores),
+      },
       {
         path: 'equipe',
         title: 'Equipe',

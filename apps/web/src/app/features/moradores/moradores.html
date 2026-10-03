@@ -1,0 +1,64 @@
+<h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">Moradores</h1>
+
+<ui-abas class="mt-4 block" rotulo="Situação dos moradores" [abas]="abas()" />
+
+<div role="search" class="mt-4 md:max-w-sm">
+  <ui-campo
+    tipo="search"
+    rotulo="Buscar por nome, bloco ou apto"
+    autocomplete="off"
+    [maxlength]="maximoBusca"
+    [formControl]="busca"
+  />
+</div>
+
+<p class="sr-only" aria-live="polite">{{ anuncioDaBusca() }}</p>
+
+@if (aviso(); as mensagem) {
+  <ui-alerta data-aviso tabindex="-1" class="mt-4" tom="aviso">{{ mensagem }}</ui-alerta>
+}
+
+<div class="mt-4">
+  @switch (estado().tipo) {
+    @case ('carregando') {
+      @if (mostrarSkeleton()) {
+        <ui-skeleton forma="cartao" [quantidade]="3" />
+      }
+    }
+    @case ('erro') {
+      <ui-estado-erro titulo="Não foi possível carregar os moradores." (tentarDeNovo)="tentarDeNovo()" />
+    }
+    @case ('pronto') {
+      @if (itens().length > 0) {
+        <app-lista-moradores
+          [itens]="itens()"
+          [legenda]="aba().legenda"
+          [mostraStatus]="aba().mostraStatus"
+          (acao)="pedirAcao($event)"
+        />
+        @if (paginacao(); as paginacao) {
+          <ui-carregar-mais
+            class="mt-4"
+            mensagemErro="Não foi possível carregar mais moradores."
+            [fim]="paginacao.fim"
+            [carregando]="carregandoMais()"
+            [erro]="erroAoCarregarMais()"
+            (carregar)="carregarMais()"
+          />
+        }
+      } @else if (q()) {
+        <ui-estado-vazio icone="usuarios" [titulo]="'Nenhum morador encontrado para \'' + q() + '\'.'">
+          <button type="button" ui-botao variante="secundario" (click)="limparBusca()">Limpar busca</button>
+        </ui-estado-vazio>
+      } @else {
+        <ui-estado-vazio icone="usuarios" [titulo]="aba().vazio.titulo" [texto]="aba().vazio.texto">
+          @if (aba().vazio.acao; as acao) {
+            <a ui-botao variante="secundario" [routerLink]="acao.rota">{{ acao.rotulo }}</a>
+          }
+        </ui-estado-vazio>
+      }
+    }
+  }
+</div>
+
+<app-confirmar-acao (concluiu)="aoConcluir($event)" (desatualizou)="aoDesatualizar($event)" />
