@@ -7,6 +7,7 @@ import {
   CondominiosPublicoService,
   DisponibilidadeSlug,
 } from '../../core/services/condominios-publico.service';
+import { UltimoCondominio } from '../../core/services/ultimo-condominio';
 import { ToastService } from '../../shared/services/toast.service';
 import { CadastroCondominio } from './cadastro-condominio';
 import { ESPERA_VERIFICACAO_SLUG } from './services/verificacao-slug';
@@ -210,6 +211,27 @@ describe('CadastroCondominio', () => {
         'Ir para o painel',
       );
       expect(document.title).toContain('Condomínio criado');
+    });
+
+    it('sucesso: lembra o condomínio criado para o "Ir para o painel" chegar ao login certo', async () => {
+      const ultimo = TestBed.inject(UltimoCondominio);
+      const gravar = vi.spyOn(ultimo, 'gravar').mockImplementation(() => undefined);
+      api.cadastrar.mockReturnValue(of({ id: '1', nome: 'Jardim', slug: 'jardim-novo' }));
+      await preencherValido();
+
+      await enviar();
+
+      expect(gravar).toHaveBeenCalledWith('jardim-novo');
+    });
+
+    it('erro no envio não troca o condomínio lembrado', async () => {
+      const gravar = vi.spyOn(TestBed.inject(UltimoCondominio), 'gravar');
+      api.cadastrar.mockReturnValue(throwError(() => erroHttp(0, null)));
+      await preencherValido();
+
+      await enviar();
+
+      expect(gravar).not.toHaveBeenCalled();
     });
 
     it('envia o e-mail aparado quando informado', async () => {

@@ -28,6 +28,7 @@ import {
 } from '../../core/interceptors/erro-http.interceptor';
 import { NOME_PRODUTO } from '../../core/config/marca';
 import { CondominiosPublicoService } from '../../core/services/condominios-publico.service';
+import { UltimoCondominio } from '../../core/services/ultimo-condominio';
 import { Botao } from '../../shared/components/botao/botao';
 import { CaixaSelecao } from '../../shared/components/caixa-selecao/caixa-selecao';
 import { Campo } from '../../shared/components/campo/campo';
@@ -92,6 +93,7 @@ function texto(...regras: readonly Regra[]): FormControl<string> {
 export class CadastroCondominio {
   private readonly api = inject(CondominiosPublicoService);
   private readonly toasts = inject(ToastService);
+  private readonly ultimoCondominio = inject(UltimoCondominio);
   private readonly titulo = inject(Title);
   private readonly documento = inject(DOCUMENT);
   private readonly injector = inject(Injector);
@@ -216,6 +218,7 @@ export class CadastroCondominio {
   private concluir(criado: CondominioCriado): void {
     this.enviando.set(false);
     this.criado.set(criado);
+    this.ultimoCondominio.gravar(criado.slug);
     this.titulo.setTitle(`Condomínio criado · ${NOME_PRODUTO}`);
   }
 
