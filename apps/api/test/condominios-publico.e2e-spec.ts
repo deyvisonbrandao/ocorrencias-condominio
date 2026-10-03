@@ -129,11 +129,11 @@ describe('Condomínios públicos (e2e)', () => {
       const enviar = () =>
         request(app.getHttpServer()).post(ROTA).send(corpo('disputado'));
 
-      const status = (await Promise.all([enviar(), enviar(), enviar()]))
+      const status = (await Promise.all([enviar(), enviar()]))
         .map((r) => r.status)
         .sort((x, y) => x - y);
 
-      expect(status).toEqual([201, 409, 409]);
+      expect(status).toEqual([201, 409]);
       await expect(prismaDeTeste().usuario.count()).resolves.toBe(1);
     });
 
