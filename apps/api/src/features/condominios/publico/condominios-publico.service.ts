@@ -10,7 +10,7 @@ import { ErroApi } from '../../../core/http/erro-api.js';
 import { violouIndiceUnico } from '../../../core/prisma/erros-prisma.js';
 import { PrismaSistema } from '../../../core/prisma/prisma-sistema.js';
 import { ContextoTenant } from '../../../core/tenancy/contexto-tenant.js';
-import type { CadastrarCondominioDto } from './condominio-publico.dto.js';
+import type { CadastrarCondominioDto } from '../dto/condominio-publico.dto.js';
 
 export const INDICE_SLUG = 'condominio_slug_key';
 export const SLOT_SINDICO = 1;

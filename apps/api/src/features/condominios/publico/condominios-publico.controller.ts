@@ -24,7 +24,7 @@ import {
   CadastrarCondominioDto,
   CondominioCriadoDto,
   CondominioPublicoDto,
-} from './condominio-publico.dto.js';
+} from '../dto/condominio-publico.dto.js';
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')

@@ -33,9 +33,10 @@ Monolito modular NestJS + SPA Angular, em monorepo com npm workspaces:
 condominio-ocorrencias/
   docker-compose.yml (mysql:8.4, utf8mb4_0900_ai_ci)  .env.example  docs/adr/  .github/workflows/ci.yml
   packages/contratos/            # enums e tipos de DTO compartilhados
-  apps/api/  prisma/  src/core/{config,tenancy,auth,prisma,http}
-             src/modules/{condominios,acesso,membros,ocorrencias}
-             test/e2e/{isolamento-tenant,anonimato,maquina-estados}
+  apps/api/  prisma/  src/core/{config,http,prisma,tenancy,auth,health}
+             src/features/<feature>/{publico,dto,enums,interfaces}  # condominios, acesso, membros, ocorrencias
+             src/shared/{validators,pipes,decorators,utils}
+             test/  # e2e: isolamento-tenant, condominios-publico; depois anonimato, maquina-estados
   apps/web/  (Angular standalone + signals, Tailwind + Flowbite)
              src/app/core/{config,interceptors,layouts/{publico,morador,admin},services,guards}
              src/app/features/<feature>/{components,services,interfaces,enums}  # uma pasta por entrega, lazy
@@ -47,6 +48,13 @@ condominio-ocorrencias/
 - `features/<feature>/`: uma pasta por entrega de valor, com o componente de página na raiz, carregado por lazy loading a partir das rotas da área. Subpastas `components/`, `services/`, `interfaces/` e `enums/` só quando a feature tem os seus próprios.
 - `shared/`: reutilizável, agrupado por tipo: `components/` (os `ui-*`), `validators/`, `services/`, `utils/` (funções puras), `pipes/` e `directives/`.
 - Dependências: `features` importam `core` e `shared`; `shared` não importa `core` nem `features`; `core` não importa `features`, exceto nas rotas das áreas; uma feature não importa outra (o que for comum sobe para `shared` ou `core`).
+
+**Estrutura da API** (`apps/api/src`, mesma divisão do web, com módulos Nest)
+- `core/`: infraestrutura essencial, carregada uma vez: configuração validada (`config/`), pipeline HTTP e erro padrão (`http/`), clients do Prisma (`prisma/`), contexto de condomínio (`tenancy/`), hash de senha e, na #6, sessão e guards (`auth/`), e o `health/`.
+- `features/<feature>/`: uma pasta por área de negócio, com o `<feature>.module.ts` na raiz. Subpastas só quando a feature precisa: `publico/` (rotas sem autenticação, que podem usar o `PrismaSistema`), `dto/`, `enums/`, `interfaces/`. Controllers e services ficam junto da rota que atendem.
+- `shared/`: reutilizável entre features e sem estado, agrupado por tipo: `validators/` (decorators de validação de DTO, como celular, e-mail e senha), `pipes/`, `decorators/` e `utils/`. Só nasce quando há um segundo consumidor real ou previsto na issue seguinte.
+- Dependências: `features` importam `core` e `shared`; `shared` não importa `core`, `features` nem o client gerado do Prisma; `core` não importa `features` (o `AppModule` é a única ligação); uma feature não importa arquivo de outra, só o módulo Nest que a outra exporta. O `.oxlintrc.json` da API aplica as três primeiras regras; a última fica na revisão.
+- `PrismaSistema` (client sem filtro) só pode ser importado em `core/prisma`, `core/health`, `features/condominios/publico`, `features/acesso/login` (#6), `prisma/`, `scripts/` e `test/` (ADR-001).
 
 **Swagger**
 - `@nestjs/swagger` em `/api/docs`, com DTOs anotados e autenticação por cookie.

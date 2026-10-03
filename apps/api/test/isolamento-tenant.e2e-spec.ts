@@ -17,7 +17,7 @@ import {
   ContextoTenant,
   SemContextoTenantError,
 } from '../src/core/tenancy/contexto-tenant.js';
-import { CondominiosPublicoService } from '../src/modules/condominios/publico/condominios-publico.service.js';
+import { CondominiosPublicoService } from '../src/features/condominios/publico/condominios-publico.service.js';
 import { limparBanco } from './banco.js';
 import { criarApp } from './criar-app.js';
 

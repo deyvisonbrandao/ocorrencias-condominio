@@ -27,11 +27,93 @@
   },
   "overrides": [
     {
+      "files": ["src/core/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "prisma-sistema([.]js)?$",
+                "message": "PrismaSistema não filtra por condomínio (ADR-001). Use o PrismaEscopado (@InjetarPrismaEscopado()). Consumidores permitidos ficam nos overrides de .oxlintrc.json."
+              },
+              {
+                "regex": "generated/prisma/client([.]js)?$",
+                "importNames": ["PrismaClient"],
+                "allowTypeImports": true,
+                "message": "Não crie PrismaClient fora de src/core/prisma: use o PrismaEscopado (ADR-001)."
+              },
+              {
+                "regex": "generated/prisma/internal/",
+                "message": "Arquivo interno do client gerado: importe de generated/prisma/client.js."
+              },
+              {
+                "regex": "(^|/)features/",
+                "message": "core e shared não dependem de features (docs/arquitetura-mvp.md, estrutura da API)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/shared/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "prisma-sistema([.]js)?$",
+                "message": "PrismaSistema não filtra por condomínio (ADR-001). Use o PrismaEscopado (@InjetarPrismaEscopado()). Consumidores permitidos ficam nos overrides de .oxlintrc.json."
+              },
+              {
+                "regex": "generated/prisma/client([.]js)?$",
+                "importNames": ["PrismaClient"],
+                "allowTypeImports": true,
+                "message": "Não crie PrismaClient fora de src/core/prisma: use o PrismaEscopado (ADR-001)."
+              },
+              {
+                "regex": "generated/prisma/internal/",
+                "message": "Arquivo interno do client gerado: importe de generated/prisma/client.js."
+              },
+              {
+                "regex": "(^|/)features/",
+                "message": "core e shared não dependem de features (docs/arquitetura-mvp.md, estrutura da API)."
+              },
+              {
+                "regex": "(^|/)core/",
+                "message": "shared não depende de core: mova o que for comum para shared ou deixe em core."
+              },
+              {
+                "regex": "(^|/)generated/",
+                "message": "shared não depende do client gerado do Prisma."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/core/prisma/**", "src/core/health/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "(^|/)features/",
+                "message": "core e shared não dependem de features (docs/arquitetura-mvp.md, estrutura da API)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": [
-        "src/core/prisma/**",
-        "src/core/health/**",
-        "src/modules/condominios/publico/**",
-        "src/modules/acesso/login/**",
+        "src/features/condominios/publico/**",
+        "src/features/acesso/login/**",
         "prisma/**",
         "scripts/**",
         "test/**"
@@ -44,7 +126,5 @@
   "env": {
     "node": true
   },
-  "ignorePatterns": [
-    "src/generated/**"
-  ]
+  "ignorePatterns": ["src/generated/**"]
 }

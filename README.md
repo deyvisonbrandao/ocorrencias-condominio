@@ -16,6 +16,8 @@ packages/contratos/   enums e tipos compartilhados entre API e web
 docs/                 plano do MVP e ADRs
 ```
 
+API e web seguem a mesma divisão em `core/` (infraestrutura que existe uma vez só), `features/` (uma pasta por entrega) e `shared/` (reutilizável entre features). As regras de cada lado estão em [docs/arquitetura-mvp.md](docs/arquitetura-mvp.md#arquitetura); na API, o lint (`apps/api/.oxlintrc.json`) barra import entre camadas na direção proibida.
+
 ## Pré-requisitos
 
 - **Node.js 22.22.3 ou superior** na linha 22 (ou 24.15+), versão mínima exigida pelo Angular CLI 22. O `.nvmrc` fixa `22.22.3` para quem usa nvm/fnm; no **nvm-windows**, que não lê `.nvmrc`, rode `nvm install 22.22.3` e `nvm use 22.22.3`.
