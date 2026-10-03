@@ -3,9 +3,10 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { PainelAdmin, Papel, UsuarioSessao } from '@ocorrencias/contratos';
+import { CondominioAdmin, PainelAdmin, Papel, UsuarioSessao } from '@ocorrencias/contratos';
 import { NEVER, Observable, of } from 'rxjs';
 import { restaurarDialogoNativo, simularDialogoNativo } from '../../../../testes/dialogo-nativo';
+import { CondominioAdminService } from '../../../features/condominio/services/condominio-admin.service';
 import { PainelService } from '../../../features/painel/services/painel.service';
 import { focarTituloERolarAoNavegar } from '../../services/foco-na-navegacao';
 import { SessaoService } from '../../services/sessao.service';
@@ -55,6 +56,7 @@ describe('ShellAdmin', () => {
         provideRouter([{ path: 'admin', children: rotasAdmin }]),
         { provide: SessaoService, useValue: sessao },
         { provide: PainelService, useValue: { obter: (): Observable<PainelAdmin> => NEVER } },
+        { provide: CondominioAdminService, useValue: { obter: (): Observable<CondominioAdmin> => NEVER } },
         {
           provide: ViewportScroller,
           useValue: {

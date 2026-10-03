@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { ORIGEM_DO_APP } from '../../../../core/config/origem-do-app';
 import { ConfirmacaoCadastro } from './confirmacao-cadastro';
 
 describe('ConfirmacaoCadastro', () => {
@@ -7,7 +8,9 @@ describe('ConfirmacaoCadastro', () => {
   let raiz: HTMLElement;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    TestBed.configureTestingModule({
+      providers: [provideRouter([]), { provide: ORIGEM_DO_APP, useValue: 'https://ocorrencias.app' }],
+    });
     fixture = TestBed.createComponent(ConfirmacaoCadastro);
     fixture.componentRef.setInput('condominio', {
       id: '1',
@@ -25,8 +28,8 @@ describe('ConfirmacaoCadastro', () => {
     expect(document.activeElement).toBe(titulo);
   });
 
-  it('mostra o link absoluto do condomínio, com o botão de copiar o mesmo valor', () => {
-    const esperado = `${location.origin}/c/jardim`;
+  it('mostra o link absoluto do condomínio na origem do app, com o botão de copiar o mesmo valor', () => {
+    const esperado = 'https://ocorrencias.app/c/jardim';
     const link = raiz.querySelector('section a') as HTMLAnchorElement;
 
     expect(raiz.querySelector('h2')?.textContent).toBe('Jardim das Flores');

@@ -108,6 +108,26 @@ describe('SessaoService', () => {
     });
   });
 
+  describe('atualizarCondominio', () => {
+    it('troca o condomínio da sessão aberta sem perguntar de novo à API', () => {
+      carregar();
+      controle.expectOne('/me').flush(SINDICO);
+
+      sessao.atualizarCondominio({ nome: 'Residencial Jardim II', slug: 'jardim' });
+
+      expect(sessao.usuario()).toEqual({
+        ...SINDICO,
+        condominio: { nome: 'Residencial Jardim II', slug: 'jardim' },
+      });
+    });
+
+    it('sem sessão, não cria uma', () => {
+      sessao.atualizarCondominio({ nome: 'Residencial Jardim II', slug: 'jardim' });
+
+      expect(sessao.usuario()).toBeNull();
+    });
+  });
+
   it('entrar envia as credenciais sem toast global e abre a sessão', () => {
     let recebido: UsuarioSessao | undefined;
     sessao

@@ -85,7 +85,7 @@ condominio-ocorrencias/
 
 ### Modelo de dados
 
-- **`condominio`**: id (UUIDv7), nome, slug UNIQUE, status, proximo_numero_ocorrencia.
+- **`condominio`**: id (UUIDv7), nome, slug UNIQUE, status, proximo_numero_ocorrencia, cidade?, uf? (enum das 27 UFs). Cidade e UF são nulas no banco porque o autocadastro não as pede; o `PUT /admin/condominio` exige as duas (issue #11). `versao` serve de lock otimista para esse PUT: a gravação só vale se a versão lida não mudou, com nova tentativa no servidor e 409 `EDICAO_CONCORRENTE` se esgotar.
 - **`usuario`**:
   - Dados: condominio_id, nome, telefone (E.164), email?, senha_hash, bloco, apto.
   - Acesso: papel, status (PENDENTE/ATIVO/RECUSADO/INATIVO), senha_temporaria, versao_sessao.
@@ -102,7 +102,7 @@ condominio-ocorrencias/
   - `interno` marca nota que só o admin vê.
   - `ator_papel` guarda o papel do autor do evento.
   - `dados` em JSON, com o de/para da mudança.
-- **`auditoria_admin`**: registra aprovar, recusar, inativar, resetar senha e mudanças na equipe.
+- **`auditoria_admin`**: registra aprovar, recusar, inativar, resetar senha, mudanças na equipe e edição dos dados do condomínio (`CONDOMINIO_ATUALIZADO`, com o de/para).
 
 ### Máquina de estados
 
@@ -156,7 +156,7 @@ condominio-ocorrencias/
   - `PUT /admin/ocorrencias/:id/{prazo|triagem}`;
   - `POST|DELETE /admin/ocorrencias/:id/duplicada`, `POST /admin/ocorrencias/:id/comentarios`;
   - `/admin/painel`, `/admin/moradores/:id/{aprovar|recusar|inativar|reativar|redefinir-senha}`.
-- Só síndico: `/admin/condominio`, `/admin/equipe/subsindico`.
+- Só síndico: `PUT /admin/condominio`, `/admin/equipe/subsindico`. O `GET /admin/condominio` vale também para o subsíndico, em modo leitura (R6 da especificação de UI).
 - Paginação por cursor `(criado_em, id)`.
 
 ## Execução
