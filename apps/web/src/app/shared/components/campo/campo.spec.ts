@@ -160,3 +160,45 @@ describe('ui-campo com máscara de telefone', () => {
     expect(raiz.querySelector('ui-moldura-campo .status')?.textContent).toBe('Conteúdo abaixo do campo');
   });
 });
+
+@Component({
+  imports: [Campo, ReactiveFormsModule],
+  template: `
+    <ui-campo rotulo="Telefone" [erro]="erro()" [formControl]="controle">
+      <a acaoErro href="/entrar">Entrar</a>
+    </ui-campo>
+  `,
+})
+class HospedeiroAcaoDoErro {
+  readonly erro = signal<string | null>(null);
+  readonly controle = new FormControl('', { nonNullable: true });
+}
+
+describe('ui-campo com ação no erro', () => {
+  let fixture: ComponentFixture<HospedeiroAcaoDoErro>;
+  let raiz: HTMLElement;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(HospedeiroAcaoDoErro);
+    raiz = fixture.nativeElement as HTMLElement;
+    await fixture.whenStable();
+  });
+
+  it('sem erro, não mostra a ação', () => {
+    expect(raiz.querySelector('a')).toBeNull();
+  });
+
+  it('com erro, mostra a ação dentro da mensagem ligada ao campo', async () => {
+    fixture.componentInstance.erro.set('Este telefone já tem cadastro neste condomínio.');
+    await fixture.whenStable();
+
+    const entrada = raiz.querySelector('input') as HTMLInputElement;
+    const idErro = (entrada.getAttribute('aria-describedby') ?? '').split(' ').at(-1);
+    const mensagem = raiz.querySelector(`#${idErro}`);
+
+    expect(mensagem?.querySelector('a')?.textContent).toBe('Entrar');
+    expect(mensagem?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Este telefone já tem cadastro neste condomínio. Entrar',
+    );
+  });
+});

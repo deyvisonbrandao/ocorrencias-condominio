@@ -66,6 +66,7 @@ export type MascaraCampo = 'telefone';
         }
       </div>
       <ng-content />
+      <ng-container ngProjectAs="[acaoErro]"><ng-content select="[acaoErro]" /></ng-container>
     </ui-moldura-campo>
   `,
 })

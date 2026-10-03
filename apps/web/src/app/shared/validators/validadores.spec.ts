@@ -44,6 +44,20 @@ describe('validadores', () => {
     expect(mensagemDeErro(new FormControl('ok'))).toBeNull();
   });
 
+  describe('maximo', () => {
+    it('conta o valor aparado por padrão', () => {
+      expect(maximo(3)('  abc  ')).toBeNull();
+      expect(maximo(3)('abcd')).toBe('Use no máximo 3 caracteres.');
+    });
+
+    it('com normalização, conta o valor normalizado', () => {
+      const semPrefixo = (valor: string) => valor.replace(/^bloco\s+/i, '');
+
+      expect(maximo(3, semPrefixo)('Bloco ABC')).toBeNull();
+      expect(maximo(3, semPrefixo)('Bloco ABCD')).toBe('Use no máximo 3 caracteres.');
+    });
+  });
+
   describe('celularBr', () => {
     it.each(['(11) 91234-5678', '11912345678', '+55 11 91234-5678'])('aceita "%s"', (valor) => {
       expect(celularBr(valor)).toBeNull();
