@@ -59,6 +59,7 @@ docs/                 plano do MVP e ADRs
    - API: http://localhost:3000/api/v1 (health em http://localhost:3000/api/v1/health)
    - Swagger: http://localhost:3000/api/docs
    - Pelo proxy do web: http://localhost:4200/api/v1
+   - Vitrine dos componentes de `shared/ui` (só em desenvolvimento): http://localhost:4200/dev/ui
 
    A API valida o `.env` na subida: com variável faltando ou inválida, ela não sobe e lista o que corrigir.
 
@@ -70,7 +71,7 @@ docs/                 plano do MVP e ADRs
 | --- | --- |
 | `npm run dev` | Compila `packages/contratos` e sobe juntos o watch de contratos, a API (watch) e o web (`ng serve`) |
 | `npm run build` | Build de produção de contratos, API e web |
-| `npm run lint` | Lint da API (oxlint) e checagem de tipos de contratos |
+| `npm run lint` | Lint da API (oxlint), do web (ESLint com angular-eslint, inclusive regras de acessibilidade de template) e checagem de tipos de contratos |
 | `npm test` | Testes unitários da API e da web (Vitest) |
 | `npm run db:up` / `npm run db:down` | Sobe o MySQL esperando ficar `healthy` / para o MySQL (o volume com os dados é mantido) |
 

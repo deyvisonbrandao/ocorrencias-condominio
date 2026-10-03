@@ -212,12 +212,12 @@ Com `prefers-reduced-motion: reduce`, nada desliza nem escala, o skeleton fica e
 
 A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, e os mockups usam a forma v3 ([`mockups/assets/mockup.js`](mockups/assets/mockup.js)).
 
-**Tailwind v4 (`@theme` em `apps/web/src/styles.css`)**, com Flowbite 3:
+> **Decisão da issue #3:** Tailwind v4 com o `@theme` abaixo, **sem** `@plugin "flowbite/plugin"` e sem `@source` do Flowbite. O plugin (3.x e 4.x) gera um seletor inválido (`:is():hover`, no `::file-selector-button`) que vira warning no build de produção, e o tema que ele lê (`--color-brand`, `--color-body`…) não existe sem importar o tema do Flowbite. O único estilo dele que o MVP usava, o reset do `<select>` com a seta, está em `styles.css`. O Flowbite segue como referência de marcação e classes e como fonte dos ícones (ADR-006). Sem o plugin, `radio` e `checkbox` (issue #12) não têm reset: use `accent-primaria` no controle nativo ou um reset próprio em `shared/ui`, com borda `borda-controle`.
+
+**Tailwind v4 (`@theme` em `apps/web/src/styles.css`)**, como implementado:
 
 ```css
 @import "tailwindcss";
-@plugin "flowbite/plugin";
-@source "../node_modules/flowbite";
 
 @theme {
   /* base */
@@ -253,7 +253,7 @@ A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, 
 }
 ```
 
-Se o tema padrão do Flowbite 3 for importado, aponte as variáveis de marca dele (família `--color-brand*`; confira os nomes na versão instalada) para `var(--color-primaria)` e seus pares. Assim, componentes copiados da documentação herdam a primária.
+O tema do Flowbite não é importado. Se um dia for, aponte as variáveis de marca dele (família `--color-brand*`; confira os nomes na versão instalada) para `var(--color-primaria)` e seus pares. Assim, componentes copiados da documentação herdam a primária.
 
 **Tailwind v3 (`tailwind.config.js`)**, com Flowbite 2: é o mesmo objeto de `theme.extend` de [`mockups/assets/mockup.js`](mockups/assets/mockup.js), mais `plugins: [require('flowbite/plugin')]` e `content: ['./src/**/*.{html,ts}', './node_modules/flowbite/**/*.js']`.
 
@@ -269,7 +269,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 
 | Necessidade | Componente `shared/ui` | Base Flowbite | Variantes e entradas | Estados obrigatórios | Notas de acessibilidade |
 |---|---|---|---|---|---|
-| Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/ui/icones`) | `nome`, `tamanho` (16, 20 ou 24px), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
+| Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/ui/icones`) | `nome`, `tamanho` (14, 16, 20 ou 24px; 14px só dentro de badge), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
 | Ação | `ui-botao` (também como `a[ui-botao]`) | Buttons | `primario` · `secundario` (contorno `borda-controle`) · `texto` · `perigo` (sólido) · `perigo-contorno`; `bloco` (largura total abaixo de 768px); `icone` (quadrado 44px, exige `rotulo`) | repouso, hover (`primaria-hover` / `superficie-sutil`), foco visível, ativo (= hover), desabilitado (`opacity-50`, `cursor-not-allowed`, `aria-disabled`), **carregando** (spinner + rótulo no gerúndio + `aria-busy`, sem clique duplo) | Altura mínima de 44px. Botão só com ícone exige `aria-label`. Não use `disabled` para esconder um erro de validação: deixe enviar e mostre o erro. |
 | Campo de texto | `ui-campo` | Input field | `tipo` (text, tel, email, password com botão "Mostrar senha"), `rotulo`, `dica`, `erro`, `opcional`, `prefixo` ("#"), `mascara` (telefone) | repouso (borda `borda-controle`), foco (borda `primaria-foco` + anel 2px a 30%), **erro** (borda 2px `perigo-borda` + mensagem `perigo` com ícone), desabilitado (`superficie-sutil`), somente leitura | `<label for>` sempre visível (placeholder não é rótulo). `aria-describedby` = dica + erro. `aria-invalid="true"` no erro. Texto de 16px. |
 | Texto longo | `ui-area-texto` | Textarea | `rotulo`, `dica`, `min`, `max`, `contador` | iguais aos do `ui-campo` + contador `n/max` (`tabular-nums`) | O contador não é `aria-live` a cada tecla. Ele anuncia só ao cruzar o mínimo e ao faltarem 100 para o máximo. |
@@ -286,11 +286,12 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Histórico | `ui-timeline` | Timeline (vertical) | `eventos` (catálogo em 6.3), `visao: 'morador' \| 'admin'` | vazio impossível (sempre há "registrou") | `<ol>` em ordem cronológica. Cada item tem `<time datetime>`. O ícone do evento é `aria-hidden`; o texto diz o que houve. |
 | Comentar | `ui-comentario-form` | Textarea + Toggle | `permiteInterno` (admin) | ocioso, enviando, erro (mantém o texto); no admin, modo nota interna (card em tom `interna`) | No admin, o `ui-alternador` "Nota interna" (desligado = público, issue #18) troca a dica (`aria-live`) e o rótulo do botão. |
 | Alerta inline | `ui-alerta` | Alert | `info` · `aviso` · `perigo` · `sucesso`; `titulo`; `acao?` | — | `role="alert"` só para erro que surge depois de uma ação; texto fixo (emergência, anonimato) é `<aside>`/`<p>` simples. |
-| Toast | `ui-toast` + `ToastService` | Toast | `sucesso` · `erro` | entrando, visível, saindo | Região única `aria-live="polite"` (sucesso) e `role="alert"` (erro) no shell. Sucesso fecha em 5s, com pausa no hover e no foco; erro só fecha manualmente. O botão fechar tem 44px. |
+| Toast | `ui-toast` + `ToastService` | Toast | `sucesso` · `erro` | entrando, visível, saindo | Região única `aria-live="polite"` (sucesso) e `role="alert"` (erro) no shell. Sucesso fecha em 5s, com pausa no hover e no foco (só volta a contar sem nenhum dos dois); erro só fecha manualmente. O botão fechar tem 44px. **Com modal ou drawer aberto o toast fica inerte** (fora do `showModal()`): requisição feita de dentro de um diálogo usa `SEM_TOAST_DE_ERRO` e mostra o erro dentro do próprio diálogo, num `ui-alerta` com `role="alert"`. |
 | Modal / bottom sheet | `ui-modal` | Modal (só visual) | `titulo`, `tamanho`, `tipo: 'dialog' \| 'alertdialog'` | abrindo, aberto, enviando (botões desabilitados), erro (dentro do modal) | `<dialog>` + `showModal()`. Abaixo de 768px vira bottom sheet (`rounded-t-2xl`, alinhado à base). Foco inicial no primeiro campo, ou no botão **não destrutivo** em confirmações. Esc fecha. O foco volta ao botão que abriu. |
 | Drawer | `ui-drawer` | Drawer | `lado: 'esquerda' \| 'base'` | — | Também `<dialog>`. Usado pelo menu do admin abaixo de 1024px e pelos filtros da fila abaixo de 768px. |
 | Navegação do morador | `ui-bottom-nav` | Bottom Navigation | itens fixos | ativo (`primaria` + `aria-current="page"`), hover | `<nav aria-label="Navegação principal">`. Célula de 64px de altura. |
 | Barra superior | `ui-barra-superior` | Navbar | `modo: 'raiz' \| 'empilhada'` | — | Na empilhada, o botão voltar tem `aria-label` específico ("Voltar para ocorrências"). |
+| Pular para o conteúdo | `ui-pular-conteudo` | — | — | oculto, visível no foco | Primeiro item de todo shell. Leva o foco ao `h1` de `#conteudo` sem trocar a URL (o `href="#conteudo"` puro recarregaria a rota por causa do `<base href>`). |
 | Sidebar do admin | `ui-sidebar` | Sidebar | itens por papel | ativo, hover, contador (pendentes) | O contador tem texto `sr-only` ("3 cadastros pendentes"). |
 | Abas | `ui-abas` | Tabs (estilo sublinhado) | `abas: {rotulo, contador?, rota}` | ativa, hover, foco | São **links de rota** (`aria-current="page"`), não `role="tab"`: cada aba é uma URL (`?aba=pendentes`). Rolam na horizontal abaixo de 640px. |
 | Visões rápidas | `ui-chips-visao` | Button Group / pills | `visoes: {rotulo, contador?, query}` | ativa (fundo `texto`, letra branca, **17.74**), inativa (contorno `borda-controle`) | Links com `aria-current="true"`. Rolagem horizontal com a última visível pela metade como pista. |

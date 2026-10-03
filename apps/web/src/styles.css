@@ -1,1 +1,188 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+
+@theme {
+  --color-primaria: #1d4ed8;
+  --color-primaria-hover: #1e40af;
+  --color-primaria-foco: #2563eb;
+  --color-primaria-suave: #eff6ff;
+  --color-primaria-borda: #bfdbfe;
+  --color-texto: #111827;
+  --color-texto-secundario: #4b5563;
+  --color-texto-suave: #6b7280;
+  --color-texto-inverso: #ffffff;
+  --color-superficie: #ffffff;
+  --color-superficie-app: #f9fafb;
+  --color-superficie-sutil: #f3f4f6;
+  --color-borda: #e5e7eb;
+  --color-borda-controle: #6b7280;
+
+  --color-perigo: #b91c1c;
+  --color-perigo-hover: #991b1b;
+  --color-perigo-suave: #fef2f2;
+  --color-perigo-texto: #991b1b;
+  --color-perigo-borda: #dc2626;
+  --color-perigo-linha: #fecaca;
+  --color-sucesso-suave: #f0fdf4;
+  --color-sucesso-texto: #166534;
+  --color-sucesso-linha: #bbf7d0;
+  --color-info-suave: #eff6ff;
+  --color-info-texto: #1e40af;
+  --color-info-linha: #bfdbfe;
+  --color-aviso-suave: #fff7ed;
+  --color-aviso-texto: #9a3412;
+  --color-aviso-linha: #fed7aa;
+
+  --color-status-aberta-fundo: #dbeafe;
+  --color-status-aberta-texto: #1e40af;
+  --color-status-aberta-ponto: #2563eb;
+  --color-status-andamento-fundo: #fef9c3;
+  --color-status-andamento-texto: #854d0e;
+  --color-status-andamento-ponto: #ca8a04;
+  --color-status-resolvida-fundo: #dcfce7;
+  --color-status-resolvida-texto: #166534;
+  --color-status-resolvida-ponto: #16a34a;
+  --color-status-arquivada-fundo: #f3f4f6;
+  --color-status-arquivada-texto: #374151;
+  --color-status-arquivada-ponto: #6b7280;
+  --color-status-duplicada-fundo: #f3e8ff;
+  --color-status-duplicada-texto: #6b21a8;
+  --color-status-duplicada-ponto: #9333ea;
+
+  --color-urgencia-baixa-fundo: #f3f4f6;
+  --color-urgencia-baixa-texto: #374151;
+  --color-urgencia-media-fundo: #ffedd5;
+  --color-urgencia-media-texto: #9a3412;
+  --color-urgencia-alta-fundo: #fee2e2;
+  --color-urgencia-alta-texto: #991b1b;
+  --color-urgencia-critica-fundo: #7f1d1d;
+  --color-urgencia-critica-texto: #ffffff;
+  --color-atrasada-fundo: #b91c1c;
+  --color-atrasada-texto: #ffffff;
+  --color-interna-fundo: #fffbeb;
+  --color-interna-texto: #78350f;
+  --color-interna-rotulo: #92400e;
+  --color-interna-borda: #d97706;
+
+  --radius-controle: 0.5rem;
+  --radius-cartao: 0.75rem;
+  --spacing-toque: 2.75rem;
+  --spacing-barra-inferior: 4rem;
+  --container-conteudo: 42rem;
+  --container-admin: 72rem;
+  --default-transition-duration: 150ms;
+  --transition-duration-rapido: 150ms;
+  --transition-duration-medio: 200ms;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-padding-top: 4rem;
+  }
+
+  @media (width < 48rem) {
+    html:has(ui-bottom-nav) {
+      scroll-padding-bottom: 5rem;
+    }
+  }
+
+  body {
+    @apply bg-superficie-app font-sans text-texto antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primaria-foco);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(17 24 39 / 0.5);
+  }
+
+  /* Substitui o plugin de formulários do Flowbite, que gera seletor inválido (:is():hover) no build. */
+  select:not([multiple]) {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 10 6'%3e%3cpath stroke='%234b5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 1 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 0.75em 0.75em;
+    padding-right: 2.5rem;
+    print-color-adjust: exact;
+  }
+}
+
+@layer components {
+  .ui-dialogo {
+    opacity: 0;
+    transition:
+      opacity var(--transition-duration-rapido) ease-in,
+      transform var(--transition-duration-rapido) ease-in,
+      overlay var(--transition-duration-rapido) ease-in allow-discrete,
+      display var(--transition-duration-rapido) ease-in allow-discrete;
+  }
+
+  .ui-dialogo[open] {
+    opacity: 1;
+    transform: none;
+    transition-duration: var(--transition-duration-medio);
+    transition-timing-function: ease-out;
+  }
+
+  @starting-style {
+    .ui-dialogo[open] {
+      opacity: 0;
+    }
+  }
+
+  .ui-dialogo-folha {
+    transform: translateY(1.5rem);
+  }
+
+  @starting-style {
+    .ui-dialogo-folha[open] {
+      transform: translateY(1.5rem);
+    }
+  }
+
+  .ui-dialogo-esquerda {
+    transform: translateX(-100%);
+  }
+
+  @starting-style {
+    .ui-dialogo-esquerda[open] {
+      transform: translateX(-100%);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .ui-dialogo-centro-md {
+      transform: scale(0.98);
+    }
+
+    @starting-style {
+      .ui-dialogo-centro-md[open] {
+        transform: scale(0.98);
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .ui-dialogo,
+  .ui-dialogo[open] {
+    transform: none !important;
+  }
+}
