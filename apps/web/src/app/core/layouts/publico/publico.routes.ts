@@ -21,12 +21,21 @@ export default [
             (m) => m.CadastroCondominio,
           ),
       },
-      { path: 'c/:slug', title: 'Condomínio', component: PaginaProvisoria, data: { issue: 7 } },
+      {
+        path: 'c/:slug',
+        title: 'Condomínio',
+        loadComponent: () =>
+          import('../../../features/pagina-do-condominio/pagina-do-condominio').then(
+            (m) => m.PaginaDoCondominio,
+          ),
+      },
       {
         path: 'c/:slug/cadastro',
         title: 'Criar conta',
-        component: PaginaProvisoria,
-        data: { issue: 7 },
+        loadComponent: () =>
+          import('../../../features/cadastro-morador/cadastro-morador').then(
+            (m) => m.CadastroMorador,
+          ),
       },
       {
         path: 'c/:slug/entrar',
@@ -37,8 +46,10 @@ export default [
       {
         path: 'c/:slug/aguardando-aprovacao',
         title: 'Cadastro enviado',
-        component: PaginaProvisoria,
-        data: { issue: 7 },
+        loadComponent: () =>
+          import('../../../features/aguardando-aprovacao/aguardando-aprovacao').then(
+            (m) => m.AguardandoAprovacao,
+          ),
       },
       { path: 'termos', title: 'Termos de uso', component: PaginaProvisoria, data: { issue: 25 } },
       {

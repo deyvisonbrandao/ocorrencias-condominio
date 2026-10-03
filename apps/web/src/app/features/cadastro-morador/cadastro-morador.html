@@ -1,0 +1,107 @@
+<div class="md:mx-auto md:max-w-md">
+  <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
+    {{ estado().tipo === 'nao-encontrado' ? 'Condomínio não encontrado' : 'Criar conta' }}
+  </h1>
+
+  @switch (estado().tipo) {
+    @case ('carregando') {
+      @if (esperaLonga()) {
+        <ui-skeleton class="mt-6" forma="detalhe" [quantidade]="1" />
+      }
+    }
+    @case ('nao-encontrado') {
+      <ui-condominio-nao-encontrado />
+    }
+    @case ('erro') {
+      <ui-estado-erro
+        class="mt-6"
+        titulo="Não foi possível carregar o condomínio."
+        (tentarDeNovo)="tentarDeNovo()"
+      />
+    }
+    @case ('pronto') {
+      <p class="mt-1 text-base text-texto-secundario">{{ condominio()?.nome }}</p>
+
+      <form
+        class="mt-6 space-y-6 md:rounded-cartao md:border md:border-borda md:bg-superficie md:p-6"
+        novalidate
+        [formGroup]="formulario"
+        (ngSubmit)="enviar()"
+      >
+        <ui-campo
+          formControlName="nome"
+          rotulo="Nome completo"
+          autocomplete="name"
+          autocapitalize="words"
+          [maxlength]="maxNome"
+          [erro]="erro('nome')"
+        />
+        <ui-campo
+          formControlName="telefone"
+          tipo="tel"
+          mascara="telefone"
+          rotulo="Telefone (celular)"
+          inputmode="tel"
+          autocomplete="tel-national"
+          placeholder="(11) 91234-5678"
+          [erro]="erro('telefone')"
+        >
+          @if (erro('telefone') === mensagemTelefoneEmUso) {
+            <a
+              acaoErro
+              class="font-semibold text-primaria underline"
+              [routerLink]="['/c', slug(), 'entrar']"
+              >Entrar</a
+            >
+          }
+        </ui-campo>
+        <div class="grid grid-cols-2 gap-4">
+          <ui-campo
+            formControlName="bloco"
+            rotulo="Bloco"
+            autocomplete="off"
+            autocapitalize="characters"
+            [erro]="erro('bloco')"
+          />
+          <ui-campo
+            formControlName="apto"
+            rotulo="Apartamento"
+            autocomplete="off"
+            autocapitalize="characters"
+            [erro]="erro('apto')"
+          />
+        </div>
+        <ui-campo
+          formControlName="email"
+          tipo="email"
+          rotulo="E-mail"
+          dica="Só para contato da administração."
+          opcional
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="none"
+          [corretor]="false"
+          [erro]="erro('email')"
+        />
+        <ui-campo
+          formControlName="senha"
+          tipo="password"
+          rotulo="Senha"
+          dica="Mínimo de 8 caracteres."
+          autocomplete="new-password"
+          [erro]="erro('senha')"
+        />
+
+        <button
+          type="submit"
+          ui-botao
+          bloco
+          rotuloCarregando="Enviando cadastro…"
+          [carregando]="enviando()"
+        >
+          Enviar cadastro
+        </button>
+      </form>
+    }
+  }
+</div>
