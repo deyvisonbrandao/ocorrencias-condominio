@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  CELULAR_BR_E164,
+  celularBrE164Valido,
   normalizarCelularBr,
   REGRAS_EMAIL,
   REGRAS_SENHA,
@@ -11,9 +11,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
   MaxLength,
   MinLength,
+  ValidateBy,
 } from 'class-validator';
 
 export const MENSAGEM_CELULAR =
@@ -42,8 +42,16 @@ export function CelularBr(): PropertyDecorator {
     Transform(({ value }: TransformFnParams) =>
       typeof value === 'string' ? (normalizarCelularBr(value) ?? value) : value,
     ),
-    IsString({ message: MENSAGEM_CELULAR }),
-    Matches(CELULAR_BR_E164, { message: MENSAGEM_CELULAR }),
+    ValidateBy(
+      {
+        name: 'celularBr',
+        validator: {
+          validate: (valor: unknown) =>
+            typeof valor === 'string' && celularBrE164Valido(valor),
+        },
+      },
+      { message: MENSAGEM_CELULAR },
+    ),
   );
 }
 

@@ -78,6 +78,15 @@ describe('validadores de campos de pessoa', () => {
     expect(erros['senha']).toContain(MENSAGEM_SENHA);
   });
 
+  it.each(['+5523912345678', '+5539912345678', '(23) 91234-5678'])(
+    'recusa celular com DDD inexistente, em qualquer formato: %s',
+    (telefone) => {
+      expect(
+        validar({ nome: 'Ana', telefone, senha: '12345678' }).erros['telefone'],
+      ).toEqual([MENSAGEM_CELULAR]);
+    },
+  );
+
   it('limita o tamanho do texto', () => {
     expect(
       validar({ nome: 'Ana Maria', telefone: '11912345678', senha: '12345678' })

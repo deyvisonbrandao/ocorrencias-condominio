@@ -5,8 +5,6 @@ const DDDS_BRASIL = new Set([
   89, 91, 92, 93, 94, 95, 96, 97, 98, 99,
 ]);
 
-export const CELULAR_BR_E164 = /^\+55[1-9]{2}9\d{8}$/;
-
 const CARACTERES_ACEITOS = /^[\d\s().+-]+$/;
 
 export function normalizarCelularBr(entrada: string): string | null {
@@ -37,4 +35,8 @@ export function normalizarCelularBr(entrada: string): string | null {
     return null;
   }
   return `+55${nacional}`;
+}
+
+export function celularBrE164Valido(valor: string): boolean {
+  return normalizarCelularBr(valor) === valor;
 }

@@ -1,4 +1,8 @@
-import { normalizarCelularBr, REGRAS_SLUG } from '@ocorrencias/contratos';
+import {
+  celularBrE164Valido,
+  normalizarCelularBr,
+  REGRAS_SLUG,
+} from '@ocorrencias/contratos';
 import { slugValido } from './condominios-publico.service.js';
 
 describe('normalizarCelularBr', () => {
@@ -19,6 +23,8 @@ describe('normalizarCelularBr', () => {
     ['fixo', '(11) 3123-4567'],
     ['sem DDD', '91234-5678'],
     ['DDD inexistente', '(20) 91234-5678'],
+    ['DDD 23 inexistente em E.164', '+5523912345678'],
+    ['DDD 39 inexistente em E.164', '+5539912345678'],
     ['DDD começando com 0', '(01) 91234-5678'],
     ['dígito a mais', '(11) 91234-56789'],
     ['outro país', '+1 415 912 3456'],
@@ -26,6 +32,22 @@ describe('normalizarCelularBr', () => {
     ['vazio', ''],
   ])('recusa %s', (_, entrada) => {
     expect(normalizarCelularBr(entrada)).toBeNull();
+  });
+});
+
+describe('celularBrE164Valido', () => {
+  it('aceita só o E.164 que a normalização produziria', () => {
+    expect(celularBrE164Valido('+5511912345678')).toBe(true);
+  });
+
+  it.each([
+    '+5523912345678',
+    '+5539912345678',
+    '+5511312345678',
+    '11912345678',
+    '+55 11 91234-5678',
+  ])('recusa %s', (valor) => {
+    expect(celularBrE164Valido(valor)).toBe(false);
   });
 });
 
