@@ -21,7 +21,12 @@ export default [
           ),
       },
       { path: 'c/:slug', title: 'Condomínio', component: PaginaProvisoria, data: { issue: 7 } },
-      { path: 'c/:slug/cadastro', title: 'Criar conta', component: PaginaProvisoria, data: { issue: 7 } },
+      {
+        path: 'c/:slug/cadastro',
+        title: 'Criar conta',
+        component: PaginaProvisoria,
+        data: { issue: 7 },
+      },
       { path: 'c/:slug/entrar', title: 'Entrar', component: PaginaProvisoria, data: { issue: 6 } },
       {
         path: 'c/:slug/aguardando-aprovacao',
@@ -29,7 +34,19 @@ export default [
         component: PaginaProvisoria,
         data: { issue: 7 },
       },
-      { path: 'trocar-senha', title: 'Crie sua nova senha', component: PaginaProvisoria, data: { issue: 9 } },
+      { path: 'termos', title: 'Termos de uso', component: PaginaProvisoria, data: { issue: 25 } },
+      {
+        path: 'privacidade',
+        title: 'Política de privacidade',
+        component: PaginaProvisoria,
+        data: { issue: 25 },
+      },
+      {
+        path: 'trocar-senha',
+        title: 'Crie sua nova senha',
+        component: PaginaProvisoria,
+        data: { issue: 9 },
+      },
       {
         path: '**',
         title: 'Página não encontrada',
