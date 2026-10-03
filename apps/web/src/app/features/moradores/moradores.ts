@@ -2,6 +2,7 @@ import {
   afterNextRender,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   inject,
   Injector,
@@ -11,8 +12,24 @@ import {
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
-import { AcaoMorador, MoradorAdmin, REGRAS_BUSCA_MORADORES } from '@ocorrencias/contratos';
-import { catchError, debounceTime, map, Observable, of, startWith, Subscription, switchMap, tap, timer } from 'rxjs';
+import {
+  AcaoMorador,
+  CodigoErroPaginacao,
+  MoradorAdmin,
+  REGRAS_BUSCA_MORADORES,
+} from '@ocorrencias/contratos';
+import {
+  catchError,
+  debounceTime,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subscription,
+  switchMap,
+  tap,
+  timer,
+} from 'rxjs';
 import { ContagemMoradoresService } from '../../core/services/contagem-moradores.service';
 import { Aba, Abas } from '../../shared/components/abas/abas';
 import { Alerta } from '../../shared/components/alerta/alerta';
@@ -23,6 +40,7 @@ import { EstadoErro } from '../../shared/components/estados/estado-erro';
 import { EstadoVazio } from '../../shared/components/estados/estado-vazio';
 import { ESPERA_ANTES_DO_SKELETON_MS, Skeleton } from '../../shared/components/estados/skeleton';
 import { ToastService } from '../../shared/services/toast.service';
+import { lerErroApi } from '../../shared/utils/erro-api';
 import {
   ABA_PADRAO,
   ABAS_MORADORES,
@@ -35,6 +53,7 @@ import { ListaMoradores, PedidoAcao } from './components/lista-moradores/lista-m
 import { MoradoresService } from './services/moradores.service';
 
 export const ESPERA_DA_BUSCA_MS = 300;
+export const DICA_BUSCA_CURTA = `Termos com até ${REGRAS_BUSCA_MORADORES.termoCurtoMax} caracteres procuram só o bloco ou o início do apto.`;
 
 type EstadoLista =
   | { readonly tipo: 'carregando' }
@@ -104,13 +123,16 @@ export class Moradores {
   private readonly router = inject(Router);
   private readonly rota = inject(ActivatedRoute);
   private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   private readonly lista = viewChild(ListaMoradores);
   private readonly confirmacao = viewChild.required(ConfirmarAcao);
 
   private readonly parametros = toSignal(this.rota.queryParamMap, { requireSync: true });
-  protected readonly consulta = computed(() => consultaDe(this.parametros()), { equal: mesmaConsulta });
+  protected readonly consulta = computed(() => consultaDe(this.parametros()), {
+    equal: mesmaConsulta,
+  });
   protected readonly aba = computed(() => this.consulta().aba);
   protected readonly q = computed(() => this.consulta().q);
   private readonly versao = signal(0);
@@ -124,10 +146,11 @@ export class Moradores {
   protected readonly busca = new FormControl(this.q(), { nonNullable: true });
   private ultimaBuscaEnviada = this.q();
   private paginaSeguinte: Subscription | null = null;
+  private focarPrimeiroAoCarregar = false;
 
   protected readonly abas = computed<readonly Aba[]>(() => {
     const q = this.q() || null;
-    const pendentes = this.contagem.contagem()?.pendentes;
+    const pendentes = this.contagem.contagem()?.pendentes || undefined;
     return ABAS_MORADORES.map((aba) => ({
       rotulo: aba.rotulo,
       rota: ROTA,
@@ -146,8 +169,18 @@ export class Moradores {
     if (estado.tipo !== 'pronto' || estado.itens.length === 0) {
       return null;
     }
-    return estado.proximoCursor !== null || estado.paginou ? { fim: estado.proximoCursor === null } : null;
+    return estado.proximoCursor !== null || estado.paginou
+      ? { fim: estado.proximoCursor === null }
+      : null;
   });
+
+  protected readonly dicaDaBuscaVazia = computed(() =>
+    this.q()
+      .split(/s+/)
+      .some((termo) => termo.length > 0 && termo.length <= REGRAS_BUSCA_MORADORES.termoCurtoMax)
+      ? DICA_BUSCA_CURTA
+      : undefined,
+  );
 
   protected readonly anuncioDaBusca = computed(() => {
     const estado = this.estado();
@@ -166,7 +199,12 @@ export class Moradores {
   protected readonly mostrarSkeleton = toSignal(
     toObservable(computed(() => this.estado().tipo === 'carregando')).pipe(
       switchMap((carregando) =>
-        carregando ? timer(ESPERA_ANTES_DO_SKELETON_MS).pipe(map(() => true), startWith(false)) : of(false),
+        carregando
+          ? timer(ESPERA_ANTES_DO_SKELETON_MS).pipe(
+              map(() => true),
+              startWith(false),
+            )
+          : of(false),
       ),
     ),
     { initialValue: false },
@@ -175,7 +213,9 @@ export class Moradores {
   constructor() {
     this.contagem.recarregar();
 
-    this.rota.queryParamMap.pipe(takeUntilDestroyed()).subscribe((parametros) => this.normalizarUrl(parametros));
+    this.rota.queryParamMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((parametros) => this.normalizarUrl(parametros));
 
     this.busca.valueChanges
       .pipe(debounceTime(ESPERA_DA_BUSCA_MS), map(normalizarBusca), takeUntilDestroyed())
@@ -199,7 +239,18 @@ export class Moradores {
         switchMap(({ consulta }) => this.carregar(consulta)),
         takeUntilDestroyed(),
       )
-      .subscribe((estado) => this.estado.set(estado));
+      .subscribe((estado) => {
+        this.estado.set(estado);
+        if (estado.tipo !== 'carregando' && this.focarPrimeiroAoCarregar) {
+          this.focarPrimeiroAoCarregar = false;
+          const primeiro = estado.tipo === 'pronto' ? estado.itens[0] : undefined;
+          if (primeiro) {
+            this.focarItem(primeiro.id);
+          } else {
+            this.focar('h1');
+          }
+        }
+      });
   }
 
   protected tentarDeNovo(): void {
@@ -221,29 +272,37 @@ export class Moradores {
     const { aba, q } = this.consulta();
     this.carregandoMais.set(true);
     this.erroAoCarregarMais.set(false);
-    this.paginaSeguinte = this.api.listar({ status: aba.status, q, cursor: estado.proximoCursor }).subscribe({
-      next: (pagina) => {
-        this.carregandoMais.set(false);
-        this.estado.update((atual) =>
-          atual.tipo === 'pronto'
-            ? {
-                tipo: 'pronto',
-                itens: [...atual.itens, ...pagina.itens],
-                proximoCursor: pagina.proximoCursor,
-                paginou: true,
-              }
-            : atual,
-        );
-        const primeiroNovo = pagina.itens[0];
-        if (primeiroNovo) {
-          this.focarItem(primeiroNovo.id);
-        }
-      },
-      error: () => {
-        this.carregandoMais.set(false);
-        this.erroAoCarregarMais.set(true);
-      },
-    });
+    this.paginaSeguinte = this.api
+      .listar({ status: aba.status, q, cursor: estado.proximoCursor })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (pagina) => {
+          this.carregandoMais.set(false);
+          this.estado.update((atual) =>
+            atual.tipo === 'pronto'
+              ? {
+                  tipo: 'pronto',
+                  itens: [...atual.itens, ...pagina.itens],
+                  proximoCursor: pagina.proximoCursor,
+                  paginou: true,
+                }
+              : atual,
+          );
+          const primeiroNovo = pagina.itens[0];
+          if (primeiroNovo) {
+            this.focarItem(primeiroNovo.id);
+          }
+        },
+        error: (erro: unknown) => {
+          this.carregandoMais.set(false);
+          // Cursor recusado não melhora com nova tentativa: recomeça a aba do início.
+          if (lerErroApi(erro)?.code === CodigoErroPaginacao.CURSOR_INVALIDO) {
+            this.recarregarAba();
+            return;
+          }
+          this.erroAoCarregarMais.set(true);
+        },
+      });
   }
 
   protected pedirAcao(pedido: PedidoAcao): void {
@@ -260,11 +319,18 @@ export class Moradores {
     }
     const indice = estado.itens.findIndex((item) => item.id === anterior.id);
     if (this.aba().status.includes(atualizado.status)) {
-      this.estado.set({ ...estado, itens: estado.itens.map((item) => (item.id === atualizado.id ? atualizado : item)) });
+      this.estado.set({
+        ...estado,
+        itens: estado.itens.map((item) => (item.id === atualizado.id ? atualizado : item)),
+      });
       this.focarItem(atualizado.id);
       return;
     }
     const restantes = estado.itens.filter((item) => item.id !== anterior.id);
+    if (restantes.length === 0 && estado.proximoCursor !== null) {
+      this.recarregarAba();
+      return;
+    }
     this.estado.set({ ...estado, itens: restantes });
     const seguinte = restantes[Math.min(Math.max(indice, 0), restantes.length - 1)];
     if (seguinte) {
@@ -281,16 +347,19 @@ export class Moradores {
     this.focar('[data-aviso]');
   }
 
+  private recarregarAba(): void {
+    this.focarPrimeiroAoCarregar = true;
+    this.versao.update((versao) => versao + 1);
+  }
+
   private carregar({ aba, q }: Consulta): Observable<EstadoLista> {
     return this.api.listar({ status: aba.status, q }).pipe(
-      map(
-        (pagina): EstadoLista => ({
-          tipo: 'pronto',
-          itens: pagina.itens,
-          proximoCursor: pagina.proximoCursor,
-          paginou: false,
-        }),
-      ),
+      map((pagina): EstadoLista => ({
+        tipo: 'pronto',
+        itens: pagina.itens,
+        proximoCursor: pagina.proximoCursor,
+        paginou: false,
+      })),
       catchError(() => of<EstadoLista>({ tipo: 'erro' })),
       startWith<EstadoLista>({ tipo: 'carregando' }),
     );

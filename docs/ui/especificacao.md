@@ -683,11 +683,12 @@ O mesmo formulário de 5.10, com estas diferenças:
   - Recusados e inativos: "Nenhum morador recusado ou inativo.".
 - **Implementação (issue #8):**
   - URL: Pendentes é `/admin/moradores` (sem `aba`); as outras são `?aba=ativos` e `?aba=recusados-inativos`. Aba desconhecida volta para a URL canônica. A busca vai para `q` com `replaceUrl` e acompanha a troca de aba.
-  - Contador: só na aba Pendentes e no item Moradores do menu ("3 cadastros pendentes" / "1 cadastro pendente" em `sr-only`). Recarrega ao entrar na área admin, ao abrir Moradores e depois de cada ação ou conflito. Sem polling.
+  - Contador: só na aba Pendentes e no item Moradores do menu ("3 cadastros pendentes" / "1 cadastro pendente" em `sr-only`). Com zero, some nos dois lugares. Recarrega ao entrar na área admin, ao abrir Moradores e depois de cada ação ou conflito. Sem polling.
+  - Carregando: skeleton `cartao` abaixo de 768px e `linha-tabela` a partir de 768px.
   - Item: unidade como "Bloco B, apto 302"; data como "Cadastro: há 2 h" (8.3); recusado mostra "Motivo da recusa: …". Os botões de ação levam o nome em `sr-only` ("Aprovar Ana Lima").
   - Confirmações: Aprovar (`alertdialog`) "Aprovar o cadastro de {nome}?" / "{nome} passa a ter acesso ao condomínio com o telefone e a senha que cadastrou."; Recusar (`dialog`) "Recusar o cadastro de {nome}?" com o campo "Motivo"; Inativar (`alertdialog`) "Inativar {nome}?"; Reativar (`alertdialog`) "Reativar {nome}?" / "{nome} volta a ter acesso ao condomínio.". Botões no gerúndio ao enviar ("Aprovando…", "Recusando…", "Inativando…", "Reativando…").
-  - Depois da ação, o item sai da aba e o foco vai ao item seguinte (ou ao h1, se a aba esvaziou). 409 e 404: o diálogo fecha, um `ui-alerta` `aviso` com a mensagem (8.5) recebe o foco e a lista e a contagem recarregam.
-  - Busca com resultado: anúncio `polite` "{n} moradores encontrados." (ou "Mais de {n} moradores encontrados." quando há próxima página).
+  - Depois da ação, o item sai da aba e o foco vai ao item seguinte (ou ao h1, se a aba esvaziou). Se a página carregada esvaziar e ainda houver próxima página, a aba recarrega do início e o foco vai ao primeiro item. Cursor recusado (`CURSOR_INVALIDO`) no "Carregar mais" também recomeça a aba. 409 e 404: o diálogo fecha, um `ui-alerta` `aviso` com a mensagem (8.5) recebe o foco e a lista e a contagem recarregam.
+  - Busca com resultado: anúncio `polite` "{n} moradores encontrados." (ou "Mais de {n} moradores encontrados." quando há próxima página). Sem resultado e com algum termo de até 2 caracteres (que a API compara só com o bloco igual ou o início do apto), o vazio explica: "Termos com até 2 caracteres procuram só o bloco ou o início do apto."
   - O menu "Mais ações" dos ativos tem hoje só "Inativar"; "Redefinir senha" entra com a issue #9.
 
 ### 5.18 Equipe `/admin/equipe` (só síndico)

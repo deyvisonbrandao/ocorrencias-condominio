@@ -22,7 +22,8 @@
   @switch (estado().tipo) {
     @case ('carregando') {
       @if (mostrarSkeleton()) {
-        <ui-skeleton forma="cartao" [quantidade]="3" />
+        <div class="md:hidden"><ui-skeleton forma="cartao" [quantidade]="3" /></div>
+        <div class="hidden md:block"><ui-skeleton forma="linha-tabela" [quantidade]="5" /></div>
       }
     }
     @case ('erro') {
@@ -47,7 +48,11 @@
           />
         }
       } @else if (q()) {
-        <ui-estado-vazio icone="usuarios" [titulo]="'Nenhum morador encontrado para \'' + q() + '\'.'">
+        <ui-estado-vazio
+          icone="usuarios"
+          [titulo]="'Nenhum morador encontrado para \'' + q() + '\'.'"
+          [texto]="dicaDaBuscaVazia()"
+        >
           <button type="button" ui-botao variante="secundario" (click)="limparBusca()">Limpar busca</button>
         </ui-estado-vazio>
       } @else {

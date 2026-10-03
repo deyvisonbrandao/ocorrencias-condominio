@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { AcaoMorador, ContagemMoradores, MoradorAdmin, PaginaMoradores } from '@ocorrencias/contratos';
-import { NEVER, Observable, of, throwError } from 'rxjs';
+import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import { restaurarDialogoNativo, simularDialogoNativo } from '../../../testes/dialogo-nativo';
 import { ContagemMoradoresService } from '../../core/services/contagem-moradores.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -344,6 +344,89 @@ describe('Moradores', () => {
     await esperar(350);
     await estabilizar();
 
-    expect(raiz.querySelector('ui-skeleton')).not.toBeNull();
+    const formas = [...raiz.querySelectorAll('ui-skeleton')].map((sk) => sk.parentElement?.className);
+    expect(formas).toEqual(['md:hidden', 'hidden md:block']);
+    expect(raiz.querySelector('.hidden ui-skeleton .border-b')).not.toBeNull();
+  });
+
+  it('sem pendentes, a aba não mostra "0" (como o menu)', async () => {
+    valorDaContagem.set({ pendentes: 0, ativos: 1, recusados: 0, inativos: 0 });
+
+    await abrir();
+
+    expect(abaAtual()).toBe('Pendentes');
+  });
+
+  it('a página local esvaziou mas ainda há cursor: recarrega a aba em vez de mostrar o vazio', async () => {
+    api.listar
+      .mockReturnValueOnce(of(pagina([morador('m1', 'Ana Lima')], 'c2')))
+      .mockReturnValueOnce(of(pagina([morador('m2', 'Bruno Costa')])));
+    api.executar.mockReturnValue(of(morador('m1', 'Ana Lima', { status: 'ATIVO' })));
+    await abrir();
+
+    botaoCom(cartoes()[0], 'Aprovar')?.click();
+    await estabilizar();
+    botaoCom(dialogo(), 'Aprovar')?.click();
+    await estabilizar();
+
+    expect(api.listar).toHaveBeenCalledTimes(2);
+    expect(ultimaConsulta()).toEqual({ status: ['PENDENTE'], q: '' });
+    expect(raiz.querySelector('ui-estado-vazio')).toBeNull();
+    expect(nomes()).toEqual(['Bruno Costa']);
+    expect(document.activeElement?.textContent?.trim()).toBe('Bruno Costa');
+  });
+
+  it('cursor recusado pela API no "Carregar mais": recomeça a aba do início', async () => {
+    api.listar
+      .mockReturnValueOnce(of(pagina([morador('m1', 'Ana Lima')], 'velho')))
+      .mockReturnValueOnce(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 400,
+              error: { statusCode: 400, code: 'CURSOR_INVALIDO', message: 'Cursor inválido.' },
+            }),
+        ),
+      )
+      .mockReturnValueOnce(of(pagina([morador('m1', 'Ana Lima'), morador('m2', 'Bruno Costa')])));
+    await abrir();
+
+    botaoCom(raiz, 'Carregar mais')?.click();
+    await estabilizar();
+
+    expect(api.listar).toHaveBeenCalledTimes(3);
+    expect(ultimaConsulta()).toEqual({ status: ['PENDENTE'], q: '' });
+    expect(nomes()).toEqual(['Ana Lima', 'Bruno Costa']);
+    expect(raiz.querySelector('ui-carregar-mais [role="alert"]')).toBeNull();
+  });
+
+  it('sair da tela com "Carregar mais" em curso cancela o pedido', async () => {
+    const proxima = new Subject<PaginaMoradores>();
+    api.listar
+      .mockReturnValueOnce(of(pagina([morador('m1', 'Ana Lima')], 'c2')))
+      .mockReturnValueOnce(proxima);
+    await abrir();
+    botaoCom(raiz, 'Carregar mais')?.click();
+    await estabilizar();
+    expect(proxima.observed).toBe(true);
+
+    await abrir('/admin/condominio');
+
+    expect(proxima.observed).toBe(false);
+    expect(() => proxima.next(pagina([morador('m2', 'Bruno Costa')]))).not.toThrow();
+  });
+
+  it('busca com termo curto sem resultado explica que ele procura só bloco e apto', async () => {
+    await abrir('/admin/moradores?q=al');
+
+    expect(raiz.querySelector('ui-estado-vazio')?.textContent).toContain(
+      'Termos com até 2 caracteres procuram só o bloco ou o início do apto.',
+    );
+  });
+
+  it('busca com termos longos sem resultado não mostra a explicação', async () => {
+    await abrir('/admin/moradores?q=alves');
+
+    expect(raiz.querySelector('ui-estado-vazio')?.textContent).not.toContain('Termos com até');
   });
 });
