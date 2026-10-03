@@ -67,7 +67,7 @@ export class ListarMoradoresDto implements ListarMoradoresConsulta {
   @ApiPropertyOptional({
     example: 'B 302',
     maxLength: REGRAS_BUSCA_MORADORES.max,
-    description: `Busca por nome, bloco ou apto, sem diferenciar maiúsculas e acentos. Cada palavra (até ${REGRAS_BUSCA_MORADORES.termos}) precisa aparecer em um dos três campos.`,
+    description: `Busca por nome, bloco ou apto, sem diferenciar maiúsculas e acentos. Cada palavra (até ${REGRAS_BUSCA_MORADORES.termos}) precisa aparecer em um dos três campos. Palavra de até ${REGRAS_BUSCA_MORADORES.termoCurtoMax} caracteres vale só como bloco exato ou início do apto ("B 302" não acha nomes com "b").`,
   })
   @IsOptional()
   @Transform(textoOuAusente)
@@ -134,7 +134,8 @@ export class MoradorAdminDto implements MoradorAdmin {
   @ApiProperty({
     example: '2026-10-03T14:31:33.000Z',
     format: 'date-time',
-    description: 'Data do cadastro, em UTC.',
+    description:
+      'Data do pedido de cadastro, em UTC. O recadastro de um recusado regrava a data.',
   })
   criadoEm!: string;
 

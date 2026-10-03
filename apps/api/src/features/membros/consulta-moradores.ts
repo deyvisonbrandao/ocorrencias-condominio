@@ -61,25 +61,34 @@ export function escaparLike(termo: string): string {
   return termo.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 
-// Cada termo precisa aparecer em nome, bloco ou apto: "B 302" acha o apto 302 do bloco B.
-// Maiúsculas e acentos são ignorados pela collation da coluna (utf8mb4_unicode_ci).
+// Termo curto casaria com qualquer nome que tenha a letra ("B 302" acharia a Bianca do 302 do bloco C),
+// então vale só como bloco exato ou início do apto. Maiúsculas e acentos ficam com a collation da coluna.
+export function condicaoDoTermo(termo: string): Prisma.UsuarioWhereInput {
+  if (termo.length <= REGRAS_BUSCA_MORADORES.termoCurtoMax) {
+    return {
+      OR: [
+        { bloco: { equals: termo } },
+        { apto: { startsWith: escaparLike(termo) } },
+      ],
+    };
+  }
+  const contains = escaparLike(termo);
+  return {
+    OR: [
+      { nome: { contains } },
+      { bloco: { contains } },
+      { apto: { contains } },
+    ],
+  };
+}
+
 export function filtroMoradores(
   status: StatusUsuario[] | undefined,
   q: string | undefined,
   cursor: PosicaoCursor | undefined,
 ): Prisma.UsuarioWhereInput {
-  const condicoes: Prisma.UsuarioWhereInput[] = termosDaBusca(q).map(
-    (termo) => {
-      const contains = escaparLike(termo);
-      return {
-        OR: [
-          { nome: { contains } },
-          { bloco: { contains } },
-          { apto: { contains } },
-        ],
-      };
-    },
-  );
+  const condicoes: Prisma.UsuarioWhereInput[] =
+    termosDaBusca(q).map(condicaoDoTermo);
   if (cursor) {
     condicoes.push({
       OR: [

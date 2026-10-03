@@ -22,6 +22,7 @@ import {
 import {
   type AcaoMorador,
   CodigoErroMorador,
+  CodigoErroPaginacao,
   TRANSICOES_MORADOR,
 } from '@ocorrencias/contratos';
 import {
@@ -93,7 +94,7 @@ export class MoradoresController {
   @ApiOperation({
     summary: 'Lista os moradores do condomínio',
     description:
-      'Só papel `MORADOR`: síndico e subsíndico aparecem apenas em Equipe. Ordem: cadastro mais recente primeiro. ' +
+      'Só papel `MORADOR`: síndico e subsíndico aparecem apenas em Equipe. Ordem: pedido de cadastro mais recente primeiro (o recadastro de um recusado conta como pedido novo). ' +
       'Abas da UI: Pendentes = `status=PENDENTE`; Ativos = `status=ATIVO`; Recusados e inativos = `status=RECUSADO,INATIVO`.',
   })
   @ApiOkResponse({ type: PaginaMoradoresDto })
@@ -103,7 +104,7 @@ export class MoradoresController {
     type: ErroApiDto,
     example: {
       statusCode: 400,
-      code: CodigoErroMorador.CURSOR_INVALIDO,
+      code: CodigoErroPaginacao.CURSOR_INVALIDO,
       message: 'A lista mudou. Recarregue para ver os moradores.',
     },
   })

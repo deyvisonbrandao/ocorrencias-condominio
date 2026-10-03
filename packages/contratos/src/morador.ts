@@ -1,7 +1,11 @@
 import { StatusUsuario } from './usuario.js';
 
 export const REGRAS_MOTIVO_RECUSA = { max: 500 } as const;
-export const REGRAS_BUSCA_MORADORES = { max: 100, termos: 5 } as const;
+export const REGRAS_BUSCA_MORADORES = {
+  max: 100,
+  termos: 5,
+  termoCurtoMax: 2,
+} as const;
 export const LIMITE_PAGINA_MORADORES = { padrao: 50, max: 100 } as const;
 
 export const AcaoMorador = {
@@ -30,7 +34,6 @@ export function acoesDisponiveisMorador(status: StatusUsuario): AcaoMorador[] {
 export const CodigoErroMorador = {
   MORADOR_NAO_ENCONTRADO: 'MORADOR_NAO_ENCONTRADO',
   TRANSICAO_MORADOR_INVALIDA: 'TRANSICAO_MORADOR_INVALIDA',
-  CURSOR_INVALIDO: 'CURSOR_INVALIDO',
 } as const;
 export type CodigoErroMorador =
   (typeof CodigoErroMorador)[keyof typeof CodigoErroMorador];

@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   type AcaoMorador,
   CodigoErroMorador,
+  CodigoErroPaginacao,
   type ContagemMoradores,
   LIMITE_PAGINA_MORADORES,
   type MoradorAdmin,
@@ -66,7 +67,7 @@ export function transicaoInvalida(statusAtual: StatusUsuario): ErroApi {
 function cursorInvalido(): ErroApi {
   return new ErroApi(
     HttpStatus.BAD_REQUEST,
-    CodigoErroMorador.CURSOR_INVALIDO,
+    CodigoErroPaginacao.CURSOR_INVALIDO,
     'A lista mudou. Recarregue para ver os moradores.',
   );
 }
@@ -173,9 +174,8 @@ export class MoradoresService {
     });
   }
 
-  // O motivo vive só na auditoria: vale o registro MORADOR_RECUSADO mais recente do alvo, e ele só é
-  // exibido enquanto o status for RECUSADO. Um recadastro que volte o morador a PENDENTE esconde o motivo
-  // antigo sem precisar apagar nada.
+  // O motivo vive só na auditoria (vale a recusa mais recente) e só aparece com status RECUSADO,
+  // então o recadastro que volta a PENDENTE esconde o motivo antigo sem apagar nada.
   private async motivosDeRecusa(
     ids: string[],
   ): Promise<Map<string, string | null>> {

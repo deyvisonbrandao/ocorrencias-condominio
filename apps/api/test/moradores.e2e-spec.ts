@@ -95,7 +95,7 @@ describe('Gestão de moradores (e2e)', () => {
     ana = (
       await criarUsuario(a.id, {
         telefone: TEL_ANA,
-        nome: 'Ana Lima',
+        nome: 'Ana Beatriz Lima',
         status: 'PENDENTE',
         bloco: 'C',
         apto: '302',
@@ -212,10 +212,29 @@ describe('Gestão de moradores (e2e)', () => {
       expect(await ids('302')).toEqual([ana, joao]);
       expect(await ids('b 302')).toEqual([joao]);
       expect(await ids('302', 'ATIVO')).toEqual([]);
-      expect(await ids('%')).toEqual([diego]);
-      expect(await ids('_')).toEqual([diego]);
-      expect(await ids('\\')).toEqual([]);
+      expect(await ids('100%')).toEqual([diego]);
+      expect(await ids('o_s')).toEqual([diego]);
+      expect(await ids('%%%')).toEqual([]);
+      expect(await ids('___')).toEqual([]);
+      expect(await ids('\\\\\\')).toEqual([]);
       expect(await ids('zzz')).toEqual([]);
+    });
+
+    it('termo de até 2 caracteres vale só como bloco exato ou início do apto, nunca no nome', async () => {
+      const ids = async (q: string) => {
+        const resposta = await comoSindico
+          .get(`${BASE}?${new URLSearchParams({ q }).toString()}`)
+          .expect(200);
+        return resposta.body.itens.map((m: { id: string }) => m.id);
+      };
+
+      expect(await ids('b')).toEqual([carla, joao]);
+      expect(await ids('c')).toEqual([ana]);
+      expect(await ids('30')).toEqual([ana, joao]);
+      expect(await ids('1')).toEqual([diego, carla]);
+      expect(await ids('jo')).toEqual([]);
+      expect(await ids('%')).toEqual([]);
+      expect(await ids('\\')).toEqual([]);
     });
 
     it('pagina por cursor sem repetir nem pular itens', async () => {

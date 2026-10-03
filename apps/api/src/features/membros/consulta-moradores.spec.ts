@@ -5,6 +5,7 @@ import {
 import {
   apresentarMorador,
   codificarCursor,
+  condicaoDoTermo,
   decodificarCursor,
   escaparLike,
   filtroMoradores,
@@ -68,6 +69,25 @@ describe('busca de moradores', () => {
     expect(termosDaBusca(undefined)).toEqual([]);
   });
 
+  it('termo de até 2 caracteres não procura no nome', () => {
+    expect(condicaoDoTermo('Jo')).toEqual({
+      OR: [{ bloco: { equals: 'Jo' } }, { apto: { startsWith: 'Jo' } }],
+    });
+    expect(condicaoDoTermo('1%')).toEqual({
+      OR: [
+        { bloco: { equals: '1%' } },
+        { apto: { startsWith: String.raw`1\%` } },
+      ],
+    });
+    expect(condicaoDoTermo('Joa')).toEqual({
+      OR: [
+        { nome: { contains: 'Joa' } },
+        { bloco: { contains: 'Joa' } },
+        { apto: { contains: 'Joa' } },
+      ],
+    });
+  });
+
   it('filtra sempre por papel MORADOR e combina status, termos e cursor', () => {
     const cursor = { criadoEm: new Date('2026-10-03T00:00:00.000Z'), id: ID };
     expect(filtroMoradores(['RECUSADO', 'INATIVO'], 'B 302', cursor)).toEqual({
@@ -75,11 +95,7 @@ describe('busca de moradores', () => {
       status: { in: ['RECUSADO', 'INATIVO'] },
       AND: [
         {
-          OR: [
-            { nome: { contains: 'B' } },
-            { bloco: { contains: 'B' } },
-            { apto: { contains: 'B' } },
-          ],
+          OR: [{ bloco: { equals: 'B' } }, { apto: { startsWith: 'B' } }],
         },
         {
           OR: [
