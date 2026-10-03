@@ -4,14 +4,16 @@ import { Component, inject } from '@angular/core';
 export const ID_CONTEUDO = 'conteudo';
 
 export function focarTituloDoConteudo(documento: Document): boolean {
-  const titulo = documento.querySelector<HTMLElement>(`#${ID_CONTEUDO} h1`);
-  if (!titulo) {
+  const alvo =
+    documento.querySelector<HTMLElement>(`#${ID_CONTEUDO} h1`) ??
+    documento.getElementById(ID_CONTEUDO);
+  if (!alvo) {
     return false;
   }
-  if (!titulo.hasAttribute('tabindex')) {
-    titulo.setAttribute('tabindex', '-1');
+  if (!alvo.hasAttribute('tabindex')) {
+    alvo.setAttribute('tabindex', '-1');
   }
-  titulo.focus();
+  alvo.focus({ preventScroll: true });
   return true;
 }
 

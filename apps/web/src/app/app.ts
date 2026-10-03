@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { focarTituloAoNavegar } from './core/navegacao/foco-na-navegacao';
+import { focarTituloERolarAoNavegar } from './core/navegacao/foco-na-navegacao';
 import { RegiaoToast } from './shared/ui/toast/regiao-toast';
 
 @Component({
@@ -13,6 +13,6 @@ import { RegiaoToast } from './shared/ui/toast/regiao-toast';
 })
 export class App {
   constructor() {
-    focarTituloAoNavegar();
+    focarTituloERolarAoNavegar();
   }
 }
