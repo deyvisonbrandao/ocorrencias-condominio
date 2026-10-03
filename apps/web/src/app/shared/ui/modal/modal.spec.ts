@@ -1,5 +1,6 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { restaurarDialogoNativo, simularDialogoNativo } from '../../../../testes/dialogo-nativo';
 import { Modal, TipoModal } from './modal';
 
 @Component({
@@ -34,21 +35,6 @@ class Hospedeiro {
   fechamentos = 0;
 }
 
-const prototipo = HTMLDialogElement.prototype;
-const originais = { showModal: prototipo.showModal, close: prototipo.close };
-
-function simularDialogoNativo(): void {
-  prototipo.showModal = function (this: HTMLDialogElement) {
-    this.setAttribute('open', '');
-  };
-  prototipo.close = function (this: HTMLDialogElement) {
-    if (this.hasAttribute('open')) {
-      this.removeAttribute('open');
-      this.dispatchEvent(new Event('close'));
-    }
-  };
-}
-
 describe('ui-modal', () => {
   let fixture: ComponentFixture<Hospedeiro>;
   let raiz: HTMLElement;
@@ -66,8 +52,7 @@ describe('ui-modal', () => {
 
   afterEach(() => {
     raiz.remove();
-    prototipo.showModal = originais.showModal;
-    prototipo.close = originais.close;
+    restaurarDialogoNativo();
   });
 
   async function abrirPeloBotao(): Promise<void> {
@@ -125,25 +110,43 @@ describe('ui-modal', () => {
     expect(document.activeElement).toBe(abridor());
   });
 
-  it('não fecha com Esc nem pelo método fechar enquanto está ocupado', async () => {
+  it('enquanto está ocupado, a pessoa não fecha nem por Esc nem pelo botão Fechar', async () => {
     await abrirPeloBotao();
     fixture.componentInstance.ocupado.set(true);
     await fixture.whenStable();
 
+    const tecla = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    (raiz.querySelector('#motivo') as HTMLInputElement).dispatchEvent(tecla);
     const cancelamento = new Event('cancel', { cancelable: true });
     dialogo().dispatchEvent(cancelamento);
-    fixture.componentInstance.modal().fechar();
+    (raiz.querySelector('button[aria-label="Fechar"]') as HTMLButtonElement).click();
+    await fixture.whenStable();
 
+    expect(tecla.defaultPrevented).toBe(true);
     expect(cancelamento.defaultPrevented).toBe(true);
     expect(dialogo().hasAttribute('open')).toBe(true);
+  });
+
+  it('a tela ainda fecha pelo método fechar ao concluir o envio', async () => {
+    await abrirPeloBotao();
+    fixture.componentInstance.ocupado.set(true);
+    await fixture.whenStable();
+
+    fixture.componentInstance.modal().fechar();
+    await fixture.whenStable();
+
+    expect(dialogo().hasAttribute('open')).toBe(false);
   });
 
   it('permite o Esc nativo quando não está ocupado', async () => {
     await abrirPeloBotao();
 
+    const tecla = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    dialogo().dispatchEvent(tecla);
     const cancelamento = new Event('cancel', { cancelable: true });
     dialogo().dispatchEvent(cancelamento);
 
+    expect(tecla.defaultPrevented).toBe(false);
     expect(cancelamento.defaultPrevented).toBe(false);
   });
 });

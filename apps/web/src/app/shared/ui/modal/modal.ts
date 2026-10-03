@@ -10,6 +10,7 @@ export type TamanhoModal = 'padrao' | 'largo';
 @Component({
   selector: 'ui-modal',
   imports: [Botao, Icone],
+  host: { '(keydown.escape)': 'aoCancelar($event)' },
   template: `
     <dialog
       #dialogo
@@ -71,11 +72,10 @@ export class Modal {
   }
 
   fechar(): void {
-    if (!this.ocupado()) {
-      this.controle.fechar();
-    }
+    this.controle.fechar();
   }
 
+  // O Chrome (CloseWatcher) ignora o preventDefault do cancel num segundo Esc; barrar o keydown impede o pedido de fechar.
   protected aoCancelar(evento: Event): void {
     if (this.ocupado()) {
       evento.preventDefault();
