@@ -138,6 +138,10 @@ export class CadastroCondominio {
   protected readonly slugDaPrevia = computed(() => this.slugAtual().trim() || 'seu-condominio');
 
   protected readonly anuncioSlug = computed(() => {
+    // Com erro do servidor, o foco vai ao campo e o aria-describedby já lê a mensagem.
+    if (this.errosDoServidor().slug) {
+      return '';
+    }
     switch (this.estadoSlug()) {
       case 'disponivel':
         return 'Endereço do link disponível.';

@@ -256,10 +256,13 @@ describe('CadastroCondominio', () => {
       expect(erroDe(slug)).toBe('Endereço já em uso. Tente outro.');
       expect(document.activeElement).toBe(slug);
       expect(slug.disabled).toBe(false);
+      expect(anuncioDoSlug()).toBe('');
+      expect(raiz.textContent).not.toContain('Disponível');
 
       digitar(slug, 'residencial-jardim-2');
       await esperar();
       expect(erroDe(slug)).toBeUndefined();
+      expect(anuncioDoSlug()).toBe('Endereço do link disponível.');
     });
 
     it('400 de validação: mapeia o campo aninhado para o campo do formulário', async () => {
