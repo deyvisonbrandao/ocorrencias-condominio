@@ -32,6 +32,9 @@ export async function criarUsuario(
     status?: 'PENDENTE' | 'ATIVO' | 'RECUSADO' | 'INATIVO';
     nome?: string;
     senhaTemporaria?: boolean;
+    bloco?: string;
+    apto?: string;
+    criadoEm?: Date;
   },
 ): Promise<{ id: string }> {
   hashSenha ??= await gerarHashSenha(SENHA);
@@ -45,6 +48,9 @@ export async function criarUsuario(
       papel,
       status: dados.status ?? 'ATIVO',
       senhaTemporaria: dados.senhaTemporaria ?? false,
+      bloco: dados.bloco ?? null,
+      apto: dados.apto ?? null,
+      ...(dados.criadoEm ? { criadoEm: dados.criadoEm } : {}),
       slotAdmin: papel === 'SINDICO' ? 1 : papel === 'SUBSINDICO' ? 2 : null,
     },
     select: { id: true },
