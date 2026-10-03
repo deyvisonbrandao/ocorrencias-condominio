@@ -19,7 +19,7 @@ O valor do Flowbite para o projeto está na **marcação e nas classes** dos com
 
 ## Decisão
 
-1. O Flowbite é usado só como **referência de marcação e classes Tailwind** para os componentes de `apps/web/src/app/shared/ui`. O plugin do Tailwind do Flowbite pode ser mantido, se a issue #3 precisar dele para estilos de formulário.
+1. O Flowbite é usado só como **referência de marcação e classes Tailwind** para os componentes de `apps/web/src/app/shared/ui`. O plugin do Tailwind do Flowbite não é usado (ver [especificação, seção 2.7](../ui/especificacao.md#27-mapeamento-para-o-tailwind)).
 2. **`initFlowbite()` não é chamado**, e nenhum módulo JS do Flowbite é importado.
 3. O **comportamento** interativo é implementado no Angular, com signals:
    - modal, bottom sheet e drawer usam o elemento nativo **`<dialog>` com `showModal()`**, que prende o foco, fecha com Esc e deixa o fundo inerte; o componente devolve o foco a quem abriu;

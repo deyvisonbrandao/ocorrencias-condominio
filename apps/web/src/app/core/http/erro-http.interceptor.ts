@@ -3,6 +3,12 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../../shared/ui/toast/toast.service';
 
+/**
+ * Desliga o toast global de erro para uma requisição.
+ * Obrigatório em requisições feitas de dentro de um `ui-modal` ou `ui-drawer`: com `showModal()`,
+ * o resto da página fica inerte e o toast não pode ser lido nem fechado. Nesse caso, a tela mostra
+ * o erro dentro do próprio diálogo (um `ui-alerta` com `anunciar`).
+ */
 export const SEM_TOAST_DE_ERRO = new HttpContextToken<boolean>(() => false);
 
 export const MENSAGEM_SEM_CONEXAO = 'Sem conexão. Verifique a internet e tente de novo.';
