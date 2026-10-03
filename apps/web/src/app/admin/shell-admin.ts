@@ -74,7 +74,7 @@ const ITENS: readonly ItemNavegacao[] = [
     </div>
 
     <ui-drawer #menu titulo="Menu da administração" rotuloFechar="Fechar menu">
-      <ui-sidebar [itens]="itens" rotulo="Navegação da administração" />
+      <ui-sidebar [itens]="itens" rotulo="Navegação da administração" (escolheu)="menu.fechar()" />
     </ui-drawer>
   `,
 })

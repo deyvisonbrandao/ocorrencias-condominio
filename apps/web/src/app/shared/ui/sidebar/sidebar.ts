@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
 import { Icone } from '../icone/icone';
 import { NomeIcone } from '../icone/icones';
@@ -32,6 +32,7 @@ const CORRESPONDENCIA: IsActiveMatchOptions = {
               routerLinkActive
               ariaCurrentWhenActive="page"
               [routerLinkActiveOptions]="correspondencia"
+              (click)="escolheu.emit()"
               class="flex min-h-toque items-center gap-3 rounded-controle px-3 text-sm font-medium text-texto-secundario transition-colors duration-rapido hover:bg-superficie-sutil hover:text-texto aria-[current=page]:bg-primaria-suave aria-[current=page]:font-semibold aria-[current=page]:text-primaria"
             >
               <ui-icone [nome]="item.icone" />
@@ -54,6 +55,8 @@ const CORRESPONDENCIA: IsActiveMatchOptions = {
 export class Sidebar {
   readonly itens = input.required<readonly ItemNavegacao[]>();
   readonly rotulo = input.required<string>();
+
+  readonly escolheu = output<void>();
 
   protected readonly correspondencia = CORRESPONDENCIA;
 }
