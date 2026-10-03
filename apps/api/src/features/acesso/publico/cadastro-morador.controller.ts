@@ -21,7 +21,7 @@ import {
 import { REGRAS_SLUG } from '@ocorrencias/contratos';
 import { Publico } from '../../../core/auth/decoradores.js';
 import { ErroApiDto } from '../../../core/http/erro-api.js';
-import { LimiteCadastroPublicoInterceptor } from '../../../core/http/limite-cadastro-publico.interceptor.js';
+import { LimiteCadastroMoradorInterceptor } from './limite-cadastro-morador.interceptor.js';
 import {
   CadastrarMoradorDto,
   MoradorCadastradoDto,
@@ -37,7 +37,7 @@ export class CadastroMoradorController {
   @Post(':slug/moradores')
   @HttpCode(HttpStatus.CREATED)
   @Header('Cache-Control', 'no-store')
-  @UseInterceptors(LimiteCadastroPublicoInterceptor)
+  @UseInterceptors(LimiteCadastroMoradorInterceptor)
   @ApiOperation({
     summary: 'Cadastro do morador pelo link do condomínio',
     description:
@@ -90,7 +90,15 @@ export class CadastroMoradorController {
   @ApiResponse({
     status: HttpStatus.TOO_MANY_REQUESTS,
     description:
-      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`.',
+      'Limite de cadastros por IP (200 a cada 15 minutos) ou de cadastros simultâneos (4 por condomínio, 16 no total) atingido. ' +
+      '`code` = `MUITAS_REQUISICOES`. O cabeçalho `Retry-After` traz os segundos de espera: 2 no limite de simultâneos, ' +
+      'o restante da janela de 15 minutos no limite por IP.',
+    headers: {
+      'Retry-After': {
+        description: 'Segundos até poder tentar de novo.',
+        schema: { type: 'integer', example: 2 },
+      },
+    },
     type: ErroApiDto,
     example: {
       statusCode: 429,

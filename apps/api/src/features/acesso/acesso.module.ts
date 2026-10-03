@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { LimiteCadastroPublicoInterceptor } from '../../core/http/limite-cadastro-publico.interceptor.js';
+import { LimiteCadastroMoradorInterceptor } from './publico/limite-cadastro-morador.interceptor.js';
 import { CondominiosModule } from '../condominios/condominios.module.js';
 import { AuthController } from './publico/auth.controller.js';
 import { CadastroMoradorController } from './publico/cadastro-morador.controller.js';
@@ -15,7 +15,7 @@ import { MeService } from './me.service.js';
     LoginService,
     MeService,
     CadastroMoradorService,
-    LimiteCadastroPublicoInterceptor,
+    LimiteCadastroMoradorInterceptor,
   ],
 })
 export class AcessoModule {}

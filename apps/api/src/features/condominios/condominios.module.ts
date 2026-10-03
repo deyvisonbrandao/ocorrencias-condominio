@@ -1,14 +1,11 @@
 import { Module } from '@nestjs/common';
-import { LimiteCadastroPublicoInterceptor } from '../../core/http/limite-cadastro-publico.interceptor.js';
+import { LimiteAutocadastroInterceptor } from './publico/limite-autocadastro.interceptor.js';
 import { CondominiosPublicoController } from './publico/condominios-publico.controller.js';
 import { CondominiosPublicoService } from './publico/condominios-publico.service.js';
 
 @Module({
   controllers: [CondominiosPublicoController],
-  providers: [
-    CondominiosPublicoService,
-    LimiteCadastroPublicoInterceptor,
-  ],
+  providers: [CondominiosPublicoService, LimiteAutocadastroInterceptor],
   exports: [CondominiosPublicoService],
 })
 export class CondominiosModule {}

@@ -2,6 +2,8 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
 import { verificarSenha } from '../src/core/auth/senha.js';
+import { CadastroMoradorService } from '../src/features/acesso/publico/cadastro-morador.service.js';
+import { LIMITES_CADASTRO_MORADOR } from '../src/features/acesso/publico/limite-cadastro-morador.interceptor.js';
 import { limparBanco, prismaDeTeste } from './banco.js';
 import { criarApp } from './criar-app.js';
 import {
@@ -39,13 +41,15 @@ const NAO_ENCONTRADO = {
   message: 'Condomínio não encontrado.',
 };
 
-// Cada describe sobe a própria app: o limite de 30 cadastros por IP do interceptor vale por instância.
+// Cada describe sobe a própria app: os contadores do limite de cadastro valem por instância.
 function prepararSuite() {
   let app: INestApplication<App>;
   const estado = { condominio: undefined as unknown as CondominioDeTeste };
 
   beforeAll(async () => {
     app = await criarApp();
+    // Servidor já escutando: o supertest não abre e fecha um por requisição quando várias correm juntas.
+    await app.listen(0);
   });
 
   afterAll(async () => {
@@ -60,11 +64,29 @@ function prepararSuite() {
   const http = () => request(app.getHttpServer());
   const cadastrar = (dados = corpo(), slug = 'jardim-a') =>
     http().post(rota(slug)).send(dados);
-  return { http, cadastrar, estado };
+  return { http, cadastrar, estado, app: () => app };
+}
+
+function segurarCadastros(app: INestApplication<App>) {
+  let liberar!: () => void;
+  const portao = new Promise<void>((resolver) => {
+    liberar = resolver;
+  });
+  const espiao = vi
+    .spyOn(app.get(CadastroMoradorService), 'cadastrar')
+    .mockImplementation(async (slug, dto) => {
+      await portao;
+      return {
+        nome: dto.nome,
+        status: 'PENDENTE',
+        condominio: { nome: 'Teste', slug },
+      };
+    });
+  return { espiao, liberar };
 }
 
 describe('Cadastro do morador (e2e): regras', () => {
-  const { http, cadastrar, estado } = prepararSuite();
+  const { http, cadastrar, estado, app } = prepararSuite();
   let condominio: CondominioDeTeste;
 
   beforeEach(() => {
@@ -229,6 +251,46 @@ describe('Cadastro do morador (e2e): regras', () => {
     await expect(prismaDeTeste().usuario.count()).resolves.toBe(1);
   });
 
+  it('cadastro concorrente gravado entre a leitura e o create: a UNIQUE do MySQL vira 409 TELEFONE_EM_USO', async () => {
+    const servico = app().get(CadastroMoradorService);
+    const original: object = Reflect.get(servico, 'prisma');
+    const leituras: unknown[] = [];
+    const comCorrida = new Proxy(original, {
+      get(alvo, propriedade) {
+        const valor: object = Reflect.get(alvo, propriedade);
+        if (propriedade !== 'usuario') return valor;
+        return new Proxy(valor, {
+          get(delegado, metodo) {
+            const funcao = Reflect.get(delegado, metodo);
+            if (metodo !== 'findUnique') return funcao;
+            return async (argumentos: unknown) => {
+              const lido: unknown = await funcao.call(delegado, argumentos);
+              leituras.push(lido);
+              await criarUsuario(condominio.id, {
+                telefone: TELEFONE,
+                status: 'PENDENTE',
+                nome: 'Concorrente',
+              });
+              return lido;
+            };
+          },
+        });
+      },
+    });
+    Reflect.set(servico, 'prisma', comCorrida);
+    try {
+      const resposta = await cadastrar().expect(409);
+
+      expect(resposta.body).toEqual(TELEFONE_EM_USO);
+    } finally {
+      Reflect.set(servico, 'prisma', original);
+    }
+    expect(leituras).toEqual([null]);
+    const usuarios = await prismaDeTeste().usuario.findMany();
+    expect(usuarios).toHaveLength(1);
+    expect(usuarios[0].nome).toBe('Concorrente');
+  });
+
   it.each([['nao-existe'], ['FORMATO-INVALIDO'], ['inativo']])(
     'slug %s responde o mesmo 404, sem revelar o status',
     async (slug) => {
@@ -305,11 +367,15 @@ describe('Cadastro do morador (e2e): validação e contrato', () => {
   });
 });
 
-describe('Cadastro do morador (e2e): limite de tentativas', () => {
-  const { cadastrar } = prepararSuite();
+describe('Cadastro do morador (e2e): limite de tentativas por IP', () => {
+  const { http, cadastrar } = prepararSuite();
 
-  it('aplica o limite do cadastro público por IP, com o 429 padrão', async () => {
-    for (let tentativa = 0; tentativa < 30; tentativa += 1) {
+  it('aceita o teto de tentativas por IP; a seguinte recebe 429 com o Retry-After da janela', async () => {
+    for (
+      let tentativa = 0;
+      tentativa < LIMITES_CADASTRO_MORADOR.maxTentativasPorIp;
+      tentativa += 1
+    ) {
       await cadastrar(corpo({ bloco: '' })).expect(400);
     }
 
@@ -320,6 +386,103 @@ describe('Cadastro do morador (e2e): limite de tentativas', () => {
       code: 'MUITAS_REQUISICOES',
       message: 'Muitas requisições. Tente de novo em instantes.',
     });
+    const retryAfter = Number(resposta.headers['retry-after']);
+    expect(retryAfter).toBeGreaterThan(15 * 60 - 60);
+    expect(retryAfter).toBeLessThanOrEqual(15 * 60);
     await expect(prismaDeTeste().usuario.count()).resolves.toBe(0);
+
+    const autocadastro = await http()
+      .post('/api/v1/public/condominios')
+      .send({
+        nome: 'Residencial Independente',
+        slug: 'residencial-independente',
+        sindico: {
+          nome: 'Maria Souza',
+          telefone: '(11) 91234-5678',
+          senha: 'senha-forte-1',
+        },
+      });
+    expect(autocadastro.status).toBe(201);
+  });
+});
+
+describe('Cadastro do morador (e2e): contador independente do autocadastro do condomínio', () => {
+  const { http, cadastrar } = prepararSuite();
+
+  it('esgotar o limite do autocadastro do condomínio não bloqueia o cadastro do morador', async () => {
+    for (let tentativa = 0; tentativa < 30; tentativa += 1) {
+      await http().post('/api/v1/public/condominios').send({}).expect(400);
+    }
+    const recusado = await http()
+      .post('/api/v1/public/condominios')
+      .send({})
+      .expect(429);
+    expect(Number(recusado.headers['retry-after'])).toBeGreaterThan(0);
+
+    await cadastrar().expect(201);
+  });
+});
+
+describe('Cadastro do morador (e2e): cadastros simultâneos', () => {
+  const { cadastrar, app } = prepararSuite();
+  const status = (pedidos: PromiseLike<{ status: number }>[]) =>
+    Promise.all(pedidos).then((respostas) => respostas.map((r) => r.status));
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('o condomínio no teto recebe 429 com Retry-After curto, e outro condomínio segue cadastrando', async () => {
+    const { espiao, liberar } = segurarCadastros(app());
+    const porCondominio = LIMITES_CADASTRO_MORADOR.maxSimultaneosPorCondominio;
+
+    const emCurso = status(
+      Array.from({ length: porCondominio }, () => cadastrar()),
+    );
+    await vi.waitFor(() => expect(espiao).toHaveBeenCalledTimes(porCondominio));
+
+    const recusado = await cadastrar().expect(429);
+    expect(recusado.body.code).toBe('MUITAS_REQUISICOES');
+    expect(recusado.headers['retry-after']).toBe('2');
+
+    const outro = status([cadastrar(corpo(), 'jardim-b')]);
+    await vi.waitFor(() =>
+      expect(espiao).toHaveBeenCalledTimes(porCondominio + 1),
+    );
+
+    liberar();
+    await expect(emCurso).resolves.toEqual(
+      Array.from({ length: porCondominio }, () => 201),
+    );
+    await expect(outro).resolves.toEqual([201]);
+    await cadastrar().expect(201);
+  });
+
+  it('com o teto global ocupado, um condomínio sem cadastros em curso também recebe 429', async () => {
+    const { espiao, liberar } = segurarCadastros(app());
+    const { maxSimultaneos, maxSimultaneosPorCondominio } =
+      LIMITES_CADASTRO_MORADOR;
+    const slugs = Array.from(
+      { length: maxSimultaneos / maxSimultaneosPorCondominio },
+      (_, i) => `cond-${i}`,
+    );
+
+    const emCurso = status(
+      slugs.flatMap((slug) =>
+        Array.from({ length: maxSimultaneosPorCondominio }, () =>
+          cadastrar(corpo(), slug),
+        ),
+      ),
+    );
+    await vi.waitFor(() =>
+      expect(espiao).toHaveBeenCalledTimes(maxSimultaneos),
+    );
+
+    const recusado = await cadastrar(corpo(), 'cond-livre').expect(429);
+    expect(recusado.headers['retry-after']).toBe('2');
+
+    liberar();
+    await expect(emCurso).resolves.toHaveLength(maxSimultaneos);
+    await cadastrar(corpo(), 'cond-livre').expect(201);
   });
 });
