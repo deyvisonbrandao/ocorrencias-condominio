@@ -44,6 +44,33 @@ describe('ContextoTenant', () => {
     ).resolves.toBe('cond-a');
   });
 
+  it('não troca de condomínio dentro de um contexto já vinculado', async () => {
+    await ContextoTenant.executar('cond-a', async () => {
+      expect(() => ContextoTenant.executar('cond-b', () => undefined)).toThrow(
+        SemContextoTenantError,
+      );
+      await expect(
+        ContextoTenant.executar('cond-a', () => ContextoTenant.exigir()),
+      ).resolves.toBe('cond-a');
+    });
+
+    await ContextoTenant.iniciarRequisicao(async () => {
+      ContextoTenant.vincular('cond-a');
+      expect(() => ContextoTenant.executar('cond-b', () => undefined)).toThrow(
+        SemContextoTenantError,
+      );
+    });
+  });
+
+  it('dentro de uma requisição ainda sem condomínio, executar vincula só o bloco', async () => {
+    await ContextoTenant.iniciarRequisicao(async () => {
+      await expect(
+        ContextoTenant.executar('cond-b', () => ContextoTenant.exigir()),
+      ).resolves.toBe('cond-b');
+      expect(ContextoTenant.obter()).toBeUndefined();
+    });
+  });
+
   it('recusa condominioId vazio', () => {
     expect(() => ContextoTenant.executar('', () => undefined)).toThrow(
       SemContextoTenantError,

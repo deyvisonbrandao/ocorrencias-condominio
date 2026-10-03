@@ -19,6 +19,14 @@ function validarId(condominioId: string): void {
   }
 }
 
+function recusarTroca(atual: string | undefined, novo: string): void {
+  if (atual !== undefined && atual !== novo) {
+    throw new SemContextoTenantError(
+      'a requisição já está vinculada a outro condomínio',
+    );
+  }
+}
+
 export const ContextoTenant = {
   iniciarRequisicao<T>(fn: () => T): T {
     return armazenamento.run({}, fn);
@@ -28,6 +36,7 @@ export const ContextoTenant = {
   // `executar(id, () => prisma.x.findMany())` consultaria fora do contexto.
   executar<T>(condominioId: string, fn: () => T | PromiseLike<T>): Promise<T> {
     validarId(condominioId);
+    recusarTroca(armazenamento.getStore()?.condominioId, condominioId);
     return armazenamento.run({ condominioId }, async () => await fn());
   },
 
@@ -39,14 +48,7 @@ export const ContextoTenant = {
         'a requisição não passou pelo middleware de contexto',
       );
     }
-    if (
-      estado.condominioId !== undefined &&
-      estado.condominioId !== condominioId
-    ) {
-      throw new SemContextoTenantError(
-        'a requisição já está vinculada a outro condomínio',
-      );
-    }
+    recusarTroca(estado.condominioId, condominioId);
     estado.condominioId = condominioId;
   },
 
