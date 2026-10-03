@@ -14,7 +14,12 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CodigoErroCondominio, CodigoErroSessao, CondominioPublico } from '@ocorrencias/contratos';
+import {
+  CodigoErroCondominio,
+  CodigoErroSessao,
+  CondominioPublico,
+  slugValido,
+} from '@ocorrencias/contratos';
 import { BehaviorSubject, catchError, map, Observable, of, startWith, switchMap, timer } from 'rxjs';
 import { NOME_PRODUTO } from '../../core/config/marca';
 import {
@@ -34,7 +39,6 @@ import { Campo } from '../../shared/components/campo/campo';
 import { EstadoErro } from '../../shared/components/estados/estado-erro';
 import { ESPERA_ANTES_DO_SKELETON_MS, Skeleton } from '../../shared/components/estados/skeleton';
 import { errosPorCampo, lerErroApi } from '../../shared/utils/erro-api';
-import { slugValido } from '../../shared/utils/slug';
 import {
   celularBr,
   mensagemDeErro,

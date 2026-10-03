@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
-import { slugValido } from '../../shared/utils/slug';
+import { slugValido } from '@ocorrencias/contratos';
 
 export const CHAVE_ULTIMO_CONDOMINIO = 'ocorrencias.ultimo-condominio';
 
