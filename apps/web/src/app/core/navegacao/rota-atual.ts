@@ -8,6 +8,7 @@ export interface Pilha {
   readonly voltarPara: string;
   readonly rotuloVoltar: string;
   readonly icone: Extract<NomeIcone, 'voltar' | 'fechar'>;
+  readonly destino?: string;
 }
 
 export interface DadosDaTela {
@@ -23,7 +24,8 @@ function ehPilha(valor: unknown): valor is Pilha {
   return (
     typeof candidato['voltarPara'] === 'string' &&
     typeof candidato['rotuloVoltar'] === 'string' &&
-    (candidato['icone'] === 'voltar' || candidato['icone'] === 'fechar')
+    (candidato['icone'] === 'voltar' || candidato['icone'] === 'fechar') &&
+    (candidato['destino'] === undefined || typeof candidato['destino'] === 'string')
   );
 }
 

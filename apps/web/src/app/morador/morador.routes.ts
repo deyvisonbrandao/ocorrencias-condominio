@@ -7,12 +7,14 @@ const VOLTAR_PARA_OCORRENCIAS: Pilha = {
   voltarPara: '/app/ocorrencias',
   rotuloVoltar: 'Voltar para ocorrências',
   icone: 'voltar',
+  destino: 'Condomínio',
 };
 
 const CANCELAR_NOVA: Pilha = {
   voltarPara: '/app/ocorrencias',
   rotuloVoltar: 'Cancelar e voltar',
   icone: 'fechar',
+  destino: 'Condomínio',
 };
 
 export default [

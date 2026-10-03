@@ -41,6 +41,28 @@ describe('ShellMorador', () => {
     expect(shell.querySelector('ui-barra-superior')?.textContent).toContain(titulo);
   });
 
+  it.each(['/app/nova', '/app/ocorrencias/57'])(
+    'na tela empilhada %s, põe o link de retorno antes do h1 a partir de md',
+    async (url) => {
+      const shell = await navegar(url);
+      const principal = shell.querySelector('main') as HTMLElement;
+      const retorno = principal.querySelector('a') as HTMLAnchorElement;
+
+      expect(retorno.getAttribute('href')).toBe('/app/ocorrencias');
+      expect(retorno.textContent?.replace(/\s+/g, ' ').trim()).toBe('Voltar para Condomínio');
+      expect(retorno.classList).toContain('md:inline-flex');
+      expect(retorno.compareDocumentPosition(principal.querySelector('h1') as HTMLElement)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    },
+  );
+
+  it('nas telas raiz, não há link de retorno no conteúdo', async () => {
+    const shell = await navegar('/app/minhas');
+
+    expect(shell.querySelector('main a')).toBeNull();
+  });
+
   it('redireciona /app para o feed do condomínio', async () => {
     await navegar('/app');
 

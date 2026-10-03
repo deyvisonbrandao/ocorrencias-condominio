@@ -61,6 +61,16 @@ interface LinkMorador {
       class="mx-auto max-w-conteudo px-4 pt-5 md:px-6 md:pt-8 md:pb-12"
       [class]="empilhada() ? 'pb-10' : 'pb-28'"
     >
+      @if (tela().pilha?.destino; as destino) {
+        <a
+          [routerLink]="tela().pilha?.voltarPara"
+          class="mb-2 hidden min-h-toque items-center gap-1.5 text-sm font-semibold text-primaria hover:underline md:inline-flex"
+        >
+          <ui-icone nome="voltar" [tamanho]="16" />
+          <span class="sr-only">Voltar para</span>
+          {{ destino }}
+        </a>
+      }
       <router-outlet />
     </main>
     @if (!empilhada()) {
