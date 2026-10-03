@@ -76,6 +76,8 @@ docs/                 plano do MVP e ADRs
 | `npm run db:up` / `npm run db:down` | Sobe o MySQL esperando ficar `healthy` / para o MySQL (o volume com os dados é mantido) |
 
 Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api` (ou `@ocorrencias/web`, `@ocorrencias/contratos`).
+
+A API usa `@ocorrencias/contratos` compilado em `build`, `start` e `start:dev`. Ao rodar esses scripts só na API, compile antes os contratos com `npm run build -w @ocorrencias/contratos`; o `npm run dev` e o `npm run build` da raiz já fazem isso. Lint e testes da API leem o código-fonte dos contratos e não precisam desse passo.
 ### Scripts da API
 
 | Comando (`-w @ocorrencias/api`) | O que faz |
