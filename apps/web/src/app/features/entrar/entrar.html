@@ -1,6 +1,6 @@
 <div class="md:mx-auto md:max-w-md">
   <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
-    {{ estado().tipo === 'nao-encontrado' ? 'Condomínio não encontrado' : 'Entrar' }}
+    {{ estado().tipo === 'nao-encontrado' ? tituloNaoEncontrado : 'Entrar' }}
   </h1>
 
   @switch (estado().tipo) {
@@ -10,10 +10,7 @@
       }
     }
     @case ('nao-encontrado') {
-      <p class="mt-2 text-base text-texto-secundario">
-        Confira o link com a administração do seu condomínio.
-      </p>
-      <a ui-botao variante="secundario" routerLink="/" class="mt-6">Ir para o início</a>
+      <ui-condominio-nao-encontrado />
     }
     @case ('erro') {
       <ui-estado-erro

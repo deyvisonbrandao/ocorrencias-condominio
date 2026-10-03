@@ -19,6 +19,9 @@ function mensagemDeLimite(retryAfter: string | null): string {
   if (!Number.isFinite(segundos) || segundos <= 0) {
     return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
   }
+  if (segundos < 60) {
+    return 'Muitas tentativas. Aguarde alguns segundos e tente de novo.';
+  }
   const minutos = Math.ceil(segundos / 60);
   return `Muitas tentativas. Aguarde ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'} e tente de novo.`;
 }

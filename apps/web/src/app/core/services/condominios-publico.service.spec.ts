@@ -1,7 +1,11 @@
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CadastrarCondominioRequisicao } from '@ocorrencias/contratos';
+import {
+  CadastrarCondominioRequisicao,
+  CadastrarMoradorRequisicao,
+  MoradorCadastrado,
+} from '@ocorrencias/contratos';
 import { SEM_TOAST_DE_ERRO } from '../interceptors/erro-http.interceptor';
 import { CondominiosPublicoService, DisponibilidadeSlug } from './condominios-publico.service';
 
@@ -33,6 +37,32 @@ describe('CondominiosPublicoService', () => {
 
     expect(chamada.request.body).toEqual(requisicao);
     expect(criado).toEqual({ id: '1', nome: 'Jardim', slug: 'jardim' });
+  });
+
+  it('cadastrarMorador envia o corpo para POST /public/condominios/:slug/moradores', () => {
+    const requisicao: CadastrarMoradorRequisicao = {
+      nome: 'João Pereira',
+      telefone: '(11) 98765-4321',
+      bloco: 'B',
+      apto: '302',
+      senha: '12345678',
+    };
+    const resposta: MoradorCadastrado = {
+      nome: 'João Pereira',
+      status: 'PENDENTE',
+      condominio: { nome: 'Jardim', slug: 'jardim' },
+    };
+    let cadastrado: unknown;
+
+    servico.cadastrarMorador('jardim', requisicao).subscribe((valor) => (cadastrado = valor));
+    const chamada = controle.expectOne({
+      method: 'POST',
+      url: '/public/condominios/jardim/moradores',
+    });
+    chamada.flush(resposta);
+
+    expect(chamada.request.body).toEqual(requisicao);
+    expect(cadastrado).toEqual(resposta);
   });
 
   it('buscarPorSlug codifica o slug na URL', () => {

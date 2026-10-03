@@ -2,8 +2,10 @@ import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   CadastrarCondominioRequisicao,
+  CadastrarMoradorRequisicao,
   CondominioCriado,
   CondominioPublico,
+  MoradorCadastrado,
 } from '@ocorrencias/contratos';
 import { catchError, map, Observable, of } from 'rxjs';
 import { SEM_TOAST_DE_ERRO } from '../interceptors/erro-http.interceptor';
@@ -18,6 +20,16 @@ export class CondominiosPublicoService {
 
   cadastrar(requisicao: CadastrarCondominioRequisicao): Observable<CondominioCriado> {
     return this.http.post<CondominioCriado>(RECURSO, requisicao);
+  }
+
+  cadastrarMorador(
+    slug: string,
+    requisicao: CadastrarMoradorRequisicao,
+  ): Observable<MoradorCadastrado> {
+    return this.http.post<MoradorCadastrado>(
+      `${RECURSO}/${encodeURIComponent(slug)}/moradores`,
+      requisicao,
+    );
   }
 
   buscarPorSlug(slug: string, contexto?: HttpContext): Observable<CondominioPublico> {

@@ -21,7 +21,7 @@ import { Icone } from '../icone/icone';
     @if (erro()) {
       <p [id]="idErro()" class="mt-2 flex items-start gap-1.5 text-sm font-medium text-perigo">
         <ui-icone nome="alerta" [tamanho]="16" class="mt-0.5" />
-        <span>{{ erro() }}</span>
+        <span>{{ erro() }} <ng-content select="[acaoErro]" /></span>
       </p>
     }
   `,

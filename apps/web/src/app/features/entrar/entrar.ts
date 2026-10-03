@@ -1,33 +1,25 @@
-import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   afterNextRender,
   Component,
-  computed,
   DestroyRef,
-  effect,
   ElementRef,
   inject,
   Injector,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import {
-  CodigoErroCondominio,
-  CodigoErroSessao,
-  CondominioPublico,
-  slugValido,
-} from '@ocorrencias/contratos';
-import { BehaviorSubject, catchError, map, Observable, of, startWith, switchMap, timer } from 'rxjs';
-import { NOME_PRODUTO } from '../../core/config/marca';
+import { CodigoErroSessao } from '@ocorrencias/contratos';
 import {
   MENSAGEM_ERRO_INESPERADO,
   mensagemDeErroGlobal,
-  SEM_TOAST_DE_ERRO,
 } from '../../core/interceptors/erro-http.interceptor';
-import { CondominiosPublicoService } from '../../core/services/condominios-publico.service';
+import {
+  condominioDaRota,
+  TITULO_CONDOMINIO_NAO_ENCONTRADO,
+} from '../../core/services/condominio-da-rota';
 import {
   destinoAposLogin,
   MENSAGEM_SESSAO_TERMINOU,
@@ -36,8 +28,9 @@ import { SessaoService } from '../../core/services/sessao.service';
 import { Alerta, TomAlerta } from '../../shared/components/alerta/alerta';
 import { Botao } from '../../shared/components/botao/botao';
 import { Campo } from '../../shared/components/campo/campo';
+import { CondominioNaoEncontrado } from '../../shared/components/estados/condominio-nao-encontrado';
 import { EstadoErro } from '../../shared/components/estados/estado-erro';
-import { ESPERA_ANTES_DO_SKELETON_MS, Skeleton } from '../../shared/components/estados/skeleton';
+import { Skeleton } from '../../shared/components/estados/skeleton';
 import { errosPorCampo, lerErroApi } from '../../shared/utils/erro-api';
 import {
   celularBr,
@@ -59,12 +52,6 @@ export const MENSAGENS_DE_LOGIN: Readonly<Record<string, string>> = {
 
 type CampoLogin = 'telefone' | 'senha';
 
-type EstadoCondominio =
-  | { readonly tipo: 'carregando' }
-  | { readonly tipo: 'pronto'; readonly condominio: CondominioPublico }
-  | { readonly tipo: 'nao-encontrado' }
-  | { readonly tipo: 'erro' };
-
 interface AlertaDoLogin {
   readonly tom: TomAlerta;
   readonly mensagem: string;
@@ -76,38 +63,33 @@ function ehCampoLogin(campo: string): campo is CampoLogin {
 
 @Component({
   selector: 'app-entrar',
-  imports: [ReactiveFormsModule, RouterLink, Alerta, Botao, Campo, EstadoErro, Skeleton],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Alerta,
+    Botao,
+    Campo,
+    CondominioNaoEncontrado,
+    EstadoErro,
+    Skeleton,
+  ],
   templateUrl: './entrar.html',
 })
 export class Entrar {
-  private readonly api = inject(CondominiosPublicoService);
   private readonly sessao = inject(SessaoService);
   private readonly router = inject(Router);
   private readonly rota = inject(ActivatedRoute);
-  private readonly titulo = inject(Title);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
   private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
-  private readonly tentativas = new BehaviorSubject<void>(undefined);
-  private readonly parametros = toSignal(this.rota.paramMap, { requireSync: true });
+  private readonly pagina = condominioDaRota();
 
-  protected readonly slug = computed(() => this.parametros().get('slug') ?? '');
-  protected readonly estado = toSignal(
-    this.rota.paramMap.pipe(
-      switchMap((parametros) =>
-        this.tentativas.pipe(switchMap(() => this.buscarCondominio(parametros.get('slug') ?? ''))),
-      ),
-    ),
-    { initialValue: { tipo: 'carregando' } satisfies EstadoCondominio },
-  );
-  protected readonly condominio = computed(() => {
-    const estado = this.estado();
-    return estado.tipo === 'pronto' ? estado.condominio : null;
-  });
-  protected readonly esperaLonga = toSignal(timer(ESPERA_ANTES_DO_SKELETON_MS).pipe(map(() => true)), {
-    initialValue: false,
-  });
+  protected readonly slug = this.pagina.slug;
+  protected readonly estado = this.pagina.estado;
+  protected readonly condominio = this.pagina.condominio;
+  protected readonly esperaLonga = this.pagina.esperaLonga;
+  protected readonly tituloNaoEncontrado = TITULO_CONDOMINIO_NAO_ENCONTRADO;
 
   protected readonly formulario = new FormGroup({
     telefone: new FormControl('', { nonNullable: true, validators: validarCom(celularBr) }),
@@ -130,11 +112,6 @@ export class Entrar {
         .pipe(takeUntilDestroyed())
         .subscribe(() => this.limparErroDoServidor(campo));
     }
-    effect(() => {
-      if (this.estado().tipo === 'nao-encontrado') {
-        this.titulo.setTitle(`Condomínio não encontrado · ${NOME_PRODUTO}`);
-      }
-    });
   }
 
   protected erro(campo: CampoLogin): string | null {
@@ -144,7 +121,7 @@ export class Entrar {
   }
 
   protected tentarDeNovo(): void {
-    this.tentativas.next();
+    this.pagina.recarregar();
   }
 
   protected enviar(): void {
@@ -177,23 +154,6 @@ export class Entrar {
         },
         error: (erro: unknown) => this.falhar(erro),
       });
-  }
-
-  private buscarCondominio(slug: string): Observable<EstadoCondominio> {
-    if (!slugValido(slug)) {
-      return of({ tipo: 'nao-encontrado' });
-    }
-    return this.api.buscarPorSlug(slug, new HttpContext().set(SEM_TOAST_DE_ERRO, true)).pipe(
-      map((condominio): EstadoCondominio => ({ tipo: 'pronto', condominio })),
-      catchError((erro: unknown) =>
-        of<EstadoCondominio>(
-          lerErroApi(erro)?.code === CodigoErroCondominio.CONDOMINIO_NAO_ENCONTRADO
-            ? { tipo: 'nao-encontrado' }
-            : { tipo: 'erro' },
-        ),
-      ),
-      startWith<EstadoCondominio>({ tipo: 'carregando' }),
-    );
   }
 
   private falhar(erro: unknown): void {

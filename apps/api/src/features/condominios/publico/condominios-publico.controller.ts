@@ -28,7 +28,7 @@ import {
   CondominioCriadoDto,
   CondominioPublicoDto,
 } from '../dto/condominio-publico.dto.js';
-import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
+import { LimiteAutocadastroInterceptor } from './limite-autocadastro.interceptor.js';
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')
@@ -39,7 +39,7 @@ export class CondominiosPublicoController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(LimiteCadastroPublicoInterceptor)
+  @UseInterceptors(LimiteAutocadastroInterceptor)
   @ApiOperation({
     summary: 'Autocadastro do condomínio e do síndico',
     description:
@@ -80,7 +80,14 @@ export class CondominiosPublicoController {
   @ApiResponse({
     status: HttpStatus.TOO_MANY_REQUESTS,
     description:
-      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`.',
+      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`. ' +
+      'O cabeçalho `Retry-After` traz os segundos até poder tentar de novo.',
+    headers: {
+      'Retry-After': {
+        description: 'Segundos até poder tentar de novo.',
+        schema: { type: 'integer', example: 2 },
+      },
+    },
     type: ErroApiDto,
     example: {
       statusCode: 429,

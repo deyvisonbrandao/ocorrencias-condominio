@@ -36,8 +36,8 @@ export function obrigatorio(mensagem: string): Regra {
   return (valor) => (valor.trim() === '' ? mensagem : null);
 }
 
-export function maximo(max: number): Regra {
-  return (valor) => (valor.trim().length > max ? `Use no máximo ${max} caracteres.` : null);
+export function maximo(max: number, normalizar = (valor: string) => valor.trim()): Regra {
+  return (valor) => (normalizar(valor).length > max ? `Use no máximo ${max} caracteres.` : null);
 }
 
 export const celularBr: Regra = (valor) =>

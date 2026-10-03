@@ -271,7 +271,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 |---|---|---|---|---|---|
 | Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/components/icone/icones`) | `nome`, `tamanho` (14, 16, 20 ou 24px; 14px só dentro de badge), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
 | Ação | `ui-botao` (também como `a[ui-botao]`) | Buttons | `primario` · `secundario` (contorno `borda-controle`) · `texto` · `perigo` (sólido) · `perigo-contorno`; `bloco` (largura total abaixo de 768px); `icone` (quadrado 44px, exige `rotulo`) | repouso, hover (`primaria-hover` / `superficie-sutil`), foco visível, ativo (= hover), desabilitado (`opacity-50`, `cursor-not-allowed`, `aria-disabled`), **carregando** (spinner + rótulo no gerúndio + `aria-busy`, sem clique duplo) | Altura mínima de 44px. Botão só com ícone exige `aria-label`. Não use `disabled` para esconder um erro de validação: deixe enviar e mostre o erro. |
-| Campo de texto | `ui-campo` | Input field | `tipo` (text, tel, email, password com botão "Mostrar senha"), `rotulo`, `dica`, `erro`, `opcional`, `prefixo` ("#"), `mascara` (telefone: `(11) 91234-5678` enquanto digita; aceita colar com +55), `autocapitalize`, `corretor` (spellcheck); conteúdo projetado aparece abaixo do controle, antes do erro (prévia e status do slug) | repouso (borda `borda-controle`), foco (borda `primaria-foco` + anel 2px a 30%), **erro** (borda 2px `perigo-borda` + mensagem `perigo` com ícone), desabilitado (`superficie-sutil`), somente leitura | `<label for>` sempre visível (placeholder não é rótulo). `aria-describedby` = dica + erro. `aria-invalid="true"` no erro. Texto de 16px. |
+| Campo de texto | `ui-campo` | Input field | `tipo` (text, tel, email, password com botão "Mostrar senha"), `rotulo`, `dica`, `erro`, `opcional`, `prefixo` ("#"), `mascara` (telefone: `(11) 91234-5678` enquanto digita; aceita colar com +55), `autocapitalize`, `corretor` (spellcheck); conteúdo projetado aparece abaixo do controle, antes do erro (prévia e status do slug); conteúdo com o atributo `acaoErro` aparece dentro da mensagem de erro (link "Entrar" do 409 de telefone, 5.4) | repouso (borda `borda-controle`), foco (borda `primaria-foco` + anel 2px a 30%), **erro** (borda 2px `perigo-borda` + mensagem `perigo` com ícone), desabilitado (`superficie-sutil`), somente leitura | `<label for>` sempre visível (placeholder não é rótulo). `aria-describedby` = dica + erro. `aria-invalid="true"` no erro. Texto de 16px. |
 | Texto longo | `ui-area-texto` | Textarea | `rotulo`, `dica`, `min`, `max`, `contador` | iguais aos do `ui-campo` + contador `n/max` (`tabular-nums`) | O contador não é `aria-live` a cada tecla. Ele anuncia só ao cruzar o mínimo e ao faltarem 100 para o máximo. |
 | Escolha em lista | `ui-select` | Select (nativo) | `rotulo`, `opcoes`, `placeholder` (opção desabilitada) | como `ui-campo` | `<select>` nativo; nada de select customizado no MVP. |
 | Tipo da ocorrência | `ui-opcoes-cartao` | Radio (variante "advanced") | `opcoes: {valor, rotulo, descricao, icone, aviso?}` | repouso, hover, **selecionado** (borda `primaria` + anel 1px + fundo `primaria-suave` + o próprio radio marcado), foco (anel global no radio), erro (mensagem abaixo da legenda) | `<fieldset>` + `<legend>`. Setas trocam a opção (comportamento nativo do radio). O card inteiro é o `<label>`. |
@@ -298,6 +298,7 @@ Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 | Visões rápidas | `ui-chips-visao` | Button Group / pills | `visoes: {rotulo, contador?, query}` | ativa (fundo `texto`, letra branca, **17.74**), inativa (contorno `borda-controle`) | Links com `aria-current="true"`. Rolagem horizontal com a última visível pela metade como pista. |
 | Vazio | `ui-estado-vazio` | — | `icone`, `titulo`, `texto`, `acao?` | — | O título é um `<h2>`/`<h3>` conforme a tela. |
 | Erro de carga | `ui-estado-erro` | Alert | `titulo`, `texto`, `tentarDeNovo()` | — | `role="alert"`. O botão "Tentar de novo" recebe o foco se o erro surgiu depois de uma ação. |
+| Condomínio não encontrado | `ui-condominio-nao-encontrado` | — | — | — | Texto e link "Ir para o início" de 5.3, usados em `/c/:slug`, cadastro, login e aguardando aprovação. O h1 "Condomínio não encontrado" fica na tela, para o foco da troca de rota continuar nele. |
 | Carregando | `ui-skeleton` | Skeleton | `forma: 'cartao' \| 'linha-tabela' \| 'detalhe'`, `quantidade` | — | Contêiner com `aria-busy="true"` + texto `sr-only` "Carregando…". Formas `aria-hidden`. |
 | Paginação | `ui-carregar-mais` | Button | `carregando`, `fim` | ocioso, carregando, fim ("Isso é tudo."), erro (resultado parcial, 5.0) | Depois de carregar, o foco vai para o primeiro item novo. |
 | Contador do painel | `ui-cartao-numero` | Card | `rotulo`, `valor`, `destino`, `tom` | repouso, hover, foco | O card inteiro é um link; o nome acessível é "Não triadas: 3". |
@@ -335,7 +336,7 @@ Largura mínima suportada: 320px, sem rolagem horizontal da página. Só a linha
 - \*\*Os dois veem Condomínio. O subsíndico entra em **modo leitura** (R6): link, copiar, QR e cartaz, sem o formulário de dados.
 - A pessoa logada aparece como "Ana Lima · Síndico(a)" (R9).
 
-**Na troca de rota:** o `document.title` vira `"{Título da tela} · {Condomínio}"`, o foco vai para o `h1` (`tabindex="-1"`) e a rolagem volta ao topo, exceto no "voltar" para uma lista, que restaura a posição.
+**Na troca de rota:** o `document.title` vira `"{Título da tela} · {Condomínio}"` (nas telas públicas, assim que o condomínio do slug carrega; antes disso, e nas telas sem condomínio, `"{Título da tela} · {Produto}"`; a página do condomínio, cujo h1 já é o nome, usa `"{Condomínio} · {Produto}"`), o foco vai para o `h1` (`tabindex="-1"`) e a rolagem volta ao topo, exceto no "voltar" para uma lista, que restaura a posição.
 
 ---
 
@@ -421,7 +422,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 | PENDENTE | "Seu cadastro ainda aguarda aprovação da administração." |
 | RECUSADO | "Seu cadastro não foi aprovado. Fale com a administração do condomínio." |
 | INATIVO | "Seu acesso está desativado. Fale com a administração do condomínio." |
-| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." (n vem do `Retry-After`; sem ele, "Aguarde alguns minutos…") |
+| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." (n vem do `Retry-After`, arredondado para cima em minutos; abaixo de 60 s, "Aguarde alguns segundos…"; sem ele, "Aguarde alguns minutos…") |
 
 - **Sucesso:** com senha temporária vai para `/trocar-senha`; senão, morador vai para `/app/ocorrencias` e admin para `/admin/painel`. Com `?voltar=` válido (rota interna), volta para ela.
 - **Implementação (issue #6):**
@@ -913,7 +914,9 @@ stateDiagram-v2
 | 409 (reabrir fora da janela) | "O prazo de 30 dias para reabrir já terminou." |
 | 409 (limite de admins) | "O condomínio já tem subsíndico." |
 | 409 (principal não vira duplicada) | "Esta ocorrência é a principal de outras duplicadas e não pode virar duplicada." |
-| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." |
+| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." ({n} = `Retry-After` arredondado para cima em minutos; "1 minuto" no singular) |
+| 429 com `Retry-After` abaixo de 60 s | "Muitas tentativas. Aguarde alguns segundos e tente de novo." |
+| 429 sem `Retry-After` | "Muitas tentativas. Aguarde alguns minutos e tente de novo." |
 
 ### 8.6 Toasts de sucesso
 
@@ -1078,8 +1081,8 @@ Os ícones dos mockups são um sprite SVG próprio e provisório. Na implementa�
 | 1 | **Nomes de enum de evento que as issues não citam:** `ASSUMIDA`, `PRAZO_DEFINIDO`, `PRAZO_ALTERADO`, `RESOLVIDA`, `ARQUIVADA`, `REABERTA`, `MARCADA_DUPLICADA`, `DUPLICADA_DESVINCULADA`, `COMENTARIO` (6.3) | A UI mapeia enum → texto; nomes diferentes quebram o mapeamento | `beckenbauer`, em `packages/contratos` |
 | 2 | **Ordenação por urgência na fila (#15)** exige cursor composto `(rank_urgencia, criado_em, id)`, com rank Crítica 1 → Baixa 4 e **não triadas no fim** (rank 5, não `NULL` na comparação). Sem isso, "Carregar mais" repete ou pula itens. Vale também para o índice `(condominio_id, status, urgencia, criado_em)` do plano | A fila ordenada por urgência e a paginação dependem disso | `beckenbauer` |
 | 3 | **Campos que a UI precisa nos presenters:** `minha` (issue #13), `atrasada` (R2), `podeReabrirAte` (data-limite da janela), número e status da principal quando DUPLICADA, lista de duplicadas na principal (#21) e o filtro do `CLASSIFICACAO_CORRIGIDA` só de urgência para o morador (6.3) | Sem eles, a UI teria que inferir regra no cliente | `beckenbauer` |
-| 4 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte) |
-| 5 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | `beckenbauer` |
+| 4 | **Limites de texto não fixados:** título 5–100, justificativa ≥ 10, senha ≥ 8, slug 3–40, bloco ≤ 20, apto ≤ 10 | As mensagens de 8.4 citam esses números | `beckenbauer` (a validação da API é a fonte). Bloco ≤ 20 e apto ≤ 10 fixados na #7, sobre o valor normalizado (ADR-002) |
+| 5 | **Normalização do bloco** ("B", "b", "Bloco B", "Torre 2") | A UI exibe "Bloco {valor}"; sem normalização, aparece "Bloco Bloco B" | **Decidida na #7** (ADR-002): sai o prefixo "Bloco"/"Bl.", espaços repetidos viram um e o valor vai para maiúsculas ("Bloco b" → "B", "Torre 2" → "TORRE 2"); o apto segue a mesma regra com "Apto"/"Ap" |
 | 6 | **Marca:** nome do produto, logotipo e cor primária definitiva | O azul é provisório; a troca é só de token | Você |
 | 7 | **Tema escuro**, fora do MVP | Os tokens já são semânticos; custo estimado: mais uma coluna de valores e uma nova rodada de contraste | Produto, pós-MVP |
 
