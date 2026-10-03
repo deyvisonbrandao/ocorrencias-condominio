@@ -1,7 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
-import { PrismaService } from '../src/core/prisma/prisma.service.js';
+import { PRISMA_ESCOPADO } from '../src/core/prisma/prisma-escopado.js';
+import { PrismaSistema } from '../src/core/prisma/prisma-sistema.js';
 import { criarApp } from './criar-app.js';
 
 describe('GET /api/v1/health (e2e)', () => {
@@ -32,10 +33,14 @@ describe('GET /api/v1/health (e2e)', () => {
     beforeAll(async () => {
       app = await criarApp({
         ajustar: (builder) =>
-          builder.overrideProvider(PrismaService).useValue({
-            bancoDisponivel: () => Promise.resolve(false),
-            onModuleDestroy: () => Promise.resolve(),
-          }),
+          builder
+            .overrideProvider(PrismaSistema)
+            .useValue({
+              bancoDisponivel: () => Promise.resolve(false),
+              onModuleDestroy: () => Promise.resolve(),
+            })
+            .overrideProvider(PRISMA_ESCOPADO)
+            .useValue({}),
       });
     });
 

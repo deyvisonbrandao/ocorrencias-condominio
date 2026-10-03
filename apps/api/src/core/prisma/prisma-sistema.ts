@@ -5,8 +5,8 @@ import { PrismaClient } from '../../generated/prisma/client.js';
 import { opcoesPool } from './opcoes-pool.js';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleDestroy {
-  private readonly logger = new Logger(PrismaService.name);
+export class PrismaSistema extends PrismaClient implements OnModuleDestroy {
+  private readonly logger = new Logger(PrismaSistema.name);
 
   constructor(config: AppConfig) {
     super({

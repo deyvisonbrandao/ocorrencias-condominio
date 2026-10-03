@@ -1,9 +1,9 @@
 import { Logger } from '@nestjs/common';
 import { AppConfig } from '../config/app-config.js';
-import { PrismaService } from './prisma.service.js';
+import { PrismaSistema } from './prisma-sistema.js';
 
-function criarServico(): PrismaService {
-  return new PrismaService(
+function criarServico(): PrismaSistema {
+  return new PrismaSistema(
     new AppConfig(
       'test',
       3000,
@@ -21,8 +21,8 @@ function criarServico(): PrismaService {
   );
 }
 
-describe('PrismaService.bancoDisponivel', () => {
-  let servico: PrismaService;
+describe('PrismaSistema.bancoDisponivel', () => {
+  let servico: PrismaSistema;
 
   beforeEach(() => {
     vi.useFakeTimers();
