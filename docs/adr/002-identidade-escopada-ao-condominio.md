@@ -25,12 +25,12 @@ Moradores entram pelo link ou QR code do próprio condomínio e se identificam p
 
 ## Implementação (issue #6)
 
-Registro das escolhas feitas ao implementar a sessão, em `apps/api/src/core/auth` e `apps/api/src/features/acesso`.
+Registro das escolhas feitas ao implementar a sessão, em `apps/api/src/core/auth` e `apps/api/src/features/acesso` (login e logout em `publico/`, `/me` na raiz da feature).
 
 - **Token.** JWT HS256 assinado com `JWT_SECRET` (obrigatório, 32+ caracteres), com `{sub, cid, papel, sv, iat, exp}` e validade de **7 dias**, sem renovação deslizante: passado o prazo, o usuário entra de novo. Assinatura e verificação usam `node:crypto` (sem dependência nova); a verificação só aceita o cabeçalho exato `{"alg":"HS256","typ":"JWT"}`, compara a assinatura em tempo constante e confere tipo e formato de cada claim.
 - **Cookie.** `sessao`, `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age` igual à validade do token e `Secure` quando `NODE_ENV=production`. O logout apaga o cookie com os mesmos atributos e é idempotente. O logout não incrementa `versao_sessao`, para não derrubar as sessões de outros aparelhos; quem precisar revogar tudo (inativação, reset de senha) incrementa a versão.
 - **Login.** `POST /auth/login {slug, telefone, senha}`:
-  - o condomínio vem de `CondominiosPublicoService.buscarAtivoPorSlug` e o usuário é lido pelo `PrismaEscopado` dentro de `ContextoTenant.executar(cid)`. O `PrismaSistema` não é necessário: a busca já é por `(condominio_id, telefone)`, e o client escopado mantém o fail-closed também no login;
+  - o condomínio vem de `CondominiosPublicoService.encontrarAtivoPorSlug` (devolve `null` em vez de lançar o 404 da rota pública) e o usuário é lido pelo `PrismaEscopado` dentro de `ContextoTenant.executar(cid)`. O `PrismaSistema` não é necessário: a busca já é por `(condominio_id, telefone)`, e o client escopado mantém o fail-closed também no login;
   - slug inexistente ou inativo, telefone fora do formato ou inexistente e senha errada respondem o mesmo **401 `CREDENCIAIS_INVALIDAS`**, e todos pagam uma verificação argon2 (contra um hash fictício gerado na subida com os mesmos parâmetros), para o tempo de resposta não revelar se o telefone existe;
   - o status só é revelado com a senha correta: **403** `CADASTRO_PENDENTE`, `CADASTRO_RECUSADO` ou `ACESSO_INATIVO`.
 - **Guard global** (`GuardaAutenticacao`, `APP_GUARD`): toda rota exige sessão, salvo as marcadas com `@Publico()`. Ele valida o JWT, chama `ContextoTenant.vincular(cid)` e só então busca o usuário pelo `PrismaEscopado`; como o `cid` tem assinatura conferida, a busca fica presa ao condomínio do token e um `sub` de outro condomínio não é encontrado. Recusa com **401 `NAO_AUTENTICADO`** (e apaga o cookie) quando o usuário não existe, não está `ATIVO`, `versao_sessao` difere de `sv` ou o condomínio não está `ATIVO`. O **papel vem do banco**, não do token: rebaixar alguém vale na próxima requisição.

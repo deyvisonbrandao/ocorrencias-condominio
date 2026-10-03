@@ -1,4 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
 import { gerarHashSenha, verificarSenha } from '../../../core/auth/senha.js';
 import { ErroApi } from '../../../core/http/erro-api.js';
 import type { PrismaEscopado } from '../../../core/prisma/prisma-escopado.js';
@@ -43,23 +42,15 @@ async function preparar(
   encontrado: unknown,
   condominioExiste = true,
 ): Promise<{ servico: LoginService; findUnique: ReturnType<typeof vi.fn> }> {
-  const buscarAtivoPorSlug = vi.fn(() =>
-    condominioExiste
-      ? Promise.resolve(CONDOMINIO)
-      : Promise.reject(
-          new ErroApi(
-            HttpStatus.NOT_FOUND,
-            'CONDOMINIO_NAO_ENCONTRADO',
-            'Condomínio não encontrado.',
-          ),
-        ),
+  const encontrarAtivoPorSlug = vi.fn(() =>
+    Promise.resolve(condominioExiste ? CONDOMINIO : null),
   );
   const findUnique = vi.fn(() => {
     expect(ContextoTenant.obter()).toBe(CONDOMINIO.id);
     return Promise.resolve(encontrado);
   });
   const servico = new LoginService(
-    { buscarAtivoPorSlug } as unknown as CondominiosPublicoService,
+    { encontrarAtivoPorSlug } as unknown as CondominiosPublicoService,
     { usuario: { findUnique } } as unknown as PrismaEscopado,
   );
   await servico.onModuleInit();
@@ -176,7 +167,7 @@ describe('LoginService', () => {
   it('repassa erro inesperado da busca do condomínio', async () => {
     const servico = new LoginService(
       {
-        buscarAtivoPorSlug: () => Promise.reject(new Error('banco fora')),
+        encontrarAtivoPorSlug: () => Promise.reject(new Error('banco fora')),
       } as unknown as CondominiosPublicoService,
       {} as PrismaEscopado,
     );

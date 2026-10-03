@@ -1,7 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { HttpStatus, Injectable, type OnModuleInit } from '@nestjs/common';
 import {
-  CodigoErroCondominio,
   CodigoErroSessao,
   normalizarCelularBr,
   type UsuarioSessao,
@@ -15,7 +14,7 @@ import {
 } from '../../../core/prisma/prisma-escopado.js';
 import { ContextoTenant } from '../../../core/tenancy/contexto-tenant.js';
 import { CondominiosPublicoService } from '../../condominios/publico/condominios-publico.service.js';
-import type { LoginDto } from './login.dto.js';
+import type { LoginDto } from '../dto/login.dto.js';
 
 export interface LoginAceito {
   claims: ClaimsSessao;
@@ -62,7 +61,7 @@ export class LoginService implements OnModuleInit {
   }
 
   async autenticar(dto: LoginDto): Promise<LoginAceito> {
-    const condominio = await this.buscarCondominio(dto.slug);
+    const condominio = await this.condominios.encontrarAtivoPorSlug(dto.slug);
     const telefone = normalizarCelularBr(dto.telefone);
     const usuario =
       condominio && telefone
@@ -117,20 +116,5 @@ export class LoginService implements OnModuleInit {
         condominio: { nome: condominio.nome, slug: condominio.slug },
       },
     };
-  }
-
-  private async buscarCondominio(slug: string) {
-    try {
-      return await this.condominios.buscarAtivoPorSlug(slug);
-    } catch (erro) {
-      if (
-        erro instanceof ErroApi &&
-        (erro.getResponse() as { code?: string }).code ===
-          CodigoErroCondominio.CONDOMINIO_NAO_ENCONTRADO
-      ) {
-        return null;
-      }
-      throw erro;
-    }
   }
 }

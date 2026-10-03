@@ -17,16 +17,16 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { Publico } from '../../core/auth/decoradores.js';
+import { Publico } from '../../../core/auth/decoradores.js';
 import {
   SessaoJwt,
   VALIDADE_SESSAO_SEGUNDOS,
-} from '../../core/auth/sessao-jwt.js';
-import { ErroApiDto } from '../../core/http/erro-api.js';
-import { NOME_COOKIE_SESSAO } from '../../core/http/swagger.js';
-import { UsuarioSessaoDto } from './dto/usuario-sessao.dto.js';
-import { LoginDto } from './login/login.dto.js';
-import { LoginService } from './login/login.service.js';
+} from '../../../core/auth/sessao-jwt.js';
+import { ErroApiDto } from '../../../core/http/erro-api.js';
+import { NOME_COOKIE_SESSAO } from '../../../core/http/swagger.js';
+import { UsuarioSessaoDto } from '../dto/usuario-sessao.dto.js';
+import { LoginDto } from '../dto/login.dto.js';
+import { LoginService } from './login.service.js';
 
 const DIAS_SESSAO = VALIDADE_SESSAO_SEGUNDOS / 86_400;
 
