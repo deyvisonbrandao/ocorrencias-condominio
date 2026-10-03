@@ -1,26 +1,5 @@
 @if (criado(); as condominio) {
-  <div class="md:mx-auto md:max-w-md">
-    <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
-      Condomínio criado
-    </h1>
-
-    <section
-      class="mt-6 rounded-cartao border border-borda bg-superficie p-4 md:p-6"
-      aria-labelledby="link-do-condominio"
-    >
-      <h2 id="link-do-condominio" class="text-base font-semibold">{{ condominio.nome }}</h2>
-      <p class="mt-1 text-sm text-texto-secundario">Link do condomínio</p>
-      <p class="mt-1 text-base font-medium break-all">
-        <a class="text-primaria underline" [href]="linkDoCondominio()">{{ linkDoCondominio() }}</a>
-      </p>
-      <ui-copiar class="mt-4" bloco [valor]="linkDoCondominio()" />
-      <p class="mt-4 text-sm text-texto-secundario">
-        Envie este link aos moradores ou imprima o QR code na tela Condomínio.
-      </p>
-    </section>
-
-    <a ui-botao bloco routerLink="/admin/painel" class="mt-6">Ir para o painel</a>
-  </div>
+  <app-confirmacao-cadastro class="md:mx-auto md:max-w-md" [condominio]="condominio" />
 } @else {
   <div class="md:mx-auto md:max-w-md">
     <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">

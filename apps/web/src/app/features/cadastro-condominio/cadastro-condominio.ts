@@ -31,7 +31,6 @@ import { CondominiosPublicoService } from '../../core/services/condominios-publi
 import { Botao } from '../../shared/components/botao/botao';
 import { CaixaSelecao } from '../../shared/components/caixa-selecao/caixa-selecao';
 import { Campo } from '../../shared/components/campo/campo';
-import { Copiar } from '../../shared/components/copiar/copiar';
 import { Icone } from '../../shared/components/icone/icone';
 import { ToastService } from '../../shared/services/toast.service';
 import { errosPorCampo, lerErroApi } from '../../shared/utils/erro-api';
@@ -47,6 +46,7 @@ import {
   senha,
   validarCom,
 } from '../../shared/validators/validadores';
+import { ConfirmacaoCadastro } from './components/confirmacao-cadastro/confirmacao-cadastro';
 import { ESPERA_VERIFICACAO_SLUG, verificarSlug } from './services/verificacao-slug';
 
 export type CampoCadastro =
@@ -78,7 +78,15 @@ function texto(...regras: readonly Regra[]): FormControl<string> {
 
 @Component({
   selector: 'app-cadastro-condominio',
-  imports: [ReactiveFormsModule, RouterLink, Botao, CaixaSelecao, Campo, Copiar, Icone],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Botao,
+    CaixaSelecao,
+    Campo,
+    ConfirmacaoCadastro,
+    Icone,
+  ],
   templateUrl: './cadastro-condominio.html',
 })
 export class CadastroCondominio {
@@ -138,11 +146,6 @@ export class CadastroCondominio {
       default:
         return '';
     }
-  });
-
-  protected readonly linkDoCondominio = computed(() => {
-    const condominio = this.criado();
-    return condominio ? `${this.documento.location.origin}/c/${condominio.slug}` : '';
   });
 
   constructor() {
@@ -210,9 +213,6 @@ export class CadastroCondominio {
     this.enviando.set(false);
     this.criado.set(criado);
     this.titulo.setTitle(`Condomínio criado · ${NOME_PRODUTO}`);
-    afterNextRender(() => this.elemento.querySelector<HTMLElement>('h1')?.focus(), {
-      injector: this.injector,
-    });
   }
 
   private falhar(erro: unknown): void {
