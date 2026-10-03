@@ -1,14 +1,23 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { afterNextRender, Component, DestroyRef, ElementRef, inject, Injector, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  Injector,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { slugValido } from '@ocorrencias/contratos';
 import { CondominiosPublicoService } from '../../core/services/condominios-publico.service';
 import { Botao } from '../../shared/components/botao/botao';
 import { Campo } from '../../shared/components/campo/campo';
 import { Icone } from '../../shared/components/icone/icone';
 import { NomeIcone } from '../../shared/components/icone/icones';
-import { extrairSlug, slugValido } from '../../shared/utils/slug';
+import { extrairSlug } from '../../shared/utils/slug';
 
 interface Destaque {
   readonly titulo: string;
@@ -35,8 +44,12 @@ export const MENSAGEM_CONDOMINIO_NAO_ENCONTRADO =
 
     <ul class="mt-8 grid gap-3 md:grid-cols-3">
       @for (destaque of destaques; track destaque.titulo) {
-        <li class="flex items-center gap-3 rounded-cartao border border-borda bg-superficie p-4 md:flex-col md:items-start">
-          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-controle bg-primaria-suave text-primaria">
+        <li
+          class="flex items-center gap-3 rounded-cartao border border-borda bg-superficie p-4 md:flex-col md:items-start"
+        >
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-controle bg-primaria-suave text-primaria"
+          >
             <ui-icone [nome]="destaque.icone" />
           </span>
           <p class="text-base font-semibold">{{ destaque.titulo }}</p>
@@ -44,9 +57,17 @@ export const MENSAGEM_CONDOMINIO_NAO_ENCONTRADO =
       }
     </ul>
 
-    <section class="mt-10 rounded-cartao border border-borda bg-superficie p-4 md:p-6" aria-labelledby="ja-usa">
+    <section
+      class="mt-10 rounded-cartao border border-borda bg-superficie p-4 md:p-6"
+      aria-labelledby="ja-usa"
+    >
       <h2 id="ja-usa" class="text-lg font-semibold">Já usa?</h2>
-      <form class="mt-4 space-y-4" novalidate [formGroup]="formularioLogin" (ngSubmit)="irParaLogin()">
+      <form
+        class="mt-4 space-y-4"
+        novalidate
+        [formGroup]="formularioLogin"
+        (ngSubmit)="irParaLogin()"
+      >
         <ui-campo
           rotulo="Endereço do seu condomínio"
           dica="O final do link que a administração enviou, como jardim-das-flores."
@@ -84,7 +105,9 @@ export class Landing {
     { titulo: 'Prazos e histórico em cada ocorrência', icone: 'lista' },
   ];
 
-  protected readonly formularioLogin = new FormGroup({ endereco: new FormControl('', { nonNullable: true }) });
+  protected readonly formularioLogin = new FormGroup({
+    endereco: new FormControl('', { nonNullable: true }),
+  });
   private readonly endereco = this.formularioLogin.controls.endereco;
   protected readonly erro = signal<string | null>(null);
   protected readonly verificando = signal(false);

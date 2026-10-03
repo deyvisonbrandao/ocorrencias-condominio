@@ -1,3 +1,4 @@
+import { slugValido } from '@ocorrencias/contratos';
 import {
   derivarSlug,
   extrairSlug,
@@ -6,7 +7,6 @@ import {
   MENSAGEM_SLUG_TAMANHO,
   MENSAGEM_SLUG_VAZIO,
   problemaDoSlug,
-  slugValido,
 } from './slug';
 
 describe('derivarSlug', () => {

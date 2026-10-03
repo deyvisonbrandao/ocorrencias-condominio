@@ -1,6 +1,6 @@
 import { REGRAS_SLUG } from '@ocorrencias/contratos';
 
-const MARCAS_DIACRITICAS = /[̀-ͯ]/g;
+const MARCAS_DIACRITICAS = /\p{Diacritic}/gu;
 const CARACTERES_ACEITOS = /^[a-z0-9-]+$/;
 const SEGMENTO_SLUG = /\/c\/([^/?#]*)/;
 
@@ -12,14 +12,6 @@ export function derivarSlug(nome: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
   return base.slice(0, REGRAS_SLUG.max).replace(/-+$/, '');
-}
-
-export function slugValido(slug: string): boolean {
-  return (
-    slug.length >= REGRAS_SLUG.min &&
-    slug.length <= REGRAS_SLUG.max &&
-    REGRAS_SLUG.padrao.test(slug)
-  );
 }
 
 export const MENSAGEM_SLUG_VAZIO = 'Informe o endereço do link.';

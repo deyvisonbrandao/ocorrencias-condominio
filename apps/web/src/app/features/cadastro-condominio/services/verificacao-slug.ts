@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { concat, distinctUntilChanged, map, Observable, of, switchMap, timer } from 'rxjs';
 import { DisponibilidadeSlug } from '../../../core/services/condominios-publico.service';
-import { slugValido } from '../../../shared/utils/slug';
+import { slugValido } from '@ocorrencias/contratos';
 
 export type EstadoSlug = 'ocioso' | 'verificando' | DisponibilidadeSlug;
 
