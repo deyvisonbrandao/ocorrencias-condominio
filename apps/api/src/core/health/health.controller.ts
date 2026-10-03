@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ErroApi, ErroApiDto } from '../http/erro-api.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaSistema } from '../prisma/prisma-sistema.js';
 
 export const TIMEOUT_BANCO_MS = 3_000;
 
@@ -26,7 +26,7 @@ export class HealthDto {
 @ApiTags('Saúde')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaSistema) {}
 
   @Get()
   @Header('Cache-Control', 'no-store')

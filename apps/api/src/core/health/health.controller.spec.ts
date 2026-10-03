@@ -1,12 +1,12 @@
 import { ErroApi } from '../http/erro-api.js';
-import type { PrismaService } from '../prisma/prisma.service.js';
+import type { PrismaSistema } from '../prisma/prisma-sistema.js';
 import { HealthController, TIMEOUT_BANCO_MS } from './health.controller.js';
 
 function controllerCom(disponivel: boolean) {
   const bancoDisponivel = vi.fn().mockResolvedValue(disponivel);
   const controller = new HealthController({
     bancoDisponivel,
-  } as unknown as PrismaService);
+  } as unknown as PrismaSistema);
   return { controller, bancoDisponivel };
 }
 

@@ -1,0 +1,145 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { REGRAS_SLUG } from '@ocorrencias/contratos';
+import { ErroApiDto } from '../../../core/http/erro-api.js';
+import {
+  CadastrarCondominioDto,
+  CondominioCriadoDto,
+  CondominioPublicoDto,
+} from '../dto/condominio-publico.dto.js';
+import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
+import { CondominiosPublicoService } from './condominios-publico.service.js';
+
+@ApiTags('Condomínios (público)')
+@Controller('public/condominios')
+export class CondominiosPublicoController {
+  constructor(private readonly servico: CondominiosPublicoService) {}
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(LimiteCadastroPublicoInterceptor)
+  @ApiOperation({
+    summary: 'Autocadastro do condomínio e do síndico',
+    description:
+      'Cria o condomínio ATIVO e o síndico ATIVO numa transação. Rota pública, sem autenticação. ' +
+      'O telefone é normalizado para E.164. O 409 `SLUG_EM_USO` é a fonte da verdade sobre o endereço: ' +
+      'a consulta por `GET /public/condominios/{slug}` serve só de ajuda no formulário.',
+  })
+  @ApiCreatedResponse({
+    description: 'Condomínio criado. Não devolve nenhum dado de senha.',
+    type: CondominioCriadoDto,
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Dados inválidos. `code` = `VALIDACAO_FALHOU`; `details` lista `{ campo, erros[] }` (campo aninhado como `sindico.telefone`).',
+    type: ErroApiDto,
+    example: {
+      statusCode: 400,
+      code: 'VALIDACAO_FALHOU',
+      message: 'Os dados enviados são inválidos.',
+      details: [
+        {
+          campo: 'sindico.telefone',
+          erros: ['Informe um celular com DDD, como (11) 91234-5678.'],
+        },
+      ],
+    },
+  })
+  @ApiConflictResponse({
+    description: 'O endereço (slug) já está em uso. `code` = `SLUG_EM_USO`.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 409,
+      code: 'SLUG_EM_USO',
+      message: 'Endereço já em uso. Tente outro.',
+      details: { campo: 'slug' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description:
+      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 429,
+      code: 'MUITAS_REQUISICOES',
+      message: 'Muitas requisições. Tente de novo em instantes.',
+    },
+  })
+  cadastrar(@Body() dto: CadastrarCondominioDto): Promise<CondominioCriadoDto> {
+    return this.servico.cadastrar(dto);
+  }
+
+  @Get(':slug/disponibilidade')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary: 'Verifica se um endereço de condomínio está disponível',
+    description:
+      'Considera ocupado qualquer slug reservado, inclusive de condomínios inativos. Não revela dados do condomínio.',
+  })
+  @ApiParam({
+    name: 'slug',
+    example: 'jardim-das-flores',
+    description: `${REGRAS_SLUG.min} a ${REGRAS_SLUG.max} caracteres: a-z, 0-9 e hífen.`,
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: { disponivel: { type: 'boolean', example: true } },
+      required: ['disponivel'],
+    },
+  })
+  verificarDisponibilidade(
+    @Param('slug') slug: string,
+  ): Promise<{ disponivel: boolean }> {
+    return this.servico.slugDisponivel(slug);
+  }
+
+  @Get(':slug')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary: 'Dados públicos do condomínio pelo endereço',
+    description:
+      'Usado pela página `/c/:slug`. Condomínio inexistente, inativo ou slug fora do formato respondem o mesmo 404.',
+  })
+  @ApiParam({
+    name: 'slug',
+    example: 'jardim-das-flores',
+    description: `${REGRAS_SLUG.min} a ${REGRAS_SLUG.max} caracteres: a-z, 0-9 e hífen.`,
+  })
+  @ApiOkResponse({ type: CondominioPublicoDto })
+  @ApiNotFoundResponse({
+    description: '`code` = `CONDOMINIO_NAO_ENCONTRADO`.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 404,
+      code: 'CONDOMINIO_NAO_ENCONTRADO',
+      message: 'Condomínio não encontrado.',
+    },
+  })
+  async buscar(@Param('slug') slug: string): Promise<CondominioPublicoDto> {
+    const { nome, slug: slugEncontrado } =
+      await this.servico.buscarAtivoPorSlug(slug);
+    return { nome, slug: slugEncontrado };
+  }
+}

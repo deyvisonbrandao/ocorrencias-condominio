@@ -1,0 +1,117 @@
+@if (criado(); as condominio) {
+  <app-confirmacao-cadastro class="md:mx-auto md:max-w-md" [condominio]="condominio" />
+} @else {
+  <div class="md:mx-auto md:max-w-md">
+    <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
+      Cadastre seu condomínio
+    </h1>
+
+    <form
+      class="mt-6 space-y-8 md:rounded-cartao md:border md:border-borda md:bg-superficie md:p-6"
+      novalidate
+      [formGroup]="formulario"
+      (ngSubmit)="enviar()"
+    >
+      <fieldset class="space-y-6">
+        <legend class="text-lg font-semibold">Condomínio</legend>
+        <ui-campo
+          formControlName="nome"
+          rotulo="Nome do condomínio"
+          autocomplete="off"
+          [maxlength]="maxNomeCondominio"
+          [erro]="erro('nome')"
+        />
+        <ui-campo
+          formControlName="slug"
+          rotulo="Endereço do link"
+          dica="Só letras minúsculas, números e hífen."
+          autocomplete="off"
+          autocapitalize="none"
+          [corretor]="false"
+          [maxlength]="maxSlug"
+          [erro]="erro('slug')"
+          (input)="aoEditarSlug()"
+        >
+          <p class="mt-2 text-sm break-all text-texto-secundario">
+            Prévia: {{ host }}/c/<span class="font-semibold text-texto">{{ slugDaPrevia() }}</span>
+          </p>
+          @if (!erro('slug')) {
+            @switch (estadoSlug()) {
+              @case ('verificando') {
+                <p class="mt-1 text-sm text-texto-secundario">Verificando…</p>
+              }
+              @case ('disponivel') {
+                <p class="mt-1 flex items-center gap-1.5 text-sm font-medium text-sucesso-texto">
+                  <ui-icone nome="check" [tamanho]="16" />
+                  Disponível
+                </p>
+              }
+            }
+          }
+        </ui-campo>
+        <span class="sr-only" aria-live="polite">{{ anuncioSlug() }}</span>
+      </fieldset>
+
+      <fieldset formGroupName="sindico" class="space-y-6">
+        <legend class="text-lg font-semibold">Seus dados (síndico)</legend>
+        <ui-campo
+          formControlName="nome"
+          rotulo="Nome"
+          autocomplete="name"
+          [maxlength]="maxNomePessoa"
+          [erro]="erro('sindico.nome')"
+        />
+        <ui-campo
+          formControlName="telefone"
+          tipo="tel"
+          mascara="telefone"
+          rotulo="Telefone (celular)"
+          inputmode="tel"
+          autocomplete="tel-national"
+          placeholder="(11) 91234-5678"
+          [erro]="erro('sindico.telefone')"
+        />
+        <ui-campo
+          formControlName="email"
+          tipo="email"
+          rotulo="E-mail"
+          opcional
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="none"
+          [corretor]="false"
+          [erro]="erro('sindico.email')"
+        />
+        <ui-campo
+          formControlName="senha"
+          tipo="password"
+          rotulo="Senha"
+          dica="Mínimo de 8 caracteres."
+          autocomplete="new-password"
+          [erro]="erro('sindico.senha')"
+        />
+      </fieldset>
+
+      <ui-caixa-selecao formControlName="aceite" [erro]="erro('aceite')">
+        Li e aceito os
+        <a routerLink="/termos" target="_blank" class="font-medium text-primaria underline"
+          >termos de uso<span class="sr-only"> (abre em nova aba)</span></a
+        >
+        e a
+        <a routerLink="/privacidade" target="_blank" class="font-medium text-primaria underline"
+          >política de privacidade<span class="sr-only"> (abre em nova aba)</span></a
+        >
+      </ui-caixa-selecao>
+
+      <button
+        type="submit"
+        ui-botao
+        bloco
+        rotuloCarregando="Criando condomínio…"
+        [carregando]="enviando()"
+      >
+        Criar condomínio
+      </button>
+    </form>
+  </div>
+}

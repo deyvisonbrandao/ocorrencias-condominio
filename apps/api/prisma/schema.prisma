@@ -10,3 +10,93 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+// Todo modelo precisa estar classificado em src/core/prisma/classificacao-modelos.ts (ADR-001).
+// Relação entre tabelas de condomínio usa FK composta (condominio_id, x_id).
+
+enum StatusCondominio {
+  ATIVO
+  INATIVO
+}
+
+enum Papel {
+  SINDICO
+  SUBSINDICO
+  MORADOR
+}
+
+enum StatusUsuario {
+  PENDENTE
+  ATIVO
+  RECUSADO
+  INATIVO
+}
+
+enum AcaoAuditoria {
+  MORADOR_APROVADO
+  MORADOR_RECUSADO
+  USUARIO_INATIVADO
+  USUARIO_REATIVADO
+  SENHA_REDEFINIDA
+  SUBSINDICO_DEFINIDO
+  SUBSINDICO_REMOVIDO
+}
+
+model Condominio {
+  id                      String           @id @default(uuid(7)) @db.Char(36)
+  nome                    String           @db.VarChar(120)
+  slug                    String           @unique @db.VarChar(40)
+  status                  StatusCondominio @default(ATIVO)
+  proximoNumeroOcorrencia Int              @default(1) @map("proximo_numero_ocorrencia") @db.UnsignedInt
+  criadoEm                DateTime         @default(now()) @map("criado_em") @db.DateTime(3)
+  atualizadoEm            DateTime         @updatedAt @map("atualizado_em") @db.DateTime(3)
+
+  usuarios   Usuario[]
+  auditorias AuditoriaAdmin[]
+
+  @@map("condominio")
+}
+
+model Usuario {
+  id              String        @id @default(uuid(7)) @db.Char(36)
+  condominioId    String        @map("condominio_id") @db.Char(36)
+  nome            String        @db.VarChar(100)
+  telefone        String        @db.VarChar(16)
+  email           String?       @db.VarChar(254)
+  senhaHash       String        @map("senha_hash") @db.VarChar(255)
+  bloco           String?       @db.VarChar(20)
+  apto            String?       @db.VarChar(10)
+  papel           Papel
+  status          StatusUsuario
+  senhaTemporaria Boolean       @default(false) @map("senha_temporaria")
+  versaoSessao    Int           @default(1) @map("versao_sessao") @db.UnsignedInt
+  slotAdmin       Int?          @map("slot_admin") @db.UnsignedTinyInt
+  criadoEm        DateTime      @default(now()) @map("criado_em") @db.DateTime(3)
+  atualizadoEm    DateTime      @updatedAt @map("atualizado_em") @db.DateTime(3)
+
+  condominio         Condominio       @relation(fields: [condominioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  auditoriasComoAtor AuditoriaAdmin[] @relation("AuditoriaAtor")
+  auditoriasComoAlvo AuditoriaAdmin[] @relation("AuditoriaAlvo")
+
+  @@unique([condominioId, id])
+  @@unique([condominioId, telefone])
+  @@unique([condominioId, slotAdmin])
+  @@map("usuario")
+}
+
+model AuditoriaAdmin {
+  id           String        @id @default(uuid(7)) @db.Char(36)
+  condominioId String        @map("condominio_id") @db.Char(36)
+  atorId       String        @map("ator_id") @db.Char(36)
+  alvoId       String?       @map("alvo_id") @db.Char(36)
+  acao         AcaoAuditoria
+  dados        Json?
+  criadoEm     DateTime      @default(now()) @map("criado_em") @db.DateTime(3)
+
+  condominio Condominio @relation(fields: [condominioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  ator       Usuario    @relation("AuditoriaAtor", fields: [condominioId, atorId], references: [condominioId, id], onDelete: Restrict, onUpdate: Restrict)
+  alvo       Usuario?   @relation("AuditoriaAlvo", fields: [condominioId, alvoId], references: [condominioId, id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([condominioId, criadoEm])
+  @@map("auditoria_admin")
+}

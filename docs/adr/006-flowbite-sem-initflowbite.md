@@ -7,7 +7,7 @@
 
 ## Contexto
 
-O plano do MVP ([`arquitetura-mvp.md`](../arquitetura-mvp.md)) previa Tailwind + Flowbite com `initFlowbite()` nos componentes interativos. Também previa encapsular os componentes em `shared/ui`, para que as telas não dependam das classes do Flowbite.
+O plano do MVP ([`arquitetura-mvp.md`](../arquitetura-mvp.md)) previa Tailwind + Flowbite com `initFlowbite()` nos componentes interativos. Também previa encapsular os componentes em `shared/components`, para que as telas não dependam das classes do Flowbite.
 
 A especificação de UI mostrou três problemas no JS do Flowbite, que é o que `initFlowbite()` ativa, dentro de uma SPA Angular:
 
@@ -19,7 +19,7 @@ O valor do Flowbite para o projeto está na **marcação e nas classes** dos com
 
 ## Decisão
 
-1. O Flowbite é usado só como **referência de marcação e classes Tailwind** para os componentes de `apps/web/src/app/shared/ui`. O plugin do Tailwind do Flowbite não é usado (ver [especificação, seção 2.7](../ui/especificacao.md#27-mapeamento-para-o-tailwind)).
+1. O Flowbite é usado só como **referência de marcação e classes Tailwind** para os componentes de `apps/web/src/app/shared/components`. O plugin do Tailwind do Flowbite não é usado (ver [especificação, seção 2.7](../ui/especificacao.md#27-mapeamento-para-o-tailwind)).
 2. **`initFlowbite()` não é chamado**, e nenhum módulo JS do Flowbite é importado.
 3. O **comportamento** interativo é implementado no Angular, com signals:
    - modal, bottom sheet e drawer usam o elemento nativo **`<dialog>` com `showModal()`**, que prende o foco, fecha com Esc e deixa o fundo inerte; o componente devolve o foco a quem abriu;
@@ -38,7 +38,7 @@ O valor do Flowbite para o projeto está na **marcação e nas classes** dos com
 - O bundle fica menor: nenhum JS do Flowbite.
 
 **Negativas e custos**
-- Exemplos da documentação do Flowbite que dependem de `data-modal-toggle`, `data-dropdown-toggle` e semelhantes não funcionam se forem colados. É preciso adaptar a marcação ao componente de `shared/ui`.
+- Exemplos da documentação do Flowbite que dependem de `data-modal-toggle`, `data-dropdown-toggle` e semelhantes não funcionam se forem colados. É preciso adaptar a marcação ao componente de `shared/components`.
 - Componentes interativos mais ricos, que não estão no MVP (datepicker, carrossel, tooltip com posicionamento), exigirão implementação própria ou uma nova decisão.
 - `ui-modal`, `ui-drawer`, menu e toast precisam de testes próprios de foco e teclado.
 

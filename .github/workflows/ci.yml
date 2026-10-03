@@ -44,6 +44,8 @@ jobs:
     env:
       NODE_ENV: test
       DATABASE_URL: mysql://ocorrencias:ocorrencias-ci@127.0.0.1:3306/ocorrencias
+      # Os e2e gravam e apagam dados: rodam só num banco <nome>_test (apps/api/test/banco-teste.ts).
+      DATABASE_URL_TEST: mysql://ocorrencias:ocorrencias-ci@127.0.0.1:3306/ocorrencias_test
     services:
       mysql:
         image: mysql:8.4
@@ -70,7 +72,7 @@ jobs:
           cache: npm
 
       # Service container não aceita `command`, então os parâmetros do docker-compose.yml são aplicados por SQL.
-      - name: Alinhar MySQL ao docker-compose (charset, collation e fuso)
+      - name: Alinhar MySQL ao docker-compose e criar o banco de teste
         env:
           MYSQL_CONTAINER: ${{ job.services.mysql.id }}
         run: |
@@ -78,7 +80,9 @@ jobs:
             SET PERSIST character_set_server = 'utf8mb4';
             SET PERSIST collation_server = 'utf8mb4_0900_ai_ci';
             SET PERSIST time_zone = '+00:00';
-            ALTER DATABASE ocorrencias CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+            ALTER DATABASE ocorrencias CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            CREATE DATABASE IF NOT EXISTS ocorrencias_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            GRANT ALL PRIVILEGES ON ocorrencias_test.* TO 'ocorrencias'@'%';"
           atual=$(docker exec -e MYSQL_PWD=root-ci "$MYSQL_CONTAINER" mysql -uroot -N -B -e \
             "SELECT CONCAT_WS(' ', VERSION(), @@character_set_server, @@collation_server, @@global.time_zone)")
           echo "MySQL: $atual"
@@ -87,8 +91,6 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Aplicar migrações
-        run: npm run prisma:migrate:deploy -w @ocorrencias/api
-
+      # O globalSetup dos e2e aplica as migrações no banco de teste antes das suítes.
       - name: Testes e2e da API
         run: npm run test:e2e -w @ocorrencias/api

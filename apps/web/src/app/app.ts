@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { focarTituloERolarAoNavegar } from './core/navegacao/foco-na-navegacao';
-import { RegiaoToast } from './shared/ui/toast/regiao-toast';
+import { focarTituloERolarAoNavegar } from './core/services/foco-na-navegacao';
+import { RegiaoToast } from './shared/components/toast/regiao-toast';
 
 @Component({
   selector: 'app-root',

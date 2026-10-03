@@ -33,12 +33,28 @@ Monolito modular NestJS + SPA Angular, em monorepo com npm workspaces:
 condominio-ocorrencias/
   docker-compose.yml (mysql:8.4, utf8mb4_0900_ai_ci)  .env.example  docs/adr/  .github/workflows/ci.yml
   packages/contratos/            # enums e tipos de DTO compartilhados
-  apps/api/  prisma/  src/core/{config,tenancy,auth,prisma,http}
-             src/modules/{condominios,acesso,membros,ocorrencias}
-             test/e2e/{isolamento-tenant,anonimato,maquina-estados}
+  apps/api/  prisma/  src/core/{config,http,prisma,tenancy,auth,health}
+             src/features/<feature>/{publico,dto,enums,interfaces}  # condominios, acesso, membros, ocorrencias
+             src/shared/{validators,pipes,decorators,utils}
+             test/  # e2e: isolamento-tenant, condominios-publico; depois anonimato, maquina-estados
   apps/web/  (Angular standalone + signals, Tailwind + Flowbite)
-             src/app/{core,publico,morador,admin,shared/ui}
+             src/app/core/{config,interceptors,layouts/{publico,morador,admin},services,guards}
+             src/app/features/<feature>/{components,services,interfaces,enums}  # uma pasta por entrega, lazy
+             src/app/shared/{components,validators,services,utils,pipes,directives}
 ```
+
+**Estrutura do web** (`apps/web/src/app`, três áreas, sem NgModules)
+- `core/`: o que carrega na inicialização e existe uma vez só: shells e rotas de cada área (`layouts/`), interceptors, guards, configuração (`config/`) e serviços globais, como os clients da API e a navegação (`services/`).
+- `features/<feature>/`: uma pasta por entrega de valor, com o componente de página na raiz, carregado por lazy loading a partir das rotas da área. Subpastas `components/`, `services/`, `interfaces/` e `enums/` só quando a feature tem os seus próprios.
+- `shared/`: reutilizável, agrupado por tipo: `components/` (os `ui-*`), `validators/`, `services/`, `utils/` (funções puras), `pipes/` e `directives/`.
+- Dependências: `features` importam `core` e `shared`; `shared` não importa `core` nem `features`; `core` não importa `features`, exceto nas rotas das áreas; uma feature não importa outra (o que for comum sobe para `shared` ou `core`).
+
+**Estrutura da API** (`apps/api/src`, mesma divisão do web, com módulos Nest)
+- `core/`: infraestrutura essencial, carregada uma vez: configuração validada (`config/`), pipeline HTTP e erro padrão (`http/`), clients do Prisma (`prisma/`), contexto de condomínio (`tenancy/`), hash de senha e, na #6, sessão e guards (`auth/`), e o `health/`.
+- `features/<feature>/`: uma pasta por área de negócio, com o `<feature>.module.ts` na raiz. Subpastas só quando a feature precisa: `publico/` (rotas sem autenticação), `dto/`, `enums/`, `interfaces/`. Controllers e services ficam junto da rota que atendem.
+- `shared/`: reutilizável entre features e sem estado, agrupado por tipo: `validators/` (decorators de validação de DTO, como celular, e-mail e senha), `pipes/`, `decorators/` e `utils/`. Só nasce quando há um segundo consumidor real ou previsto na issue seguinte.
+- Dependências: `features` importam `core` e `shared`; `shared` não importa `core`, `features` nem o client gerado do Prisma; `core` não importa `features` (o `AppModule` é a única ligação); uma feature não importa arquivo de outra, só o módulo Nest que a outra exporta. O `.oxlintrc.json` da API aplica as três primeiras regras; a última fica na revisão.
+- `PrismaSistema` (client sem filtro) só pode ser importado em `core/prisma`, `core/health`, `features/condominios/publico/condominios-publico.service.ts` (autocadastro e resolução do slug), `prisma/`, `scripts/` e `test/` (ADR-001).
 
 **Swagger**
 - `@nestjs/swagger` em `/api/docs`, com DTOs anotados e autenticação por cookie.
@@ -46,7 +62,7 @@ condominio-ocorrencias/
 
 **Flowbite**
 - Tailwind + `flowbite` como referência de marcação e classes, com ícones do Flowbite Icons (SVG inline). O comportamento interativo (modal, drawer, menus, abas) fica no Angular, com `<dialog>` nativo; **sem `initFlowbite()`** ([ADR-006](adr/006-flowbite-sem-initflowbite.md)).
-- Componentes de UI encapsulados em `shared/ui`: botão, input, select, badge de status/tipo, timeline, modal, toast, bottom-nav, abas.
+- Componentes de UI encapsulados em `shared/components`: botão, input, select, badge de status/tipo, timeline, modal, toast, bottom-nav, abas.
 - Assim as telas não dependem direto das classes do Flowbite.
 - O `zidane` define os tokens e o mapeamento de componentes.
 
@@ -63,7 +79,7 @@ condominio-ocorrencias/
 - Uma **client extension** fail-closed (`PrismaEscopado`) injeta o `condominioId` em toda leitura e escrita.
   - Sem contexto, lança exceção.
   - `$queryRaw` fica bloqueado.
-- O `PrismaSistema` (sem filtro) é restrito por lint a login, autocadastro e scripts.
+- O `PrismaSistema` (sem filtro) é restrito por lint ao autocadastro, à resolução do slug e a scripts. O login (#6) usa o `PrismaEscopado` dentro de `ContextoTenant.executar`.
 - Um teste sobre o DMMF exige que todo modelo esteja classificado como de condomínio ou global.
 - FKs compostas `(condominio_id, x_id)` em todas as relações.
 
@@ -175,7 +191,7 @@ condominio-ocorrencias/
    - NestJS, Prisma, config validada, filtro de erros padrão, `/health`, Swagger em `/api/docs`, CI no GitHub Actions (lint, test, build).
    - Testar: abrir `/api/docs` e executar `/health`; checks verdes no PR.
 3. **Web base com Flowbite**
-   - Angular, Tailwind e Flowbite; shells das áreas pública, morador (bottom-nav) e admin (navbar/sidebar responsiva); componentes base em `shared/ui`.
+   - Angular, Tailwind e Flowbite; shells das áreas pública, morador (bottom-nav) e admin (navbar/sidebar responsiva); componentes base em `shared/components`.
    - Testar: navegar pelos shells em 375px e em desktop.
 4. **Especificação de UI** (`zidane`)
    - Tokens, mapeamento Flowbite e fluxo das telas do MVP, com estados vazio, carregando e erro.

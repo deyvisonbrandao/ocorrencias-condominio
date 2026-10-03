@@ -16,6 +16,8 @@ packages/contratos/   enums e tipos compartilhados entre API e web
 docs/                 plano do MVP e ADRs
 ```
 
+API e web seguem a mesma divisão em `core/` (infraestrutura que existe uma vez só), `features/` (uma pasta por entrega) e `shared/` (reutilizável entre features). As regras de cada lado estão em [docs/arquitetura-mvp.md](docs/arquitetura-mvp.md#arquitetura); na API, o lint (`apps/api/.oxlintrc.json`) barra import entre camadas na direção proibida.
+
 ## Pré-requisitos
 
 - **Node.js 22.22.3 ou superior** na linha 22 (ou 24.15+), versão mínima exigida pelo Angular CLI 22. O `.nvmrc` fixa `22.22.3` para quem usa nvm/fnm; no **nvm-windows**, que não lê `.nvmrc`, rode `nvm install 22.22.3` e `nvm use 22.22.3`.
@@ -59,7 +61,7 @@ docs/                 plano do MVP e ADRs
    - API: http://localhost:3000/api/v1 (health em http://localhost:3000/api/v1/health)
    - Swagger: http://localhost:3000/api/docs
    - Pelo proxy do web: http://localhost:4200/api/v1
-   - Vitrine dos componentes de `shared/ui` (só em desenvolvimento): http://localhost:4200/dev/ui
+   - Vitrine dos componentes de `shared/components` (só em desenvolvimento): http://localhost:4200/dev/ui
 
    A API valida o `.env` na subida: com variável faltando ou inválida, ela não sobe e lista o que corrigir.
 
@@ -77,14 +79,15 @@ docs/                 plano do MVP e ADRs
 
 Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api` (ou `@ocorrencias/web`, `@ocorrencias/contratos`).
 
+A API usa `@ocorrencias/contratos` compilado em `build`, `start` e `start:dev`. Ao rodar esses scripts só na API, compile antes os contratos com `npm run build -w @ocorrencias/contratos`; o `npm run dev` e o `npm run build` da raiz já fazem isso. Lint e testes da API leem o código-fonte dos contratos e não precisam desse passo.
 ### Scripts da API
 
 | Comando (`-w @ocorrencias/api`) | O que faz |
 | --- | --- |
-| `npm run test:e2e` | Testes e2e da API; precisam do MySQL no ar e das migrações aplicadas |
+| `npm run test:e2e` | Testes e2e da API. Precisam do MySQL no ar e rodam no banco de teste (veja [Banco de dados](#banco-de-dados)): aplicam as migrações nele e apagam os dados a cada suíte, sem tocar no banco de desenvolvimento |
 | `npm run prisma:generate` | Gera o client do Prisma em `apps/api/src/generated/prisma` (fora do git) |
 | `npm run prisma:migrate` | `prisma migrate dev`: cria uma migração a partir do `schema.prisma` e aplica no banco local |
-| `npm run prisma:migrate:deploy` | Aplica as migrações pendentes sem gerar nenhuma (é o que o CI usa) |
+| `npm run prisma:migrate:deploy` | Aplica as migrações pendentes sem gerar nenhuma |
 
 ## Banco de dados
 
@@ -96,5 +99,9 @@ Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api`
 - O `prisma migrate dev` precisa de um banco sombra. O `docker/mysql/init/01-banco-shadow.sh` cria `<MYSQL_DATABASE>_shadow` e dá acesso só a ele ao usuário da aplicação, sem privilégio global. O script roda sozinho apenas quando o volume é criado; num volume que já existia, rode uma vez (PowerShell ou cmd; no Git Bash, prefixe com `MSYS_NO_PATHCONV=1`):
   ```bash
   docker compose exec mysql bash /docker-entrypoint-initdb.d/01-banco-shadow.sh
+  ```
+- Os testes e2e da API rodam num banco separado, `<MYSQL_DATABASE>_test` (`DATABASE_URL_TEST` no `.env`; sem ela, o banco da `DATABASE_URL` com o sufixo `_test`). O `globalSetup` do Vitest aplica as migrações nele, e cada suíte começa com as tabelas vazias. Os e2e se recusam a rodar se o nome do banco não terminar em `_test` ou se for o mesmo da `DATABASE_URL`. O `docker/mysql/init/02-banco-teste.sh` cria o banco quando o volume é criado; num volume que já existia, rode uma vez (no Git Bash, com o mesmo prefixo acima):
+  ```bash
+  docker compose exec mysql bash /docker-entrypoint-initdb.d/02-banco-teste.sh
   ```
 - Em Linux com SELinux (Fedora, RHEL), o bind mount de `docker/mysql/init` precisa do sufixo `:z` (`...:/docker-entrypoint-initdb.d:ro,z`) para o container conseguir ler o script.
