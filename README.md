@@ -76,15 +76,14 @@ docs/                 plano do MVP e ADRs
 | `npm run db:up` / `npm run db:down` | Sobe o MySQL esperando ficar `healthy` / para o MySQL (o volume com os dados é mantido) |
 
 Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api` (ou `@ocorrencias/web`, `@ocorrencias/contratos`).
-
 ### Scripts da API
 
 | Comando (`-w @ocorrencias/api`) | O que faz |
 | --- | --- |
-| `npm run test:e2e` | Testes e2e da API; precisam do MySQL no ar e das migrações aplicadas |
+| `npm run test:e2e` | Testes e2e da API. Precisam do MySQL no ar e rodam no banco de teste (veja [Banco de dados](#banco-de-dados)): aplicam as migrações nele e apagam os dados a cada suíte, sem tocar no banco de desenvolvimento |
 | `npm run prisma:generate` | Gera o client do Prisma em `apps/api/src/generated/prisma` (fora do git) |
 | `npm run prisma:migrate` | `prisma migrate dev`: cria uma migração a partir do `schema.prisma` e aplica no banco local |
-| `npm run prisma:migrate:deploy` | Aplica as migrações pendentes sem gerar nenhuma (é o que o CI usa) |
+| `npm run prisma:migrate:deploy` | Aplica as migrações pendentes sem gerar nenhuma |
 
 ## Banco de dados
 
@@ -96,5 +95,9 @@ Para rodar um script de um workspace só: `npm run <script> -w @ocorrencias/api`
 - O `prisma migrate dev` precisa de um banco sombra. O `docker/mysql/init/01-banco-shadow.sh` cria `<MYSQL_DATABASE>_shadow` e dá acesso só a ele ao usuário da aplicação, sem privilégio global. O script roda sozinho apenas quando o volume é criado; num volume que já existia, rode uma vez (PowerShell ou cmd; no Git Bash, prefixe com `MSYS_NO_PATHCONV=1`):
   ```bash
   docker compose exec mysql bash /docker-entrypoint-initdb.d/01-banco-shadow.sh
+  ```
+- Os testes e2e da API rodam num banco separado, `<MYSQL_DATABASE>_test` (`DATABASE_URL_TEST` no `.env`; sem ela, o banco da `DATABASE_URL` com o sufixo `_test`). O `globalSetup` do Vitest aplica as migrações nele, e cada suíte começa com as tabelas vazias. Os e2e se recusam a rodar se o nome do banco não terminar em `_test` ou se for o mesmo da `DATABASE_URL`. O `docker/mysql/init/02-banco-teste.sh` cria o banco quando o volume é criado; num volume que já existia, rode uma vez (no Git Bash, com o mesmo prefixo acima):
+  ```bash
+  docker compose exec mysql bash /docker-entrypoint-initdb.d/02-banco-teste.sh
   ```
 - Em Linux com SELinux (Fedora, RHEL), o bind mount de `docker/mysql/init` precisa do sufixo `:z` (`...:/docker-entrypoint-initdb.d:ro,z`) para o container conseguir ler o script.
