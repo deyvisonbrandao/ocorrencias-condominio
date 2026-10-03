@@ -2,8 +2,8 @@ import {
   celularBrE164Valido,
   normalizarCelularBr,
   REGRAS_SLUG,
+  slugValido,
 } from '@ocorrencias/contratos';
-import { slugValido } from './condominios-publico.service.js';
 
 describe('normalizarCelularBr', () => {
   it.each([

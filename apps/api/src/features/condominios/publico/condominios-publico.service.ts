@@ -3,7 +3,7 @@ import {
   CodigoErroCondominio,
   type CondominioCriado,
   type CondominioPublico,
-  REGRAS_SLUG,
+  slugValido,
 } from '@ocorrencias/contratos';
 import { gerarHashSenha } from '../../../core/auth/senha.js';
 import { ErroApi } from '../../../core/http/erro-api.js';
@@ -14,14 +14,6 @@ import type { CadastrarCondominioDto } from '../dto/condominio-publico.dto.js';
 
 export const INDICE_SLUG = 'condominio_slug_key';
 export const SLOT_SINDICO = 1;
-
-export function slugValido(slug: string): boolean {
-  return (
-    slug.length >= REGRAS_SLUG.min &&
-    slug.length <= REGRAS_SLUG.max &&
-    REGRAS_SLUG.padrao.test(slug)
-  );
-}
 
 function naoEncontrado(): ErroApi {
   return new ErroApi(

@@ -4,6 +4,14 @@ export const REGRAS_SLUG = {
   padrao: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
 } as const;
 
+export function slugValido(slug: string): boolean {
+  return (
+    slug.length >= REGRAS_SLUG.min &&
+    slug.length <= REGRAS_SLUG.max &&
+    REGRAS_SLUG.padrao.test(slug)
+  );
+}
+
 export const REGRAS_SENHA = {
   min: 8,
   max: 128,
