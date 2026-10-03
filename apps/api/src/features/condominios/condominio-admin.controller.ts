@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Header, Put } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiConflictResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -61,6 +62,17 @@ export class CondominioAdminController {
         { campo: 'uf', erros: ['Escolha a UF.'] },
         { campo: 'slug', erros: [MENSAGEM_SLUG_IMUTAVEL] },
       ],
+    },
+  })
+  @ApiConflictResponse({
+    description:
+      'Outras edições simultâneas venceram todas as tentativas de gravar (lock otimista com nova tentativa no servidor). `code` = `EDICAO_CONCORRENTE`; recarregar e reenviar resolve.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 409,
+      code: 'EDICAO_CONCORRENTE',
+      message:
+        'Os dados do condomínio foram alterados ao mesmo tempo em outra tela. Recarregue a página e tente de novo.',
     },
   })
   atualizar(

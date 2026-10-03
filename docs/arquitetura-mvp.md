@@ -85,7 +85,7 @@ condominio-ocorrencias/
 
 ### Modelo de dados
 
-- **`condominio`**: id (UUIDv7), nome, slug UNIQUE, status, proximo_numero_ocorrencia, cidade?, uf? (enum das 27 UFs). Cidade e UF são nulas no banco porque o autocadastro não as pede; o `PUT /admin/condominio` exige as duas (issue #11).
+- **`condominio`**: id (UUIDv7), nome, slug UNIQUE, status, proximo_numero_ocorrencia, cidade?, uf? (enum das 27 UFs). Cidade e UF são nulas no banco porque o autocadastro não as pede; o `PUT /admin/condominio` exige as duas (issue #11). `versao` serve de lock otimista para esse PUT: a gravação só vale se a versão lida não mudou, com nova tentativa no servidor e 409 `EDICAO_CONCORRENTE` se esgotar.
 - **`usuario`**:
   - Dados: condominio_id, nome, telefone (E.164), email?, senha_hash, bloco, apto.
   - Acesso: papel, status (PENDENTE/ATIVO/RECUSADO/INATIVO), senha_temporaria, versao_sessao.

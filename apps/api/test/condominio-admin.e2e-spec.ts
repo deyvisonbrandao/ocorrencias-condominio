@@ -124,6 +124,51 @@ describe('/admin/condominio (e2e)', () => {
       expect(await auditorias()).toHaveLength(1);
     });
 
+    it('PUTs simultâneos com os mesmos dados gravam uma auditoria só', async () => {
+      const cookie = await entrar(app, 'cond-a', SINDICO);
+      const respostas = await Promise.all(
+        Array.from({ length: 4 }, () =>
+          http().put(ROTA).set('Cookie', cookie).send(NOVOS),
+        ),
+      );
+
+      expect(respostas.map((r) => r.status)).toEqual([200, 200, 200, 200]);
+      expect(await auditorias()).toHaveLength(1);
+    });
+
+    it('PUTs simultâneos com dados diferentes: cada um vê o estado gravado pelo anterior', async () => {
+      const cookie = await entrar(app, 'cond-a', SINDICO);
+      const nomes = ['Nome 1', 'Nome 2', 'Nome 3', 'Nome 4'];
+      const respostas = await Promise.all(
+        nomes.map((nome) =>
+          http()
+            .put(ROTA)
+            .set('Cookie', cookie)
+            .send({ ...NOVOS, nome }),
+        ),
+      );
+      expect(respostas.map((r) => r.status)).toEqual([200, 200, 200, 200]);
+
+      const registros = (await auditorias()).map(
+        (x) => x.dados as { de: { nome: string }; para: { nome: string } },
+      );
+      expect(registros).toHaveLength(nomes.length);
+
+      // Serializado, o de/para forma uma cadeia única do nome original até o nome final, sem repetir o "de".
+      const seguinte = new Map(registros.map((r) => [r.de.nome, r.para.nome]));
+      expect(seguinte.size).toBe(registros.length);
+      let nome = 'Condomínio cond-a';
+      for (let passo = 0; passo < registros.length; passo++) {
+        expect(seguinte.has(nome)).toBe(true);
+        nome = seguinte.get(nome)!;
+      }
+      const final = await prismaDeTeste().condominio.findUniqueOrThrow({
+        where: { id: a.id },
+        select: { nome: true },
+      });
+      expect(final.nome).toBe(nome);
+    });
+
     it('subsíndico e morador recebem 403 e nada muda', async () => {
       for (const telefone of [SUBSINDICO, MORADOR]) {
         const cookie = await entrar(app, 'cond-a', telefone);

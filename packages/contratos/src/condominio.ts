@@ -24,6 +24,7 @@ export const REGRAS_EMAIL = { max: 254 } as const;
 export const CodigoErroCondominio = {
   SLUG_EM_USO: 'SLUG_EM_USO',
   CONDOMINIO_NAO_ENCONTRADO: 'CONDOMINIO_NAO_ENCONTRADO',
+  EDICAO_CONCORRENTE: 'EDICAO_CONCORRENTE',
 } as const;
 export type CodigoErroCondominio =
   (typeof CodigoErroCondominio)[keyof typeof CodigoErroCondominio];

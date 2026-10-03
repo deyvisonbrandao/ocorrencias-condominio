@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `condominio` ADD COLUMN `versao` INTEGER UNSIGNED NOT NULL DEFAULT 1;
