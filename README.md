@@ -38,6 +38,10 @@ API e web seguem a mesma divisão em `core/` (infraestrutura que existe uma vez 
    ```
    No PowerShell: `Copy-Item .env.example .env`.
 
+   - Preencha o `JWT_SECRET` (obrigatório, 32+ caracteres), que assina o cookie de sessão. Gere um valor com:
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+     ```
    - A `DATABASE_URL` repete usuário, senha, porta e banco do bloco MySQL: se mudar algum deles, ajuste a URL também.
    - As senhas do MySQL só são aplicadas na primeira subida, quando o volume é criado. Para trocá-las depois, rode `docker compose down -v` (apaga os dados deste projeto) e suba de novo.
 3. Suba o MySQL; o comando só retorna quando o container estiver `healthy`:

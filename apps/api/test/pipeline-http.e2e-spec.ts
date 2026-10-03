@@ -9,6 +9,7 @@ import { Type } from 'class-transformer';
 import { IsInt, IsString, Min, MinLength } from 'class-validator';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
+import { Publico } from '../src/core/auth/decoradores.js';
 import { AppConfig } from '../src/core/config/app-config.js';
 import { criarApp } from './criar-app.js';
 
@@ -23,6 +24,7 @@ class EcoDto {
   quantidade!: number;
 }
 
+@Publico()
 @Controller('teste-eco')
 class EcoController {
   @Post()
@@ -183,7 +185,7 @@ describe('Swagger desligado (e2e)', () => {
                 limiteConexoes: 1,
               },
               false,
-              undefined,
+              'x'.repeat(32),
             ),
         }),
     });

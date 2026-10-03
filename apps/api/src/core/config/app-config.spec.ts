@@ -1,7 +1,8 @@
 import { carregarConfig, ConfigInvalidaError } from './app-config.js';
 
 const DATABASE_URL = 'mysql://usuario:senha@localhost:3306/ocorrencias';
-const BASE = { NODE_ENV: 'development', DATABASE_URL };
+const JWT_SECRET = 'segredo-de-teste-com-32-caracteres!';
+const BASE = { NODE_ENV: 'development', DATABASE_URL, JWT_SECRET };
 
 function erroDe(env: NodeJS.ProcessEnv): ConfigInvalidaError {
   try {
@@ -20,7 +21,7 @@ describe('carregarConfig', () => {
     expect(config.ambiente).toBe('development');
     expect(config.porta).toBe(3000);
     expect(config.swaggerHabilitado).toBe(true);
-    expect(config.jwtSecret).toBeUndefined();
+    expect(config.jwtSecret).toBe(JWT_SECRET);
   });
 
   it('converte API_PORT para número', () => {
@@ -28,13 +29,13 @@ describe('carregarConfig', () => {
   });
 
   it('recusa subir sem NODE_ENV, sem assumir ambiente', () => {
-    expect(erroDe({ DATABASE_URL }).problemas).toEqual([
+    expect(erroDe({ DATABASE_URL, JWT_SECRET }).problemas).toEqual([
       expect.stringMatching(/^NODE_ENV: é obrigatória/),
     ]);
   });
 
   it('recusa subir sem DATABASE_URL', () => {
-    expect(erroDe({ NODE_ENV: 'test' }).problemas).toEqual([
+    expect(erroDe({ NODE_ENV: 'test', JWT_SECRET }).problemas).toEqual([
       expect.stringMatching(/^DATABASE_URL: /),
     ]);
   });
@@ -43,9 +44,9 @@ describe('carregarConfig', () => {
     expect(erroDe({ ...BASE, DATABASE_URL: '  ' }).problemas[0]).toMatch(
       /^DATABASE_URL: /,
     );
-    expect(
-      carregarConfig({ ...BASE, JWT_SECRET: '' }).jwtSecret,
-    ).toBeUndefined();
+    expect(erroDe({ ...BASE, JWT_SECRET: '   ' }).problemas).toEqual([
+      expect.stringMatching(/^JWT_SECRET: .*é obrigatória/),
+    ]);
   });
 
   it('lista todos os problemas de uma vez, sem expor os valores', () => {
@@ -80,9 +81,9 @@ describe('carregarConfig', () => {
     [{ NODE_ENV: 'production', SWAGGER_ENABLED: 'true' }, true],
     [{ NODE_ENV: 'development', SWAGGER_ENABLED: 'false' }, false],
   ])('Swagger com %o -> %s', (env, esperado) => {
-    expect(carregarConfig({ DATABASE_URL, ...env }).swaggerHabilitado).toBe(
-      esperado,
-    );
+    expect(
+      carregarConfig({ DATABASE_URL, JWT_SECRET, ...env }).swaggerHabilitado,
+    ).toBe(esperado);
   });
 
   it('aceita JWT_SECRET com 32+ caracteres', () => {

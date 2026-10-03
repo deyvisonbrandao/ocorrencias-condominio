@@ -4,6 +4,7 @@ import { provideRouter, TitleStrategy } from '@angular/router';
 import { routes } from './app.routes';
 import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { erroHttpInterceptor } from './core/interceptors/erro-http.interceptor';
+import { sessaoExpiradaInterceptor } from './core/interceptors/sessao-expirada.interceptor';
 import { TituloDaPagina } from './core/services/titulo-da-pagina';
 
 export const appConfig: ApplicationConfig = {
@@ -11,6 +12,9 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     { provide: TitleStrategy, useClass: TituloDaPagina },
-    provideHttpClient(withFetch(), withInterceptors([apiInterceptor, erroHttpInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([apiInterceptor, erroHttpInterceptor, sessaoExpiradaInterceptor]),
+    ),
   ],
 };

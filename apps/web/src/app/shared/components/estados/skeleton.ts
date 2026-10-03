@@ -1,5 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
+export const ESPERA_ANTES_DO_SKELETON_MS = 300;
+
 export type FormaSkeleton = 'cartao' | 'linha-tabela' | 'detalhe';
 
 @Component({

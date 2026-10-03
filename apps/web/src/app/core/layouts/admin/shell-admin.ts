@@ -1,27 +1,43 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { NOME_PRODUTO } from '../../config/marca';
 import { dadosDaTelaAtual } from '../../services/rota-atual';
+import { SessaoService } from '../../services/sessao.service';
+import { Alerta } from '../../../shared/components/alerta/alerta';
 import { BarraSuperior } from '../../../shared/components/barra-superior/barra-superior';
 import { Botao } from '../../../shared/components/botao/botao';
 import { Drawer } from '../../../shared/components/drawer/drawer';
 import { Icone } from '../../../shared/components/icone/icone';
 import { PularConteudo } from '../../../shared/components/pular-conteudo/pular-conteudo';
 import { ItemNavegacao, Sidebar } from '../../../shared/components/sidebar/sidebar';
+import { ROTULO_PAPEL } from '../../../shared/utils/dominio';
+
+const ROTA_EQUIPE = '/admin/equipe';
 
 const ITENS: readonly ItemNavegacao[] = [
   { rotulo: 'Painel', rota: '/admin/painel', icone: 'painel' },
   { rotulo: 'Ocorrências', rota: '/admin/ocorrencias', icone: 'lista' },
   { rotulo: 'Moradores', rota: '/admin/moradores', icone: 'usuarios' },
-  { rotulo: 'Equipe', rota: '/admin/equipe', icone: 'escudo' },
+  { rotulo: 'Equipe', rota: ROTA_EQUIPE, icone: 'escudo' },
   { rotulo: 'Condomínio', rota: '/admin/condominio', icone: 'predio' },
 ];
 
 @Component({
   selector: 'app-shell-admin',
-  imports: [RouterOutlet, BarraSuperior, Botao, Drawer, Icone, PularConteudo, Sidebar],
+  imports: [
+    NgTemplateOutlet,
+    RouterOutlet,
+    Alerta,
+    BarraSuperior,
+    Botao,
+    Drawer,
+    Icone,
+    PularConteudo,
+    Sidebar,
+  ],
   template: `
     <ui-pular-conteudo />
     <aside
@@ -33,11 +49,12 @@ const ITENS: readonly ItemNavegacao[] = [
           <ui-icone nome="predio" />
         </span>
         <div class="min-w-0">
-          <p class="truncate text-sm font-semibold">{{ nomeProduto }}</p>
+          <p class="truncate text-sm font-semibold">{{ nomeDoCondominio() }}</p>
           <p class="text-sm text-texto-secundario">Administração</p>
         </div>
       </div>
-      <ui-sidebar class="min-h-0 flex-1 overflow-y-auto" [itens]="itens" rotulo="Navegação da administração" />
+      <ui-sidebar class="min-h-0 flex-1 overflow-y-auto" [itens]="itens()" rotulo="Navegação da administração" />
+      <ng-container [ngTemplateOutlet]="rodape" />
     </aside>
 
     <div class="lg:pl-64">
@@ -52,7 +69,7 @@ const ITENS: readonly ItemNavegacao[] = [
           [iconeVoltar]="pilha.icone"
         />
       } @else {
-        <ui-barra-superior visibilidade="abaixo-lg" largura="total" [titulo]="nomeProduto">
+        <ui-barra-superior visibilidade="abaixo-lg" largura="total" [titulo]="nomeDoCondominio()">
           <button
             inicio
             type="button"
@@ -73,15 +90,49 @@ const ITENS: readonly ItemNavegacao[] = [
       </main>
     </div>
 
-    <ui-drawer #menu titulo="Menu da administração" rotuloFechar="Fechar menu">
-      <ui-sidebar [itens]="itens" rotulo="Navegação da administração" (escolheu)="menu.fechar()" />
+    <ui-drawer #menu titulo="Menu da administração" rotuloFechar="Fechar menu" (fechado)="sessao.descartarErroAoSair()">
+      <div class="flex min-h-full flex-col">
+        <ui-sidebar class="flex-1" [itens]="itens()" rotulo="Navegação da administração" (escolheu)="menu.fechar()" />
+        <ng-container [ngTemplateOutlet]="rodape" />
+      </div>
     </ui-drawer>
+
+    <ng-template #rodape>
+      <div class="shrink-0 border-t border-borda p-3">
+        @if (pessoa(); as rotulo) {
+          <p class="px-3 py-2 text-sm break-words text-texto-secundario">{{ rotulo }}</p>
+        }
+        @if (sessao.erroAoSair(); as erro) {
+          <ui-alerta class="mb-2" tom="perigo" anunciar>{{ erro }}</ui-alerta>
+        }
+        <button
+          type="button"
+          ui-botao
+          variante="texto"
+          rotuloCarregando="Saindo…"
+          [carregando]="sessao.saindo()"
+          (click)="sessao.sair()"
+        >
+          <ui-icone nome="sair" />
+          Sair
+        </button>
+      </div>
+    </ng-template>
   `,
 })
 export class ShellAdmin {
-  protected readonly nomeProduto = NOME_PRODUTO;
-  protected readonly itens = ITENS;
+  protected readonly sessao = inject(SessaoService);
   protected readonly tela = dadosDaTelaAtual();
+  protected readonly nomeDoCondominio = computed(
+    () => this.sessao.usuario()?.condominio.nome ?? NOME_PRODUTO,
+  );
+  protected readonly pessoa = computed(() => {
+    const usuario = this.sessao.usuario();
+    return usuario ? `${usuario.nome} · ${ROTULO_PAPEL[usuario.papel]}` : null;
+  });
+  protected readonly itens = computed(() =>
+    this.sessao.usuario()?.papel === 'SINDICO' ? ITENS : ITENS.filter((item) => item.rota !== ROTA_EQUIPE),
+  );
   private readonly gaveta = viewChild.required<Drawer>('menu');
 
   constructor() {

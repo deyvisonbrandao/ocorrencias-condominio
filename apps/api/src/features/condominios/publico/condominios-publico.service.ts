@@ -64,20 +64,30 @@ export class CondominiosPublicoService {
     }
   }
 
-  async buscarAtivoPorSlug(
+  async encontrarAtivoPorSlug(
     slug: string,
-  ): Promise<CondominioPublico & { id: string }> {
+  ): Promise<(CondominioPublico & { id: string }) | null> {
     if (!slugValido(slug)) {
-      throw naoEncontrado();
+      return null;
     }
     const condominio = await this.sistema.condominio.findUnique({
       where: { slug },
       select: { id: true, nome: true, slug: true, status: true },
     });
     if (!condominio || condominio.status !== 'ATIVO') {
-      throw naoEncontrado();
+      return null;
     }
     return { id: condominio.id, nome: condominio.nome, slug: condominio.slug };
+  }
+
+  async buscarAtivoPorSlug(
+    slug: string,
+  ): Promise<CondominioPublico & { id: string }> {
+    const condominio = await this.encontrarAtivoPorSlug(slug);
+    if (!condominio) {
+      throw naoEncontrado();
+    }
+    return condominio;
   }
 
   async slugDisponivel(slug: string): Promise<{ disponivel: boolean }> {

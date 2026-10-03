@@ -91,6 +91,13 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # Segredo descartável, gerado a cada execução: a API não sobe sem JWT_SECRET.
+      - name: Gerar JWT_SECRET de teste
+        run: |
+          segredo=$(openssl rand -hex 32)
+          echo "::add-mask::$segredo"
+          echo "JWT_SECRET=$segredo" >> "$GITHUB_ENV"
+
       # O globalSetup dos e2e aplica as migrações no banco de teste antes das suítes.
       - name: Testes e2e da API
         run: npm run test:e2e -w @ocorrencias/api

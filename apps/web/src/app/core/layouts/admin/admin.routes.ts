@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { somenteSindico } from '../../guards/sessao.guards';
 import { Pilha } from '../../services/rota-atual';
 import { PaginaProvisoria } from '../../../shared/components/pagina-provisoria/pagina-provisoria';
 import { ShellAdmin } from './shell-admin';
@@ -15,7 +16,11 @@ export default [
     component: ShellAdmin,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'painel' },
-      { path: 'painel', title: 'Painel', component: PaginaProvisoria, data: { issue: 22 } },
+      {
+        path: 'painel',
+        title: 'Painel',
+        loadComponent: () => import('../../../features/painel/painel').then((m) => m.Painel),
+      },
       { path: 'ocorrencias', title: 'Ocorrências', component: PaginaProvisoria, data: { issue: 15 } },
       {
         path: 'ocorrencias/nova',
@@ -30,7 +35,13 @@ export default [
         data: { issue: 15, pilha: VOLTAR_PARA_FILA },
       },
       { path: 'moradores', title: 'Moradores', component: PaginaProvisoria, data: { issue: 8 } },
-      { path: 'equipe', title: 'Equipe', component: PaginaProvisoria, data: { issue: 10 } },
+      {
+        path: 'equipe',
+        title: 'Equipe',
+        canActivate: [somenteSindico],
+        component: PaginaProvisoria,
+        data: { issue: 10 },
+      },
       { path: 'condominio', title: 'Condomínio', component: PaginaProvisoria, data: { issue: 11 } },
     ],
   },

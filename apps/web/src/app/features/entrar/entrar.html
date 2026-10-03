@@ -1,0 +1,69 @@
+<div class="md:mx-auto md:max-w-md">
+  <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
+    {{ estado().tipo === 'nao-encontrado' ? 'Condomínio não encontrado' : 'Entrar' }}
+  </h1>
+
+  @switch (estado().tipo) {
+    @case ('carregando') {
+      @if (esperaLonga()) {
+        <ui-skeleton class="mt-6" forma="detalhe" [quantidade]="1" />
+      }
+    }
+    @case ('nao-encontrado') {
+      <p class="mt-2 text-base text-texto-secundario">
+        Confira o link com a administração do seu condomínio.
+      </p>
+      <a ui-botao variante="secundario" routerLink="/" class="mt-6">Ir para o início</a>
+    }
+    @case ('erro') {
+      <ui-estado-erro
+        class="mt-6"
+        titulo="Não foi possível carregar o condomínio."
+        (tentarDeNovo)="tentarDeNovo()"
+      />
+    }
+    @case ('pronto') {
+      <p class="mt-1 text-base text-texto-secundario">{{ condominio()?.nome }}</p>
+
+      @if (alerta(); as aviso) {
+        <ui-alerta class="mt-6" tabindex="-1" anunciar [tom]="aviso.tom">{{ aviso.mensagem }}</ui-alerta>
+      }
+
+      <form
+        class="mt-6 space-y-6 md:rounded-cartao md:border md:border-borda md:bg-superficie md:p-6"
+        novalidate
+        [formGroup]="formulario"
+        (ngSubmit)="enviar()"
+      >
+        <ui-campo
+          formControlName="telefone"
+          tipo="tel"
+          mascara="telefone"
+          rotulo="Telefone (celular)"
+          inputmode="tel"
+          autocomplete="tel-national"
+          placeholder="(11) 91234-5678"
+          [erro]="erro('telefone')"
+        />
+        <ui-campo
+          formControlName="senha"
+          tipo="password"
+          rotulo="Senha"
+          autocomplete="current-password"
+          [erro]="erro('senha')"
+        />
+        <button type="submit" ui-botao bloco rotuloCarregando="Entrando…" [carregando]="enviando()">
+          Entrar
+        </button>
+      </form>
+
+      <div class="mt-6 space-y-3 text-sm text-texto-secundario">
+        <p>Esqueceu a senha? Peça à administração do condomínio para redefinir.</p>
+        <p>
+          Ainda não tem cadastro?
+          <a class="font-semibold text-primaria underline" [routerLink]="['/c', slug(), 'cadastro']">Criar conta</a>
+        </p>
+      </div>
+    }
+  }
+</div>

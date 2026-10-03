@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { loginSemSessao } from '../../guards/sessao.guards';
 import { PaginaProvisoria } from '../../../shared/components/pagina-provisoria/pagina-provisoria';
 import { ShellPublico } from './shell-publico';
 
@@ -27,7 +28,12 @@ export default [
         component: PaginaProvisoria,
         data: { issue: 7 },
       },
-      { path: 'c/:slug/entrar', title: 'Entrar', component: PaginaProvisoria, data: { issue: 6 } },
+      {
+        path: 'c/:slug/entrar',
+        title: 'Entrar',
+        canActivate: [loginSemSessao],
+        loadComponent: () => import('../../../features/entrar/entrar').then((m) => m.Entrar),
+      },
       {
         path: 'c/:slug/aguardando-aprovacao',
         title: 'Cadastro enviado',
@@ -46,6 +52,14 @@ export default [
         title: 'Crie sua nova senha',
         component: PaginaProvisoria,
         data: { issue: 9 },
+      },
+      {
+        path: 'sessao-indisponivel',
+        title: 'Não foi possível abrir a página',
+        loadComponent: () =>
+          import('../../../features/sessao-indisponivel/sessao-indisponivel').then(
+            (m) => m.SessaoIndisponivel,
+          ),
       },
       {
         path: '**',

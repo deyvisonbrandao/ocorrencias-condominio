@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { areaAdmin, areaMorador } from './core/guards/sessao.guards';
 
 const rotasDeDesenvolvimento: Routes =
   typeof ngDevMode === 'undefined' || ngDevMode
@@ -6,8 +7,16 @@ const rotasDeDesenvolvimento: Routes =
     : [];
 
 export const routes: Routes = [
-  { path: 'app', loadChildren: () => import('./core/layouts/morador/morador.routes') },
-  { path: 'admin', loadChildren: () => import('./core/layouts/admin/admin.routes') },
+  {
+    path: 'app',
+    canActivate: [areaMorador],
+    loadChildren: () => import('./core/layouts/morador/morador.routes'),
+  },
+  {
+    path: 'admin',
+    canActivate: [areaAdmin],
+    loadChildren: () => import('./core/layouts/admin/admin.routes'),
+  },
   ...rotasDeDesenvolvimento,
   { path: '', loadChildren: () => import('./core/layouts/publico/publico.routes') },
 ];
