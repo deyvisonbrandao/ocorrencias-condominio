@@ -128,13 +128,11 @@ describe('Sessão: login, logout, /me e papéis (e2e)', () => {
 
     it('senha errada, telefone inexistente e slug inexistente respondem igual, sem cookie', async () => {
       const respostas = await Promise.all([
-        http()
-          .post(LOGIN)
-          .send({
-            slug: 'jardim-a',
-            telefone: TEL_SINDICO,
-            senha: 'errada-123',
-          }),
+        http().post(LOGIN).send({
+          slug: 'jardim-a',
+          telefone: TEL_SINDICO,
+          senha: 'errada-123',
+        }),
         http()
           .post(LOGIN)
           .send({ slug: 'jardim-a', telefone: '+5511999999999', senha: SENHA }),
@@ -244,6 +242,25 @@ describe('Sessão: login, logout, /me e papéis (e2e)', () => {
       expect(resposta.headers['set-cookie']?.[0]).toMatch(
         /^sessao=;.*Expires=Thu, 01 Jan 1970/,
       );
+    });
+
+    it('com dois cookies de sessão, mesmo ambos válidos, responde 401 e apaga o cookie', async () => {
+      const morador = await entrar(app, 'jardim-a', TEL_MORADOR);
+      const sindico = await entrar(app, 'jardim-a', TEL_SINDICO);
+
+      for (const cookies of [
+        [morador, sindico],
+        [sindico, 'sessao=implantado'],
+      ]) {
+        const resposta = await http()
+          .get(ME)
+          .set('Cookie', cookies.join('; '))
+          .expect(401);
+        expect(resposta.body).toEqual(NAO_AUTENTICADO);
+        expect(resposta.headers['set-cookie']?.[0]).toMatch(
+          /^sessao=;.*Expires=Thu, 01 Jan 1970/,
+        );
+      }
     });
 
     it('com sessão devolve o usuário do token', async () => {

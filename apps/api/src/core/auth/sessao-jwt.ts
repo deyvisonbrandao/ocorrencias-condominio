@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { CookieOptions, Request, Response } from 'express';
 import { AppConfig } from '../config/app-config.js';
-import { NOME_COOKIE_SESSAO } from '../http/swagger.js';
 import {
   assinarJwt,
   type ClaimsSessao,
@@ -10,28 +9,45 @@ import {
 } from './jwt.js';
 
 export const VALIDADE_SESSAO_SEGUNDOS = 7 * 24 * 60 * 60;
+export const NOME_COOKIE_SESSAO = 'sessao';
+export const NOME_COOKIE_SESSAO_PRODUCAO = '__Host-sessao';
 
-export function lerCookie(
+// O prefixo __Host- obriga Secure, Path=/ e ausência de Domain: um subdomínio irmão não consegue implantar
+// a sessão. Em desenvolvimento e teste a API roda em http, onde o navegador recusa cookie __Host-.
+export function nomeCookieSessao(producao: boolean): string {
+  return producao ? NOME_COOKIE_SESSAO_PRODUCAO : NOME_COOKIE_SESSAO;
+}
+
+export function valoresDoCookie(
   cabecalho: string | undefined,
   nome: string,
-): string | undefined {
-  if (!cabecalho) return undefined;
+): string[] {
+  if (!cabecalho) return [];
+  const valores: string[] = [];
   for (const par of cabecalho.split(';')) {
     const separador = par.indexOf('=');
-    if (separador < 0 || par.slice(0, separador).trim() !== nome) continue;
-    const valor = par.slice(separador + 1).trim();
-    try {
-      return decodeURIComponent(valor);
-    } catch {
-      return undefined;
+    if (separador >= 0 && par.slice(0, separador).trim() === nome) {
+      valores.push(par.slice(separador + 1).trim());
     }
   }
-  return undefined;
+  return valores;
+}
+
+function decodificar(valor: string): string | undefined {
+  try {
+    return decodeURIComponent(valor);
+  } catch {
+    return undefined;
+  }
 }
 
 @Injectable()
 export class SessaoJwt {
-  constructor(private readonly config: AppConfig) {}
+  readonly nomeCookie: string;
+
+  constructor(private readonly config: AppConfig) {
+    this.nomeCookie = nomeCookieSessao(config.producao);
+  }
 
   private get opcoesCookie(): CookieOptions {
     return {
@@ -48,24 +64,28 @@ export class SessaoJwt {
       this.config.jwtSecret,
       VALIDADE_SESSAO_SEGUNDOS,
     );
-    resposta.cookie(NOME_COOKIE_SESSAO, token, {
+    resposta.cookie(this.nomeCookie, token, {
       ...this.opcoesCookie,
       maxAge: VALIDADE_SESSAO_SEGUNDOS * 1000,
     });
   }
 
   encerrar(resposta: Response): void {
-    resposta.clearCookie(NOME_COOKIE_SESSAO, this.opcoesCookie);
+    resposta.clearCookie(this.nomeCookie, this.opcoesCookie);
   }
 
   presente(requisicao: Request): boolean {
     return (
-      lerCookie(requisicao.headers.cookie, NOME_COOKIE_SESSAO) !== undefined
+      valoresDoCookie(requisicao.headers.cookie, this.nomeCookie).length > 0
     );
   }
 
+  // Dois cookies com o nome da sessão indicam um implantado por outro domínio ou caminho: em vez de escolher
+  // um, a sessão é recusada, e o guard responde 401 e apaga o cookie.
   ler(requisicao: Request): TokenVerificado | null {
-    const token = lerCookie(requisicao.headers.cookie, NOME_COOKIE_SESSAO);
+    const valores = valoresDoCookie(requisicao.headers.cookie, this.nomeCookie);
+    if (valores.length !== 1) return null;
+    const token = decodificar(valores[0]);
     return token ? verificarJwt(token, this.config.jwtSecret) : null;
   }
 }

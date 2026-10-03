@@ -144,6 +144,18 @@ describe('GuardaAutenticacao', () => {
     expect(findUnique).not.toHaveBeenCalled();
   });
 
+  it('dois cookies de sessão respondem 401, apagam o cookie e não vinculam condomínio', async () => {
+    const { guarda, findUnique } = preparar();
+    const resultado = await executar(guarda, {
+      cookie: `${cookieCom()}; ${cookieCom()}`,
+    });
+
+    expect(codigoDe(resultado.erro)).toBe('NAO_AUTENTICADO');
+    expect(resultado.resposta.clearCookie).toHaveBeenCalled();
+    expect(resultado.cid).toBeUndefined();
+    expect(findUnique).not.toHaveBeenCalled();
+  });
+
   it('vincula o cid do token antes de buscar o usuário e expõe o usuário com o papel do banco', async () => {
     const { guarda, findUnique } = preparar();
     let cidNaBusca: string | undefined;

@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 import { AppConfig, type Ambiente } from '../config/app-config.js';
 import {
-  lerCookie,
+  nomeCookieSessao,
   SessaoJwt,
   VALIDADE_SESSAO_SEGUNDOS,
+  valoresDoCookie,
 } from './sessao-jwt.js';
 
 const SEGREDO = 'k'.repeat(40);
@@ -37,18 +38,17 @@ function respostaFalsa() {
 
 const CLAIMS = { sub: 'u1', cid: 'c1', papel: 'MORADOR', sv: 1 } as const;
 
-describe('lerCookie', () => {
+describe('valoresDoCookie', () => {
   it.each([
-    [undefined, undefined],
-    ['', undefined],
-    ['outro=1', undefined],
-    ['sessao=abc', 'abc'],
-    ['a=1; sessao=abc; b=2', 'abc'],
-    ['minhasessao=x; sessao=ok', 'ok'],
-    ['sessao=a%2Eb', 'a.b'],
-    ['sessao=%E0%A4%A', undefined],
-  ])('%s -> %s', (cabecalho, esperado) => {
-    expect(lerCookie(cabecalho, 'sessao')).toBe(esperado);
+    [undefined, []],
+    ['', []],
+    ['outro=1', []],
+    ['sessao=abc', ['abc']],
+    ['a=1; sessao=abc; b=2', ['abc']],
+    ['minhasessao=x; sessao=ok', ['ok']],
+    ['sessao=a; sessao=b', ['a', 'b']],
+  ])('%s -> %j', (cabecalho, esperado) => {
+    expect(valoresDoCookie(cabecalho, 'sessao')).toEqual(esperado);
   });
 });
 
@@ -70,14 +70,24 @@ describe('SessaoJwt', () => {
     );
   });
 
-  it('marca o cookie como Secure em produção, inclusive ao apagar', () => {
+  it('usa __Host-sessao só em produção', () => {
+    expect(nomeCookieSessao(true)).toBe('__Host-sessao');
+    expect(nomeCookieSessao(false)).toBe('sessao');
+  });
+
+  it('em produção grava __Host-sessao com Secure e Path=/, sem Domain, inclusive ao apagar', () => {
     const resposta = respostaFalsa();
     const sessao = new SessaoJwt(config('production'));
     sessao.abrir(resposta, CLAIMS);
     sessao.encerrar(resposta);
 
-    expect(resposta.cookie.mock.calls[0][2]).toMatchObject({ secure: true });
-    expect(resposta.clearCookie).toHaveBeenCalledWith('sessao', {
+    expect(resposta.cookie.mock.calls[0][0]).toBe('__Host-sessao');
+    expect(resposta.cookie.mock.calls[0][2]).toMatchObject({
+      secure: true,
+      path: '/',
+    });
+    expect(resposta.cookie.mock.calls[0][2]).not.toHaveProperty('domain');
+    expect(resposta.clearCookie).toHaveBeenCalledWith('__Host-sessao', {
       httpOnly: true,
       sameSite: 'lax',
       secure: true,
@@ -98,5 +108,45 @@ describe('SessaoJwt', () => {
       sessao.ler({ headers: { cookie: 'sessao=lixo' } } as Request),
     ).toBeNull();
     expect(sessao.presente({ headers: {} } as Request)).toBe(false);
+  });
+
+  it('recusa dois cookies de sessão, mesmo com um deles válido', () => {
+    const resposta = respostaFalsa();
+    const sessao = new SessaoJwt(config('test'));
+    sessao.abrir(resposta, CLAIMS);
+    const token = resposta.cookie.mock.calls[0][1] as string;
+
+    for (const cookie of [
+      `sessao=${token}; sessao=lixo`,
+      `sessao=lixo; sessao=${token}`,
+      `sessao=${token}; sessao=${token}`,
+    ]) {
+      const requisicao = { headers: { cookie } } as Request;
+      expect(sessao.presente(requisicao)).toBe(true);
+      expect(sessao.ler(requisicao)).toBeNull();
+    }
+  });
+
+  it('em produção ignora o cookie sem prefixo e lê só o __Host-sessao', () => {
+    const resposta = respostaFalsa();
+    const sessao = new SessaoJwt(config('production'));
+    sessao.abrir(resposta, CLAIMS);
+    const token = resposta.cookie.mock.calls[0][1] as string;
+
+    expect(
+      sessao.ler({ headers: { cookie: `sessao=${token}` } } as Request),
+    ).toBeNull();
+    expect(
+      sessao.ler({
+        headers: { cookie: `sessao=lixo; __Host-sessao=${token}` },
+      } as Request),
+    ).toMatchObject(CLAIMS);
+  });
+
+  it('valor com codificação inválida é recusado', () => {
+    const sessao = new SessaoJwt(config('test'));
+    expect(
+      sessao.ler({ headers: { cookie: 'sessao=%E0%A4%A' } } as Request),
+    ).toBeNull();
   });
 });

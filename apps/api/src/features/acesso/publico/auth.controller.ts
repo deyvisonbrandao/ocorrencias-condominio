@@ -19,11 +19,12 @@ import {
 import type { Response } from 'express';
 import { Publico } from '../../../core/auth/decoradores.js';
 import {
+  NOME_COOKIE_SESSAO,
+  NOME_COOKIE_SESSAO_PRODUCAO,
   SessaoJwt,
   VALIDADE_SESSAO_SEGUNDOS,
 } from '../../../core/auth/sessao-jwt.js';
 import { ErroApiDto } from '../../../core/http/erro-api.js';
-import { NOME_COOKIE_SESSAO } from '../../../core/http/swagger.js';
 import { UsuarioSessaoDto } from '../dto/usuario-sessao.dto.js';
 import { LoginDto } from '../dto/login.dto.js';
 import { LoginService } from './login.service.js';
@@ -45,7 +46,8 @@ export class AuthController {
   @ApiOperation({
     summary: 'Entrar com telefone e senha no condomínio do slug',
     description:
-      `Define o cookie httpOnly \`${NOME_COOKIE_SESSAO}\` (SameSite=Lax, Secure em produção, Path=/), com JWT válido por ${DIAS_SESSAO} dias. ` +
+      `Define o cookie httpOnly \`${NOME_COOKIE_SESSAO_PRODUCAO}\` em produção (com Secure) ou \`${NOME_COOKIE_SESSAO}\` fora dela, ` +
+      `com SameSite=Lax, Path=/ e JWT válido por ${DIAS_SESSAO} dias. Dois cookies de sessão na mesma requisição são recusados com 401. ` +
       'Condomínio inexistente, telefone inexistente e senha errada respondem o mesmo 401. ' +
       'Os 403 de status só aparecem quando a senha confere.',
   })
