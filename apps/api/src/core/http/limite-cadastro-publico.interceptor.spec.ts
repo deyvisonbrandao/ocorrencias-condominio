@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Observable, of } from 'rxjs';
-import { ErroApi } from '../../../core/http/erro-api.js';
+import { ErroApi } from './erro-api.js';
 import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
 
 function contextoComIp(ip: string): ExecutionContext {

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { LimiteCadastroPublicoInterceptor } from './publico/limite-cadastro-publico.interceptor.js';
+import { LimiteCadastroPublicoInterceptor } from '../../core/http/limite-cadastro-publico.interceptor.js';
 import { CondominiosPublicoController } from './publico/condominios-publico.controller.js';
 import { CondominiosPublicoService } from './publico/condominios-publico.service.js';
 

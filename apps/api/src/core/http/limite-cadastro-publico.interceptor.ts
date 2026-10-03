@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { type Observable, defer, finalize } from 'rxjs';
-import { ErroApi } from '../../../core/http/erro-api.js';
+import { ErroApi } from './erro-api.js';
 
 const JANELA_MS = 15 * 60 * 1000;
 const MAX_TENTATIVAS_POR_IP = 30;

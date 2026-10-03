@@ -28,7 +28,7 @@ import {
   CondominioCriadoDto,
   CondominioPublicoDto,
 } from '../dto/condominio-publico.dto.js';
-import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
+import { LimiteCadastroPublicoInterceptor } from '../../../core/http/limite-cadastro-publico.interceptor.js';
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')
