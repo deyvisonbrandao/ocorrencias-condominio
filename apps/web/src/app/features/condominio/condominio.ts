@@ -55,7 +55,7 @@ export const NOTA_SOMENTE_SINDICO = 'Só o(a) síndico(a) edita os dados do cond
                   <dd class="text-base font-medium break-words">{{ dados.nome }}</dd>
                 </div>
                 <div>
-                  <dt class="text-sm text-texto-secundario">Cidade</dt>
+                  <dt class="text-sm text-texto-secundario">Cidade/UF</dt>
                   <dd class="text-base font-medium break-words">{{ cidade() ?? 'Não informada' }}</dd>
                 </div>
               </dl>

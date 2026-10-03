@@ -82,6 +82,8 @@ describe('Condominio', () => {
     expect(raiz.querySelector('form')).toBeNull();
     expect(raiz.querySelector('button[type="submit"]')).toBeNull();
     const dados = [...raiz.querySelectorAll('dd')].map((dd) => dd.textContent?.trim());
+    const rotulos = [...raiz.querySelectorAll('dt')].map((dt) => dt.textContent?.trim());
+    expect(rotulos).toEqual(['Nome', 'Cidade/UF']);
     expect(dados).toEqual(['Residencial Jardim', 'Campinas – SP']);
     expect(raiz.textContent).toContain(NOTA_SOMENTE_SINDICO);
     expect(campoDoLink()?.value).toBe('https://ocorrencias.app/c/jardim');
