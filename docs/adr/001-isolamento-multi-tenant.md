@@ -48,5 +48,9 @@ Registro das escolhas feitas ao implementar a decisão acima, em `apps/api/src/c
   - Os tipos do client continuam pedindo `condominioId` no `create`: passe `condominioId: ContextoTenant.exigir()`. A extensão grava o valor do contexto e recusa qualquer outro.
 - **Lint.** O `.oxlintrc.json` da API proíbe importar `prisma-sistema` e instanciar `PrismaClient` fora de `src/core/prisma`, `src/core/health` (o `SELECT 1`), `src/features/condominios/publico/condominios-publico.service.ts` (autocadastro e resolução do slug), `prisma/`, `scripts/` e `test/`.
 - **Teste do DMMF.** O generator `prisma-client` do Prisma 7 não exporta `Prisma.dmmf`. O teste usa `Prisma.ModelName` e `Prisma.<Modelo>ScalarFieldEnum`, gerados do mesmo DMMF.
+- **Teste da FK composta** (`relacoes-tenant.spec.ts`). Lê o `schema.prisma` e falha se:
+  - uma relação entre modelos de condomínio não ligar `condominioId` (ou o `id` do `Condominio`) à chave do outro lado;
+  - um modelo global se relacionar com modelo de condomínio;
+  - houver muitos-para-muitos implícito entre modelos de condomínio.
 - **`upsert` no MySQL não é atômico** (o Prisma faz `SELECT` e depois `INSERT`/`UPDATE`). Quem usar precisa tratar P2002 com `violouIndiceUnico`. O autocadastro trata a corrida pelo slug assim, sem pré-checagem.
 - A suíte de isolamento fica em `apps/api/test/isolamento-tenant.e2e-spec.ts` e roda no job de e2e do CI, num banco `_test` separado.
