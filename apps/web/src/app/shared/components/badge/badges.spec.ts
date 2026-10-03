@@ -1,7 +1,8 @@
 import { Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { StatusOcorrencia, TipoOcorrencia, Urgencia } from '@ocorrencias/contratos';
+import { StatusOcorrencia, StatusUsuario, TipoOcorrencia, Urgencia } from '@ocorrencias/contratos';
 import { BadgeStatus } from './badge-status';
+import { BadgeStatusUsuario } from './badge-status-usuario';
 import { BadgeTipo } from './badge-tipo';
 import { BadgeUrgencia } from './badge-urgencia';
 import { Marcador } from './marcador';
@@ -30,6 +31,24 @@ describe('ui-badge-status', () => {
 
   it.each(casos)('mostra %s como "%s" com o token de status', async (status, rotulo, classe) => {
     const elemento = await renderizar(BadgeStatus, { status });
+    const badge = elemento.querySelector('span') as HTMLElement;
+
+    expect(textoNormalizado(badge)).toBe(rotulo);
+    expect(badge.classList).toContain(classe);
+    expect(badge.querySelector('[aria-hidden="true"]')).not.toBeNull();
+  });
+});
+
+describe('ui-badge-status-usuario', () => {
+  const casos: [StatusUsuario, string, string][] = [
+    ['PENDENTE', 'Pendente', 'bg-aviso-suave'],
+    ['ATIVO', 'Ativo', 'bg-sucesso-suave'],
+    ['INATIVO', 'Inativo', 'bg-superficie-sutil'],
+    ['RECUSADO', 'Recusado', 'bg-perigo-suave'],
+  ];
+
+  it.each(casos)('mostra %s como "%s" com texto visível e ponto decorativo', async (status, rotulo, classe) => {
+    const elemento = await renderizar(BadgeStatusUsuario, { status });
     const badge = elemento.querySelector('span') as HTMLElement;
 
     expect(textoNormalizado(badge)).toBe(rotulo);

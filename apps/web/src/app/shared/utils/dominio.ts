@@ -110,6 +110,29 @@ export const ROTULO_STATUS_USUARIO: Readonly<Record<StatusUsuario, string>> = {
   RECUSADO: 'Recusado',
 };
 
+export const STATUS_USUARIO: Readonly<Record<StatusUsuario, ApresentacaoStatus>> = {
+  PENDENTE: {
+    rotulo: ROTULO_STATUS_USUARIO.PENDENTE,
+    classes: 'bg-aviso-suave text-aviso-texto',
+    classePonto: 'bg-aviso-texto',
+  },
+  ATIVO: {
+    rotulo: ROTULO_STATUS_USUARIO.ATIVO,
+    classes: 'bg-sucesso-suave text-sucesso-texto',
+    classePonto: 'bg-sucesso-texto',
+  },
+  INATIVO: {
+    rotulo: ROTULO_STATUS_USUARIO.INATIVO,
+    classes: 'bg-superficie-sutil text-texto-secundario',
+    classePonto: 'bg-texto-secundario',
+  },
+  RECUSADO: {
+    rotulo: ROTULO_STATUS_USUARIO.RECUSADO,
+    classes: 'bg-perigo-suave text-perigo-texto',
+    classePonto: 'bg-perigo-texto',
+  },
+};
+
 export const ROTULO_ORIGEM: Readonly<Record<OrigemOcorrencia, string>> = {
   MORADOR: 'Moradores',
   ADMIN: 'Administração',

@@ -5,6 +5,7 @@ import { HealthModule } from './core/health/health.module.js';
 import { PrismaModule } from './core/prisma/prisma.module.js';
 import { AcessoModule } from './features/acesso/acesso.module.js';
 import { CondominiosModule } from './features/condominios/condominios.module.js';
+import { MembrosModule } from './features/membros/membros.module.js';
 import { PainelModule } from './features/painel/painel.module.js';
 
 @Module({
@@ -16,6 +17,7 @@ import { PainelModule } from './features/painel/painel.module.js';
     CondominiosModule,
     AcessoModule,
     PainelModule,
+    MembrosModule,
   ],
 })
 export class AppModule {}

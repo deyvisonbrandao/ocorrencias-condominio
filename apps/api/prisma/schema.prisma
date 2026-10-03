@@ -81,6 +81,7 @@ model Usuario {
   @@unique([condominioId, id])
   @@unique([condominioId, telefone])
   @@unique([condominioId, slotAdmin])
+  @@index([condominioId, papel, status, criadoEm])
   @@map("usuario")
 }
 
