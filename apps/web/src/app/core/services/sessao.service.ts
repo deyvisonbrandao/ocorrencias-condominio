@@ -2,7 +2,7 @@ import { HttpClient, HttpContext, HttpContextToken, HttpErrorResponse } from '@a
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginRequisicao, UsuarioSessao } from '@ocorrencias/contratos';
-import { catchError, finalize, Observable, of, shareReplay, tap } from 'rxjs';
+import { catchError, finalize, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 import {
   MENSAGEM_ERRO_INESPERADO,
   mensagemDeErroGlobal,
@@ -45,8 +45,9 @@ export class SessaoService {
         catchError((erro: unknown) => {
           if (erro instanceof HttpErrorResponse && erro.status === 401) {
             this.estado.set(null);
+            return of(null);
           }
-          return of(null);
+          return throwError(() => erro);
         }),
         finalize(() => (this.sondagem = null)),
         shareReplay(1),
@@ -84,6 +85,10 @@ export class SessaoService {
         );
       },
     });
+  }
+
+  invalidar(): void {
+    this.estado.set(undefined);
   }
 
   descartarErroAoSair(): void {

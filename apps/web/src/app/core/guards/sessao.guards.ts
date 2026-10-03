@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { map } from 'rxjs';
+import { CanActivateFn, RedirectCommand, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 import { ToastService } from '../../shared/services/toast.service';
 import { AreaDaSessao } from '../models/sessao';
 import {
@@ -8,6 +8,7 @@ import {
   destinoAposLogin,
   MENSAGEM_SEM_ACESSO,
   ROTA_INICIAL,
+  ROTA_SESSAO_INDISPONIVEL,
   ROTA_TROCAR_SENHA,
   rotaDoLogin,
 } from '../services/navegacao-da-sessao';
@@ -35,6 +36,17 @@ export function exigirArea(area: AreaDaSessao): CanActivateFn {
         }
         return true;
       }),
+      // Não deu para verificar (rede, 5xx): não é "sem sessão". O toast global já avisou;
+      // com tela aberta, fica nela; na abertura do app, mostra o erro sem trocar a URL.
+      catchError(() =>
+        of(
+          router.navigated
+            ? false
+            : new RedirectCommand(router.parseUrl(ROTA_SESSAO_INDISPONIVEL), {
+                skipLocationChange: true,
+              }),
+        ),
+      ),
     );
   };
 }
@@ -54,5 +66,6 @@ export const loginSemSessao: CanActivateFn = (rota) => {
           ? router.parseUrl(destinoAposLogin(usuario, voltar))
           : true,
       ),
+      catchError(() => of(true)),
     );
 };

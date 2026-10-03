@@ -54,6 +54,14 @@ export default [
         data: { issue: 9 },
       },
       {
+        path: 'sessao-indisponivel',
+        title: 'Não foi possível abrir a página',
+        loadComponent: () =>
+          import('../../../features/sessao-indisponivel/sessao-indisponivel').then(
+            (m) => m.SessaoIndisponivel,
+          ),
+      },
+      {
         path: '**',
         title: 'Página não encontrada',
         loadComponent: () =>

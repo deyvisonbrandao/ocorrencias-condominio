@@ -6,12 +6,14 @@ import {
   GuardResult,
   MaybeAsync,
   provideRouter,
+  RedirectCommand,
   Router,
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
 import { Papel, UsuarioSessao } from '@ocorrencias/contratos';
-import { firstValueFrom, isObservable, Observable, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom, isObservable, Observable, of, throwError } from 'rxjs';
 import { ToastService } from '../../shared/services/toast.service';
 import { MENSAGEM_SEM_ACESSO } from '../services/navegacao-da-sessao';
 import { SessaoService } from '../services/sessao.service';
@@ -61,7 +63,11 @@ describe('guards de sessão', () => {
     if (final instanceof UrlTree) {
       return TestBed.inject(Router).serializeUrl(final);
     }
-    return final === true;
+    if (final instanceof RedirectCommand) {
+      const sem = final.navigationBehaviorOptions?.skipLocationChange ? ' (sem trocar a URL)' : '';
+      return TestBed.inject(Router).serializeUrl(final.redirectTo) + sem;
+    }
+    return final;
   }
 
   describe('área admin', () => {
@@ -98,6 +104,37 @@ describe('guards de sessão', () => {
       sessao.carregar.mockReturnValue(of(usuario('SINDICO', { senhaTemporaria: true })));
 
       expect(await executar(areaAdmin, '/admin/painel')).toBe('/trocar-senha');
+    });
+  });
+
+  describe('sem conseguir verificar a sessão (rede, 5xx)', () => {
+    const falhaDeRede = () => throwError(() => new HttpErrorResponse({ status: 0 }));
+
+    it('na abertura do app, mostra o erro sem trocar a URL e sem mandar ao login', async () => {
+      sessao.carregar.mockReturnValue(falhaDeRede());
+      ultimo.ler.mockReturnValue('jardim');
+
+      expect(await executar(areaAdmin, '/admin/painel')).toBe('/sessao-indisponivel (sem trocar a URL)');
+      expect(toasts.erro).not.toHaveBeenCalled();
+    });
+
+    it('com uma tela já aberta, cancela a navegação e fica nela', async () => {
+      TestBed.inject(Router).navigated = true;
+      sessao.carregar.mockReturnValue(falhaDeRede());
+
+      expect(await executar(areaMorador, '/app/minhas')).toBe(false);
+    });
+
+    it('no login, mostra o formulário sem nova tentativa', async () => {
+      sessao.carregar.mockReturnValue(falhaDeRede());
+
+      expect(
+        await executar(loginSemSessao, '/c/jardim/entrar', {
+          paramMap: convertToParamMap({ slug: 'jardim' }),
+          queryParamMap: convertToParamMap({}),
+        }),
+      ).toBe(true);
+      expect(sessao.carregar).toHaveBeenCalledTimes(1);
     });
   });
 

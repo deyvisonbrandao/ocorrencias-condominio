@@ -73,14 +73,38 @@ describe('SessaoService', () => {
       controle.expectNone('/me');
     });
 
-    it('falha de rede: responde sem sessão, mas tenta de novo na próxima vez', () => {
-      const recebidos = carregar();
-      controle.expectOne('/me').error(new ProgressEvent('error'));
+    it.each([
+      ['rede', 0],
+      ['500', 500],
+    ])('falha de %s: não vira "sem sessão", propaga o erro e tenta de novo na próxima vez', (_nome, status) => {
+      const recebidos: (UsuarioSessao | null)[] = [];
+      let erro: unknown;
+      sessao.carregar().subscribe({ next: (usuario) => recebidos.push(usuario), error: (e: unknown) => (erro = e) });
+      const requisicao = controle.expectOne('/me');
+      if (status === 0) {
+        requisicao.error(new ProgressEvent('error'));
+      } else {
+        requisicao.flush(null, { status, statusText: 'Erro' });
+      }
 
-      expect(recebidos).toEqual([null]);
+      expect(recebidos).toEqual([]);
+      expect(erro).toBeDefined();
+      expect(sessao.usuario()).toBeNull();
       carregar();
       controle.expectOne('/me').flush(SINDICO);
       expect(sessao.usuario()).toEqual(SINDICO);
+    });
+
+    it('invalidar descarta o usuário em cache e a próxima carga pergunta de novo', () => {
+      carregar();
+      controle.expectOne('/me').flush(SINDICO);
+
+      sessao.invalidar();
+
+      expect(sessao.usuario()).toBeNull();
+      expect(carregar()).toEqual([]);
+      controle.expectOne('/me').flush({ ...SINDICO, papel: 'MORADOR' });
+      expect(sessao.usuario()?.papel).toBe('MORADOR');
     });
   });
 

@@ -700,6 +700,7 @@ O mesmo formulário de 5.10, com estas diferenças:
 | 403 (morador em `/admin`, subsíndico em Equipe) | Redireciona para o início da área do papel, com o toast "Você não tem acesso a essa página." |
 | 401 / sessão revogada | Vai para `/c/:slug/entrar?voltar=…`, com o alerta "Sua sessão terminou. Entre de novo." |
 | Sem conexão (falha de rede) | Toast de erro "Sem conexão. Verifique a internet e tente de novo." O formulário mantém os dados |
+| Sessão não verificada (rede ou 5xx no `GET /me`) | Não é tratada como "sem sessão" e não leva ao login. Com uma tela já aberta, a navegação é cancelada e a pessoa fica nela, só com o toast de rede. Na abertura do app, a URL fica a mesma e a tela mostra h1 "Não foi possível abrir a página" e `ui-estado-erro` "Não foi possível verificar sua sessão." com "Tentar de novo" (issue #6) |
 
 ### 5.21 404 e 403 de recurso
 

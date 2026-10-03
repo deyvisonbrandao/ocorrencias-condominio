@@ -3,6 +3,7 @@ import { Papel, UsuarioSessao } from '@ocorrencias/contratos';
 import { AreaDaSessao } from '../models/sessao';
 
 export const ROTA_TROCAR_SENHA = '/trocar-senha';
+export const ROTA_SESSAO_INDISPONIVEL = '/sessao-indisponivel';
 
 export const ROTA_INICIAL: Readonly<Record<AreaDaSessao, string>> = {
   admin: '/admin/painel',
