@@ -140,6 +140,14 @@ describe('normalização de bloco e apto', () => {
     ['Blue', 'BLUE'],
     ['Bloco', 'BLOCO'],
     ['a1', 'A1'],
+    ['Bloco nº 3', '3'],
+    ['Bl. Nº 4', '4'],
+    ['bloco n° 5', '5'],
+    ['Bloco no. 6', '6'],
+    ['nº 7', '7'],
+    ['Bloco Norte', 'NORTE'],
+    ['Nova Torre', 'NOVA TORRE'],
+    ['No', 'NO'],
   ])('bloco %j -> %j', (entrada, esperado) => {
     expect(normalizarBloco(entrada)).toBe(esperado);
   });
@@ -154,6 +162,15 @@ describe('normalização de bloco e apto', () => {
     ['apt-7', '7'],
     ['Casa 3', 'CASA 3'],
     ['Apto', 'APTO'],
+    ['Apto nº 302', '302'],
+    ['Apto. Nº 302', '302'],
+    ['apto n.º 302', '302'],
+    ['Apto Nº302', '302'],
+    ['ap no 12', '12'],
+    ['Apartamento N° 101', '101'],
+    ['nº 302', '302'],
+    ['Nº', 'Nº'],
+    ['Norte 1', 'NORTE 1'],
   ])('apto %j -> %j', (entrada, esperado) => {
     expect(normalizarApto(entrada)).toBe(esperado);
   });

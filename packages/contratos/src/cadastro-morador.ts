@@ -5,9 +5,11 @@ export const REGRAS_BLOCO = { max: 20 } as const;
 export const REGRAS_APTO = { max: 10 } as const;
 
 const ESPACOS = /\s+/gu;
-const PREFIXO_BLOCO = /^(?:bloco|bl)(?:\s*[.:ºª°-]\s*|\s+|(?=\d))/iu;
+// O "nº" opcional exige ponto, espaço ou dígito depois, para "Norte" não perder o "No".
+const PREFIXO_BLOCO =
+  /^(?:(?:bloco|bl)(?:\s*[.:ºª°-]\s*|\s+|(?=\d)))?(?:n\.?[ºo°](?:\.|\s|(?=\d))\s*)?/iu;
 const PREFIXO_APTO =
-  /^(?:apartamento|apto|apt|ap)(?:\s*[.:ºª°-]\s*|\s+|(?=\d))/iu;
+  /^(?:(?:apartamento|apto|apt|ap)(?:\s*[.:ºª°-]\s*|\s+|(?=\d)))?(?:n\.?[ºo°](?:\.|\s|(?=\d))\s*)?/iu;
 
 // A UI exibe "Bloco {bloco}, apto {apto}": o prefixo digitado pelo morador sai para não virar "Bloco Bloco B".
 function normalizarUnidade(entrada: string, prefixo: RegExp): string {
