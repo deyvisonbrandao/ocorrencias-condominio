@@ -40,12 +40,46 @@ enum AcaoAuditoria {
   SENHA_REDEFINIDA
   SUBSINDICO_DEFINIDO
   SUBSINDICO_REMOVIDO
+  CONDOMINIO_ATUALIZADO
+}
+
+enum Uf {
+  AC
+  AL
+  AM
+  AP
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MG
+  MS
+  MT
+  PA
+  PB
+  PE
+  PI
+  PR
+  RJ
+  RN
+  RO
+  RR
+  RS
+  SC
+  SE
+  SP
+  TO
 }
 
 model Condominio {
   id                      String           @id @default(uuid(7)) @db.Char(36)
   nome                    String           @db.VarChar(120)
   slug                    String           @unique @db.VarChar(40)
+  // Nulos nos condomínios do M0 e no autocadastro, que não pedem esses dados; o PUT /admin/condominio exige os dois.
+  cidade                  String?          @db.VarChar(80)
+  uf                      Uf?
   status                  StatusCondominio @default(ATIVO)
   proximoNumeroOcorrencia Int              @default(1) @map("proximo_numero_ocorrencia") @db.UnsignedInt
   criadoEm                DateTime         @default(now()) @map("criado_em") @db.DateTime(3)
