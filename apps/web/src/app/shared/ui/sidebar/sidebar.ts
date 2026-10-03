@@ -39,9 +39,11 @@ const CORRESPONDENCIA: IsActiveMatchOptions = {
               {{ item.rotulo }}
               @if (item.contador) {
                 <span class="ml-auto rounded-full bg-perigo px-2 py-0.5 text-xs font-semibold text-texto-inverso tabular-nums">
-                  {{ item.contador }}
                   @if (item.rotuloContador) {
-                    <span class="sr-only">{{ item.rotuloContador }}</span>
+                    <span aria-hidden="true">{{ item.contador }}</span>
+                    <span class="sr-only">{{ item.contador }} {{ item.rotuloContador }}</span>
+                  } @else {
+                    {{ item.contador }}
                   }
                 </span>
               }
