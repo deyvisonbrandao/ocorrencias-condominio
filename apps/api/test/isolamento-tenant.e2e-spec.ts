@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
+import { Publico } from '../src/core/auth/decoradores.js';
 import {
   AcessoEscopadoError,
   InjetarPrismaEscopado,
@@ -21,7 +22,8 @@ import { CondominiosPublicoService } from '../src/features/condominios/publico/c
 import { limparBanco } from './banco.js';
 import { criarApp } from './criar-app.js';
 
-// Simula o que o guard da #6 fará: vincular o condomínio da sessão ao contexto da requisição.
+// Público de propósito: vincula o condomínio pelo header para testar o contexto sem depender do login.
+@Publico()
 @Controller('teste-tenant')
 class TenantTesteController {
   constructor(

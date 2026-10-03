@@ -6,6 +6,7 @@ import {
   ApiServiceUnavailableResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Publico } from '../auth/decoradores.js';
 import { ErroApi, ErroApiDto } from '../http/erro-api.js';
 import { PrismaSistema } from '../prisma/prisma-sistema.js';
 
@@ -24,6 +25,7 @@ export class HealthDto {
 }
 
 @ApiTags('Saúde')
+@Publico()
 @Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaSistema) {}

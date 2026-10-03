@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { REGRAS_SLUG } from '@ocorrencias/contratos';
+import { Publico } from '../../../core/auth/decoradores.js';
 import { ErroApiDto } from '../../../core/http/erro-api.js';
 import {
   CadastrarCondominioDto,
@@ -28,6 +29,7 @@ import {
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')
+@Publico()
 @Controller('public/condominios')
 export class CondominiosPublicoController {
   constructor(private readonly servico: CondominiosPublicoService) {}
