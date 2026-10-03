@@ -63,6 +63,24 @@ describe('erroHttpInterceptor', () => {
     expect(toasts.erro).toHaveBeenCalledWith('Muitas tentativas. Aguarde 2 minutos e tente de novo.');
   });
 
+  it('429 com Retry-After de exatamente 60 s: fala em 1 minuto', () => {
+    falhar(429, { cabecalhos: { 'Retry-After': '60' } });
+
+    expect(toasts.erro).toHaveBeenCalledWith('Muitas tentativas. Aguarde 1 minuto e tente de novo.');
+  });
+
+  it('429 com Retry-After abaixo de 60 s: fala em segundos, não em 1 minuto', () => {
+    falhar(429, { cabecalhos: { 'Retry-After': '2' } });
+
+    expect(toasts.erro).toHaveBeenCalledWith('Muitas tentativas. Aguarde alguns segundos e tente de novo.');
+  });
+
+  it('429 com Retry-After de 59 s: ainda fala em segundos', () => {
+    falhar(429, { cabecalhos: { 'Retry-After': '59' } });
+
+    expect(toasts.erro).toHaveBeenCalledWith('Muitas tentativas. Aguarde alguns segundos e tente de novo.');
+  });
+
   it('429 sem Retry-After: usa a espera genérica', () => {
     falhar(429);
 

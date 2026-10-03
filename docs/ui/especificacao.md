@@ -422,7 +422,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 | PENDENTE | "Seu cadastro ainda aguarda aprovação da administração." |
 | RECUSADO | "Seu cadastro não foi aprovado. Fale com a administração do condomínio." |
 | INATIVO | "Seu acesso está desativado. Fale com a administração do condomínio." |
-| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." (n vem do `Retry-After`; sem ele, "Aguarde alguns minutos…") |
+| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." (n vem do `Retry-After`, arredondado para cima em minutos; abaixo de 60 s, "Aguarde alguns segundos…"; sem ele, "Aguarde alguns minutos…") |
 
 - **Sucesso:** com senha temporária vai para `/trocar-senha`; senão, morador vai para `/app/ocorrencias` e admin para `/admin/painel`. Com `?voltar=` válido (rota interna), volta para ela.
 - **Implementação (issue #6):**
@@ -914,7 +914,9 @@ stateDiagram-v2
 | 409 (reabrir fora da janela) | "O prazo de 30 dias para reabrir já terminou." |
 | 409 (limite de admins) | "O condomínio já tem subsíndico." |
 | 409 (principal não vira duplicada) | "Esta ocorrência é a principal de outras duplicadas e não pode virar duplicada." |
-| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." |
+| 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." ({n} = `Retry-After` arredondado para cima em minutos; "1 minuto" no singular) |
+| 429 com `Retry-After` abaixo de 60 s | "Muitas tentativas. Aguarde alguns segundos e tente de novo." |
+| 429 sem `Retry-After` | "Muitas tentativas. Aguarde alguns minutos e tente de novo." |
 
 ### 8.6 Toasts de sucesso
 
