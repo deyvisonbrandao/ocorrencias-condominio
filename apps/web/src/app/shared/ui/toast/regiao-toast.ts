@@ -16,10 +16,10 @@ import { ToastService } from './toast.service';
         @for (toast of toasts.sucessos(); track toast.id) {
           <div
             class="pointer-events-auto flex items-center gap-3 rounded-cartao border border-sucesso-linha bg-superficie p-3 shadow-lg"
-            (mouseenter)="toasts.pausar(toast.id)"
-            (mouseleave)="toasts.retomar(toast.id)"
-            (focusin)="toasts.pausar(toast.id)"
-            (focusout)="toasts.retomar(toast.id)"
+            (mouseenter)="toasts.pausar(toast.id, 'ponteiro')"
+            (mouseleave)="toasts.retomar(toast.id, 'ponteiro')"
+            (focusin)="toasts.pausar(toast.id, 'foco')"
+            (focusout)="aoPerderFoco(toast.id, $event)"
           >
             <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sucesso-suave text-sucesso-texto">
               <ui-icone nome="check" />
@@ -50,4 +50,13 @@ import { ToastService } from './toast.service';
 export class RegiaoToast {
   protected readonly toasts = inject(ToastService);
   protected readonly presencaBottomNav = inject(PresencaBottomNav);
+
+  protected aoPerderFoco(id: number, evento: FocusEvent): void {
+    const cartao = evento.currentTarget;
+    const destino = evento.relatedTarget;
+    if (cartao instanceof Node && destino instanceof Node && cartao.contains(destino)) {
+      return;
+    }
+    this.toasts.retomar(id, 'foco');
+  }
 }

@@ -27,14 +27,28 @@ describe('ToastService', () => {
     const id = servico.sucesso('Comentário enviado.');
 
     vi.advanceTimersByTime(3000);
-    servico.pausar(id);
+    servico.pausar(id, 'ponteiro');
     vi.advanceTimersByTime(10_000);
     expect(servico.sucessos()).toHaveLength(1);
 
-    servico.retomar(id);
+    servico.retomar(id, 'ponteiro');
     vi.advanceTimersByTime(1999);
     expect(servico.sucessos()).toHaveLength(1);
     vi.advanceTimersByTime(1);
+    expect(servico.sucessos()).toHaveLength(0);
+  });
+
+  it('só volta a contar quando sai o ponteiro e também o foco', () => {
+    const id = servico.sucesso('Comentário enviado.');
+    servico.pausar(id, 'ponteiro');
+    servico.pausar(id, 'foco');
+
+    servico.retomar(id, 'ponteiro');
+    vi.advanceTimersByTime(60_000);
+    expect(servico.sucessos()).toHaveLength(1);
+
+    servico.retomar(id, 'foco');
+    vi.advanceTimersByTime(DURACAO_TOAST_SUCESSO_MS);
     expect(servico.sucessos()).toHaveLength(0);
   });
 

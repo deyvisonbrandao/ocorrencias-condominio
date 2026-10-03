@@ -40,13 +40,26 @@ describe('ui-regiao-toast', () => {
     expect(servico.fechar).toHaveBeenCalledWith(2);
   });
 
-  it('pausa o sucesso com o ponteiro ou o foco e retoma ao sair', () => {
+  it('pausa o sucesso com o ponteiro e com o foco, informando o motivo', () => {
     const cartao = raiz.querySelector('[aria-live="polite"] > div') as HTMLElement;
 
     cartao.dispatchEvent(new Event('mouseenter'));
-    cartao.dispatchEvent(new Event('focusout'));
+    cartao.dispatchEvent(new FocusEvent('focusin'));
+    cartao.dispatchEvent(new Event('mouseleave'));
 
-    expect(servico.pausar).toHaveBeenCalledWith(1);
-    expect(servico.retomar).toHaveBeenCalledWith(1);
+    expect(servico.pausar).toHaveBeenCalledWith(1, 'ponteiro');
+    expect(servico.pausar).toHaveBeenCalledWith(1, 'foco');
+    expect(servico.retomar).toHaveBeenCalledWith(1, 'ponteiro');
+  });
+
+  it('não retoma pelo foco quando ele só passa para outro elemento do mesmo toast', () => {
+    const cartao = raiz.querySelector('[aria-live="polite"] > div') as HTMLElement;
+    const botao = cartao.querySelector('button') as HTMLButtonElement;
+
+    cartao.dispatchEvent(new FocusEvent('focusout', { relatedTarget: botao }));
+    expect(servico.retomar).not.toHaveBeenCalled();
+
+    cartao.dispatchEvent(new FocusEvent('focusout', { relatedTarget: null }));
+    expect(servico.retomar).toHaveBeenCalledWith(1, 'foco');
   });
 });

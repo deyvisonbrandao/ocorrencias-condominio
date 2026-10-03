@@ -83,6 +83,12 @@
     scroll-padding-top: 4rem;
   }
 
+  @media (width < 48rem) {
+    html:has(ui-bottom-nav) {
+      scroll-padding-bottom: 5rem;
+    }
+  }
+
   body {
     @apply bg-superficie-app font-sans text-texto antialiased;
     -webkit-tap-highlight-color: transparent;

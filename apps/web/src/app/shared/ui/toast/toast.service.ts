@@ -8,10 +8,13 @@ export interface Toast {
   readonly mensagem: string;
 }
 
+export type MotivoPausa = 'ponteiro' | 'foco';
+
 interface Cronometro {
   restante: number;
   inicio: number;
   temporizador: ReturnType<typeof setTimeout> | null;
+  readonly pausas: Set<MotivoPausa>;
 }
 
 export const DURACAO_TOAST_SUCESSO_MS = 5000;
@@ -28,8 +31,14 @@ export class ToastService {
   sucesso(mensagem: string): number {
     const id = this.adicionar('sucesso', mensagem);
     if (!this.cronometros.has(id)) {
-      this.cronometros.set(id, { restante: DURACAO_TOAST_SUCESSO_MS, inicio: 0, temporizador: null });
-      this.retomar(id);
+      const cronometro: Cronometro = {
+        restante: DURACAO_TOAST_SUCESSO_MS,
+        inicio: 0,
+        temporizador: null,
+        pausas: new Set(),
+      };
+      this.cronometros.set(id, cronometro);
+      this.contar(id, cronometro);
     }
     return id;
   }
@@ -47,9 +56,13 @@ export class ToastService {
     this.lista.update((lista) => lista.filter((toast) => toast.id !== id));
   }
 
-  pausar(id: number): void {
+  pausar(id: number, motivo: MotivoPausa): void {
     const cronometro = this.cronometros.get(id);
-    if (!cronometro?.temporizador) {
+    if (!cronometro) {
+      return;
+    }
+    cronometro.pausas.add(motivo);
+    if (!cronometro.temporizador) {
       return;
     }
     clearTimeout(cronometro.temporizador);
@@ -57,9 +70,17 @@ export class ToastService {
     cronometro.restante -= Date.now() - cronometro.inicio;
   }
 
-  retomar(id: number): void {
+  retomar(id: number, motivo: MotivoPausa): void {
     const cronometro = this.cronometros.get(id);
-    if (!cronometro || cronometro.temporizador) {
+    if (!cronometro) {
+      return;
+    }
+    cronometro.pausas.delete(motivo);
+    this.contar(id, cronometro);
+  }
+
+  private contar(id: number, cronometro: Cronometro): void {
+    if (cronometro.temporizador || cronometro.pausas.size > 0) {
       return;
     }
     cronometro.inicio = Date.now();
