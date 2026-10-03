@@ -40,7 +40,7 @@ export function TextoObrigatorio(
 export function CelularBr(): PropertyDecorator {
   return applyDecorators(
     Transform(({ value }: TransformFnParams) =>
-      typeof value === 'string' ? (normalizarCelularBr(value) ?? value) : value,
+      typeof value === 'string' ? (normalizarCelularBr(value) ?? '') : value,
     ),
     ValidateBy(
       {

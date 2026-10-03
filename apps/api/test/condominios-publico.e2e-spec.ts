@@ -129,11 +129,11 @@ describe('Condomínios públicos (e2e)', () => {
       const enviar = () =>
         request(app.getHttpServer()).post(ROTA).send(corpo('disputado'));
 
-      const status = (await Promise.all([enviar(), enviar(), enviar()]))
+      const status = (await Promise.all([enviar(), enviar()]))
         .map((r) => r.status)
         .sort((x, y) => x - y);
 
-      expect(status).toEqual([201, 409, 409]);
+      expect(status).toEqual([201, 409]);
       await expect(prismaDeTeste().usuario.count()).resolves.toBe(1);
     });
 
@@ -233,6 +233,31 @@ describe('Condomínios públicos (e2e)', () => {
   });
 
   describe('GET /public/condominios/:slug', () => {
+    it('verifica a disponibilidade incluindo slugs reservados por condomínios inativos', async () => {
+      await request(app.getHttpServer())
+        .post(ROTA)
+        .send(corpo('inativo'))
+        .expect(201);
+      await prismaDeTeste().condominio.update({
+        where: { slug: 'inativo' },
+        data: { status: 'INATIVO' },
+      });
+
+      const respostaPublica = await request(app.getHttpServer())
+        .get(`${ROTA}/inativo`)
+        .expect(404);
+      const respostaDisponibilidade = await request(app.getHttpServer())
+        .get(`${ROTA}/inativo/disponibilidade`)
+        .expect(200);
+      const slugLivre = await request(app.getHttpServer())
+        .get(`${ROTA}/nao-existe/disponibilidade`)
+        .expect(200);
+
+      expect(respostaPublica.body.code).toBe('CONDOMINIO_NAO_ENCONTRADO');
+      expect(respostaDisponibilidade.body).toEqual({ disponivel: false });
+      expect(slugLivre.body).toEqual({ disponivel: true });
+    });
+
     it('devolve só nome e slug do condomínio ativo, sem cache', async () => {
       await request(app.getHttpServer())
         .post(ROTA)
@@ -295,5 +320,8 @@ describe('Condomínios públicos (e2e)', () => {
     expect(
       caminhos['/api/v1/public/condominios/{slug}'].get.responses,
     ).toHaveProperty('404');
+    expect(
+      caminhos['/api/v1/public/condominios/{slug}/disponibilidade'].get.responses,
+    ).toHaveProperty('200');
   });
 });

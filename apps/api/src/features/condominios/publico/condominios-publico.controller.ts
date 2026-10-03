@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -16,6 +17,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { REGRAS_SLUG } from '@ocorrencias/contratos';
@@ -26,6 +28,7 @@ import {
   CondominioCriadoDto,
   CondominioPublicoDto,
 } from '../dto/condominio-publico.dto.js';
+import { LimiteCadastroPublicoInterceptor } from './limite-cadastro-publico.interceptor.js';
 import { CondominiosPublicoService } from './condominios-publico.service.js';
 
 @ApiTags('Condomínios (público)')
@@ -36,6 +39,7 @@ export class CondominiosPublicoController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(LimiteCadastroPublicoInterceptor)
   @ApiOperation({
     summary: 'Autocadastro do condomínio e do síndico',
     description:
@@ -73,8 +77,44 @@ export class CondominiosPublicoController {
       details: { campo: 'slug' },
     },
   })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description:
+      'Limite de cadastros por IP ou de cadastros simultâneos atingido. `code` = `MUITAS_REQUISICOES`.',
+    type: ErroApiDto,
+    example: {
+      statusCode: 429,
+      code: 'MUITAS_REQUISICOES',
+      message: 'Muitas requisições. Tente de novo em instantes.',
+    },
+  })
   cadastrar(@Body() dto: CadastrarCondominioDto): Promise<CondominioCriadoDto> {
     return this.servico.cadastrar(dto);
+  }
+
+  @Get(':slug/disponibilidade')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary: 'Verifica se um endereço de condomínio está disponível',
+    description:
+      'Considera ocupado qualquer slug reservado, inclusive de condomínios inativos. Não revela dados do condomínio.',
+  })
+  @ApiParam({
+    name: 'slug',
+    example: 'jardim-das-flores',
+    description: `${REGRAS_SLUG.min} a ${REGRAS_SLUG.max} caracteres: a-z, 0-9 e hífen.`,
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: { disponivel: { type: 'boolean', example: true } },
+      required: ['disponivel'],
+    },
+  })
+  verificarDisponibilidade(
+    @Param('slug') slug: string,
+  ): Promise<{ disponivel: boolean }> {
+    return this.servico.slugDisponivel(slug);
   }
 
   @Get(':slug')
@@ -82,8 +122,7 @@ export class CondominiosPublicoController {
   @ApiOperation({
     summary: 'Dados públicos do condomínio pelo endereço',
     description:
-      'Usado pela página `/c/:slug` e pela verificação de endereço disponível no autocadastro (404 = disponível). ' +
-      'Condomínio inexistente, inativo ou slug fora do formato respondem o mesmo 404.',
+      'Usado pela página `/c/:slug`. Condomínio inexistente, inativo ou slug fora do formato respondem o mesmo 404.',
   })
   @ApiParam({
     name: 'slug',

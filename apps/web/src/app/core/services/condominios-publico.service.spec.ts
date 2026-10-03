@@ -52,33 +52,26 @@ describe('CondominiosPublicoService', () => {
       servico.disponibilidade('jardim').subscribe((valor) => (resultado = valor));
       return {
         resultado: () => resultado,
-        chamada: controle.expectOne('/public/condominios/jardim'),
+        chamada: controle.expectOne('/public/condominios/jardim/disponibilidade'),
       };
     }
 
-    it('200: o endereço está em uso', () => {
+    it('200 com disponível falso: o endereço está em uso', () => {
       const { resultado, chamada } = consultar();
-      chamada.flush({ nome: 'Jardim', slug: 'jardim' });
+      chamada.flush({ disponivel: false });
 
       expect(resultado()).toBe('em-uso');
     });
 
-    it('404 de condomínio não encontrado: o endereço está disponível', () => {
+    it('200 com disponível verdadeiro: o endereço está disponível', () => {
       const { resultado, chamada } = consultar();
-      chamada.flush(
-        {
-          statusCode: 404,
-          code: 'CONDOMINIO_NAO_ENCONTRADO',
-          message: 'Condomínio não encontrado.',
-        },
-        { status: 404, statusText: 'Not Found' },
-      );
+      chamada.flush({ disponivel: true });
 
       expect(resultado()).toBe('disponivel');
     });
 
     it.each([
-      ['404 sem o código da API', 404, null],
+      ['erro não esperado', 404, null],
       ['erro do servidor', 500, null],
     ])('%s: a disponibilidade fica desconhecida', (_caso, status, corpo) => {
       const { resultado, chamada } = consultar();

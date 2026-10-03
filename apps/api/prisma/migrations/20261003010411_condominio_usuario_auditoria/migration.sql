@@ -62,5 +62,8 @@ ALTER TABLE `auditoria_admin` ADD CONSTRAINT `auditoria_admin_condominio_id_ator
 -- AddForeignKey
 ALTER TABLE `auditoria_admin` ADD CONSTRAINT `auditoria_admin_condominio_id_alvo_id_fkey` FOREIGN KEY (`condominio_id`, `alvo_id`) REFERENCES `usuario`(`condominio_id`, `id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
--- O Prisma não modela CHECK: os slots de admin (síndico e subsíndico) são só 1 e 2 (ADR-002).
-ALTER TABLE `usuario` ADD CONSTRAINT `usuario_slot_admin_check` CHECK (`slot_admin` IN (1, 2));
+-- O Prisma não modela CHECK: admins ocupam obrigatoriamente um dos dois slots; moradores não ocupam slot (ADR-002).
+ALTER TABLE `usuario` ADD CONSTRAINT `usuario_slot_admin_check` CHECK (
+  (`papel` = 'MORADOR' AND `slot_admin` IS NULL)
+  OR (`papel` IN ('SINDICO', 'SUBSINDICO') AND `slot_admin` IS NOT NULL AND `slot_admin` IN (1, 2))
+);
