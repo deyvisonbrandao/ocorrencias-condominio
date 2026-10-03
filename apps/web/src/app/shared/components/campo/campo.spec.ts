@@ -144,6 +144,18 @@ describe('ui-campo com máscara de telefone', () => {
     expect(fixture.componentInstance.controle.value).toBe('(11) 91234-5678');
   });
 
+  it('digitado tecla a tecla com +55, entrega o número completo ao formulário', () => {
+    const entrada = raiz.querySelector('input') as HTMLInputElement;
+
+    for (const tecla of '+5511912345678') {
+      entrada.value = entrada.value + tecla;
+      entrada.dispatchEvent(new Event('input'));
+    }
+
+    expect(entrada.value).toBe('+55 (11) 91234-5678');
+    expect(fixture.componentInstance.controle.value).toBe('+55 (11) 91234-5678');
+  });
+
   it('mostra o conteúdo projetado junto ao campo', () => {
     expect(raiz.querySelector('ui-moldura-campo .status')?.textContent).toBe('Conteúdo abaixo do campo');
   });
