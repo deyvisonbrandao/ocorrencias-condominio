@@ -35,6 +35,7 @@
     <ui-campo formControlName="local" rotulo="Local" opcional dica="Ex.: garagem G2, hall do bloco B, salão de festas." />
     <ui-campo formControlName="prazo" tipo="date" rotulo="Prazo" />
     <ui-campo rotulo="Número da principal" prefixo="#" inputmode="numeric" />
+    <ui-select rotulo="Tipo" placeholder="Escolha o tipo" [opcoes]="opcoesTipo" />
     <ui-select formControlName="urgencia" rotulo="Urgência" opcional placeholder="Escolha a urgência" [opcoes]="opcoesUrgencia" dica="O morador não vê a urgência." />
     <ui-area-texto formControlName="descricao" rotulo="Descrição" dica="Conte o que aconteceu, quando e onde. Mínimo de 20 caracteres." contador [min]="20" [max]="2000" [erro]="erroDaDescricao()" />
     <button type="submit" ui-botao variante="secundario">Validar formulário</button>
@@ -100,11 +101,21 @@
   </div>
 </section>
 
-<ui-modal #modal titulo="Arquivar ocorrência #57">
+<ui-modal #modal titulo="Arquivar ocorrência #57" [ocupado]="arquivando()">
   <ui-campo rotulo="Motivo" dica="O autor e os moradores do condomínio veem este motivo." />
   <ng-container acoes>
-    <button type="button" ui-botao variante="secundario" (click)="modal.fechar()">Cancelar</button>
-    <button type="button" ui-botao (click)="modal.fechar()">Arquivar</button>
+    <button type="button" ui-botao variante="secundario" [desabilitado]="arquivando()" (click)="modal.fechar()">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      ui-botao
+      rotuloCarregando="Arquivando…"
+      [carregando]="arquivando()"
+      (click)="arquivar(modal)"
+    >
+      Arquivar
+    </button>
   </ng-container>
 </ui-modal>
 

@@ -14,7 +14,7 @@ import { BadgeUrgencia } from '../shared/ui/badge/badge-urgencia';
 import { Marcador } from '../shared/ui/badge/marcador';
 import { Botao } from '../shared/ui/botao/botao';
 import { Campo } from '../shared/ui/campo/campo';
-import { URGENCIA } from '../shared/ui/dominio';
+import { TIPO_OCORRENCIA, URGENCIA } from '../shared/ui/dominio';
 import { Drawer } from '../shared/ui/drawer/drawer';
 import { EstadoErro } from '../shared/ui/estados/estado-erro';
 import { EstadoVazio } from '../shared/ui/estados/estado-vazio';
@@ -62,7 +62,12 @@ export class VitrineUi {
     { rotulo: 'Recusados e inativos', rota: '/dev/ui', queryParams: { aba: 'recusados' } },
   ];
 
+  protected readonly opcoesTipo: readonly OpcaoSelect[] = Object.values(TipoOcorrencia).map(
+    (valor) => ({ valor, rotulo: TIPO_OCORRENCIA[valor].rotulo }),
+  );
+
   protected readonly carregando = signal(false);
+  protected readonly arquivando = signal(false);
   protected readonly enviado = signal(false);
 
   protected readonly formulario = new FormGroup({
@@ -113,6 +118,15 @@ export class VitrineUi {
       this.carregando.set(false);
       this.toasts.sucesso('Ocorrência #63 registrada.');
     }, 1500);
+  }
+
+  protected arquivar(modal: Modal): void {
+    this.arquivando.set(true);
+    setTimeout(() => {
+      this.arquivando.set(false);
+      modal.fechar();
+      this.toasts.sucesso('Ocorrência arquivada.');
+    }, 4000);
   }
 
   protected mostrarSucesso(): void {
