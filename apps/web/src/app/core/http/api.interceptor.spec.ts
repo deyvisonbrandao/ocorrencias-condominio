@@ -21,6 +21,10 @@ describe('apiInterceptor', () => {
     ['ocorrencias', '/api/v1/ocorrencias'],
     ['/ocorrencias?escopo=minhas', '/api/v1/ocorrencias?escopo=minhas'],
     ['/api/v1/me', '/api/v1/me'],
+    ['/api/v1', '/api/v1'],
+    ['/api/v1?x=1', '/api/v1?x=1'],
+    ['/api/v1#f', '/api/v1#f'],
+    ['/api/v10/recurso', '/api/v1/api/v10/recurso'],
   ])('envia "%s" para "%s" com cookie de sessão', (url, esperado) => {
     http.get(url).subscribe();
 
