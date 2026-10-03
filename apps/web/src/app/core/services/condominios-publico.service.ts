@@ -8,7 +8,7 @@ import {
 } from '@ocorrencias/contratos';
 import { catchError, map, Observable, of } from 'rxjs';
 import { lerErroApi } from '../../shared/utils/erro-api';
-import { SEM_TOAST_DE_ERRO } from '../http/erro-http.interceptor';
+import { SEM_TOAST_DE_ERRO } from '../interceptors/erro-http.interceptor';
 
 export type DisponibilidadeSlug = 'disponivel' | 'em-uso' | 'desconhecida';
 

@@ -2,7 +2,7 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { CadastrarCondominioRequisicao } from '@ocorrencias/contratos';
-import { SEM_TOAST_DE_ERRO } from '../http/erro-http.interceptor';
+import { SEM_TOAST_DE_ERRO } from '../interceptors/erro-http.interceptor';
 import { CondominiosPublicoService, DisponibilidadeSlug } from './condominios-publico.service';
 
 describe('CondominiosPublicoService', () => {

@@ -59,7 +59,7 @@ docs/                 plano do MVP e ADRs
    - API: http://localhost:3000/api/v1 (health em http://localhost:3000/api/v1/health)
    - Swagger: http://localhost:3000/api/docs
    - Pelo proxy do web: http://localhost:4200/api/v1
-   - Vitrine dos componentes de `shared/ui` (só em desenvolvimento): http://localhost:4200/dev/ui
+   - Vitrine dos componentes de `shared/components` (só em desenvolvimento): http://localhost:4200/dev/ui
 
    A API valida o `.env` na subida: com variável faltando ou inválida, ela não sobe e lista o que corrigir.
 

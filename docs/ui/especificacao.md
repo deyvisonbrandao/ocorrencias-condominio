@@ -12,7 +12,7 @@
 
 1. [Princípios e decisões](#1-princípios-e-decisões)
 2. [Tokens](#2-tokens)
-3. [Componentes: Flowbite e `shared/ui`](#3-componentes-flowbite-e-sharedui)
+3. [Componentes: Flowbite e `shared/components`](#3-componentes-flowbite-e-sharedcomponents)
 4. [Shells, navegação e breakpoints](#4-shells-navegação-e-breakpoints)
 5. [Telas](#5-telas)
 6. [Visibilidade por papel na UI](#6-visibilidade-por-papel-na-ui)
@@ -76,7 +76,7 @@ Decididas na revisão do PR #28 (pelo usuário e pelo orquestrador). A UI só ex
 
 ## 2. Tokens
 
-Os tokens são **semânticos**: o nome diz o papel, não a cor. Os valores vêm da paleta padrão do Tailwind, para não criar cor nova. O código das telas usa **só** os nomes desta seção. Classe de cor crua (`bg-blue-700`, `text-gray-600`) fica restrita a `shared/ui`, e mesmo lá só quando o token não cobre o caso.
+Os tokens são **semânticos**: o nome diz o papel, não a cor. Os valores vêm da paleta padrão do Tailwind, para não criar cor nova. O código das telas usa **só** os nomes desta seção. Classe de cor crua (`bg-blue-700`, `text-gray-600`) fica restrita a `shared/components`, e mesmo lá só quando o token não cobre o caso.
 
 Os contrastes foram calculados pela fórmula de luminância relativa da WCAG 2.x. O piso é AA: 4.5:1 para texto normal e 3:1 para texto grande e para elementos de interface.
 
@@ -212,7 +212,7 @@ Com `prefers-reduced-motion: reduce`, nada desliza nem escala, o skeleton fica e
 
 A issue #3 decide a versão. As duas formas abaixo geram **as mesmas classes**, e os mockups usam a forma v3 ([`mockups/assets/mockup.js`](mockups/assets/mockup.js)).
 
-> **Decisão da issue #3:** Tailwind v4 com o `@theme` abaixo, **sem** `@plugin "flowbite/plugin"` e sem `@source` do Flowbite. O plugin (3.x e 4.x) gera um seletor inválido (`:is():hover`, no `::file-selector-button`) que vira warning no build de produção, e o tema que ele lê (`--color-brand`, `--color-body`…) não existe sem importar o tema do Flowbite. O único estilo dele que o MVP usava, o reset do `<select>` com a seta, está em `styles.css`. O Flowbite segue como referência de marcação e classes e como fonte dos ícones (ADR-006). Sem o plugin, `radio` e `checkbox` (issue #12) não têm reset: use `accent-primaria` no controle nativo ou um reset próprio em `shared/ui`, com borda `borda-controle`.
+> **Decisão da issue #3:** Tailwind v4 com o `@theme` abaixo, **sem** `@plugin "flowbite/plugin"` e sem `@source` do Flowbite. O plugin (3.x e 4.x) gera um seletor inválido (`:is():hover`, no `::file-selector-button`) que vira warning no build de produção, e o tema que ele lê (`--color-brand`, `--color-body`…) não existe sem importar o tema do Flowbite. O único estilo dele que o MVP usava, o reset do `<select>` com a seta, está em `styles.css`. O Flowbite segue como referência de marcação e classes e como fonte dos ícones (ADR-006). Sem o plugin, `radio` e `checkbox` (issue #12) não têm reset: use `accent-primaria` no controle nativo ou um reset próprio em `shared/components`, com borda `borda-controle`.
 
 **Tailwind v4 (`@theme` em `apps/web/src/styles.css`)**, como implementado:
 
@@ -261,15 +261,15 @@ O tema do Flowbite não é importado. Se um dia for, aponte as variáveis de mar
 
 ---
 
-## 3. Componentes: Flowbite e `shared/ui`
+## 3. Componentes: Flowbite e `shared/components`
 
-**Regra ([ADR-006](../adr/006-flowbite-sem-initflowbite.md), status Aceita):** as telas usam apenas componentes de `apps/web/src/app/shared/ui`. O Flowbite serve de **referência de marcação e classes** para esses componentes, e o Flowbite Icons fornece os ícones. O **comportamento** (abrir, fechar, foco, `aria-expanded`) fica no Angular, com signals. O `initFlowbite()` e o JS do Flowbite não são usados. Motivo: os componentes JS do Flowbite manipulam o DOM fora do ciclo do Angular, se perdem quando a rota troca e não gerenciam o foco como a WCAG exige.
+**Regra ([ADR-006](../adr/006-flowbite-sem-initflowbite.md), status Aceita):** as telas usam apenas componentes de `apps/web/src/app/shared/components`. O Flowbite serve de **referência de marcação e classes** para esses componentes, e o Flowbite Icons fornece os ícones. O **comportamento** (abrir, fechar, foco, `aria-expanded`) fica no Angular, com signals. O `initFlowbite()` e o JS do Flowbite não são usados. Motivo: os componentes JS do Flowbite manipulam o DOM fora do ciclo do Angular, se perdem quando a rota troca e não gerenciam o foco como a WCAG exige.
 
 Os nomes de seletor são sugestões. O prefixo `ui-` segue a pasta.
 
-| Necessidade | Componente `shared/ui` | Base Flowbite | Variantes e entradas | Estados obrigatórios | Notas de acessibilidade |
+| Necessidade | Componente `shared/components` | Base Flowbite | Variantes e entradas | Estados obrigatórios | Notas de acessibilidade |
 |---|---|---|---|---|---|
-| Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/ui/icones`) | `nome`, `tamanho` (14, 16, 20 ou 24px; 14px só dentro de badge), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
+| Ícone | `ui-icone` | Flowbite Icons (SVG inline, copiado para um registro em `shared/components/icone/icones`) | `nome`, `tamanho` (14, 16, 20 ou 24px; 14px só dentro de badge), `rotulo?` | — | Sem `rotulo`: `aria-hidden="true"`. Com `rotulo`: `role="img"` + `aria-label`. `stroke="currentColor"` para herdar a cor do texto. As barras de urgência (1 a 4) são um SVG próprio, porque o catálogo não tem um equivalente |
 | Ação | `ui-botao` (também como `a[ui-botao]`) | Buttons | `primario` · `secundario` (contorno `borda-controle`) · `texto` · `perigo` (sólido) · `perigo-contorno`; `bloco` (largura total abaixo de 768px); `icone` (quadrado 44px, exige `rotulo`) | repouso, hover (`primaria-hover` / `superficie-sutil`), foco visível, ativo (= hover), desabilitado (`opacity-50`, `cursor-not-allowed`, `aria-disabled`), **carregando** (spinner + rótulo no gerúndio + `aria-busy`, sem clique duplo) | Altura mínima de 44px. Botão só com ícone exige `aria-label`. Não use `disabled` para esconder um erro de validação: deixe enviar e mostre o erro. |
 | Campo de texto | `ui-campo` | Input field | `tipo` (text, tel, email, password com botão "Mostrar senha"), `rotulo`, `dica`, `erro`, `opcional`, `prefixo` ("#"), `mascara` (telefone: `(11) 91234-5678` enquanto digita; aceita colar com +55), `autocapitalize`, `corretor` (spellcheck); conteúdo projetado aparece abaixo do controle, antes do erro (prévia e status do slug) | repouso (borda `borda-controle`), foco (borda `primaria-foco` + anel 2px a 30%), **erro** (borda 2px `perigo-borda` + mensagem `perigo` com ícone), desabilitado (`superficie-sutil`), somente leitura | `<label for>` sempre visível (placeholder não é rótulo). `aria-describedby` = dica + erro. `aria-invalid="true"` no erro. Texto de 16px. |
 | Texto longo | `ui-area-texto` | Textarea | `rotulo`, `dica`, `min`, `max`, `contador` | iguais aos do `ui-campo` + contador `n/max` (`tabular-nums`) | O contador não é `aria-live` a cada tecla. Ele anuncia só ao cruzar o mínimo e ao faltarem 100 para o máximo. |
@@ -1022,12 +1022,12 @@ Piso: **WCAG 2.2 AA**. Os itens abaixo valem para revisão de PR.
 ## 10. Para a implementação
 
 **Fazer**
-1. Criar os tokens da seção 2.7 **antes** de qualquer tela (issue #3) e os componentes de `shared/ui` da seção 3 na ordem em que as issues pedem:
+1. Criar os tokens da seção 2.7 **antes** de qualquer tela (issue #3) e os componentes de `shared/components` da seção 3 na ordem em que as issues pedem:
    - #3: tokens, ícone (Flowbite Icons), botão, campo, select, alerta, toast, modal, bottom-nav, barra, sidebar e estados;
    - #12: opções-cartão, alternador e área de texto;
    - #13: badges, cartão de ocorrência e timeline;
    - #11: QR code (biblioteca `qrcode`).
-2. Mapear enum → rótulo, ícone e token num único lugar (ex.: `shared/ui/dominio.ts`), consumindo `packages/contratos`. Os badges recebem o enum, nunca a string pronta.
+2. Mapear enum → rótulo, ícone e token num único lugar (ex.: `shared/utils/dominio.ts`), consumindo `packages/contratos`. Os badges recebem o enum, nunca a string pronta.
 3. Toda chamada remota numa tela passa pelos 4 estados de 5.0. O "carregando" do botão bloqueia o clique duplo.
 4. Regras derivadas vêm prontas da API: `atrasada` (R2), `minha` (autor), `podeReabrirAte` e o recorte de "Não triada" (R3). A UI não recalcula datas nem status.
 5. Formulários reativos com as mensagens da seção 8.4. Erro 422 da API mapeado para o campo correspondente.
@@ -1035,7 +1035,7 @@ Piso: **WCAG 2.2 AA**. Os itens abaixo valem para revisão de PR.
 7. Registrar nesta especificação qualquer componente, token ou texto novo no mesmo PR que o introduz.
 
 **Não fazer**
-- Classe de cor crua do Tailwind ou valor arbitrário (`bg-[#…]`, `p-[13px]`) fora de `shared/ui`.
+- Classe de cor crua do Tailwind ou valor arbitrário (`bg-[#…]`, `p-[13px]`) fora de `shared/components`.
 - Renderizar urgência, nota interna ou dados do autor anônimo **condicionando só no template**. Se o campo não veio da API, ele não existe; a UI não "esconde" dado recebido.
 - Usar a borda `gray-300` do Flowbite em controles, ou `outline-none` sem anel.
 - Usar `initFlowbite()` ou qualquer JS do Flowbite (ADR-006).

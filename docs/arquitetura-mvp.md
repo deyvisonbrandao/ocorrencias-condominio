@@ -37,8 +37,16 @@ condominio-ocorrencias/
              src/modules/{condominios,acesso,membros,ocorrencias}
              test/e2e/{isolamento-tenant,anonimato,maquina-estados}
   apps/web/  (Angular standalone + signals, Tailwind + Flowbite)
-             src/app/{core,publico,morador,admin,shared/ui}
+             src/app/core/{config,interceptors,layouts/{publico,morador,admin},services,guards}
+             src/app/features/<feature>/{components,services,interfaces,enums}  # uma pasta por entrega, lazy
+             src/app/shared/{components,validators,services,utils,pipes,directives}
 ```
+
+**Estrutura do web** (`apps/web/src/app`, três áreas, sem NgModules)
+- `core/`: o que carrega na inicialização e existe uma vez só: shells e rotas de cada área (`layouts/`), interceptors, guards, configuração (`config/`) e serviços globais, como os clients da API e a navegação (`services/`).
+- `features/<feature>/`: uma pasta por entrega de valor, com o componente de página na raiz, carregado por lazy loading a partir das rotas da área. Subpastas `components/`, `services/`, `interfaces/` e `enums/` só quando a feature tem os seus próprios.
+- `shared/`: reutilizável, agrupado por tipo: `components/` (os `ui-*`), `validators/`, `services/`, `utils/` (funções puras), `pipes/` e `directives/`.
+- Dependências: `features` importam `core` e `shared`; `shared` não importa `core` nem `features`; `core` não importa `features`, exceto nas rotas das áreas; uma feature não importa outra (o que for comum sobe para `shared` ou `core`).
 
 **Swagger**
 - `@nestjs/swagger` em `/api/docs`, com DTOs anotados e autenticação por cookie.
@@ -46,7 +54,7 @@ condominio-ocorrencias/
 
 **Flowbite**
 - Tailwind + `flowbite` como referência de marcação e classes, com ícones do Flowbite Icons (SVG inline). O comportamento interativo (modal, drawer, menus, abas) fica no Angular, com `<dialog>` nativo; **sem `initFlowbite()`** ([ADR-006](adr/006-flowbite-sem-initflowbite.md)).
-- Componentes de UI encapsulados em `shared/ui`: botão, input, select, badge de status/tipo, timeline, modal, toast, bottom-nav, abas.
+- Componentes de UI encapsulados em `shared/components`: botão, input, select, badge de status/tipo, timeline, modal, toast, bottom-nav, abas.
 - Assim as telas não dependem direto das classes do Flowbite.
 - O `zidane` define os tokens e o mapeamento de componentes.
 
@@ -175,7 +183,7 @@ condominio-ocorrencias/
    - NestJS, Prisma, config validada, filtro de erros padrão, `/health`, Swagger em `/api/docs`, CI no GitHub Actions (lint, test, build).
    - Testar: abrir `/api/docs` e executar `/health`; checks verdes no PR.
 3. **Web base com Flowbite**
-   - Angular, Tailwind e Flowbite; shells das áreas pública, morador (bottom-nav) e admin (navbar/sidebar responsiva); componentes base em `shared/ui`.
+   - Angular, Tailwind e Flowbite; shells das áreas pública, morador (bottom-nav) e admin (navbar/sidebar responsiva); componentes base em `shared/components`.
    - Testar: navegar pelos shells em 375px e em desktop.
 4. **Especificação de UI** (`zidane`)
    - Tokens, mapeamento Flowbite e fluxo das telas do MVP, com estados vazio, carregando e erro.

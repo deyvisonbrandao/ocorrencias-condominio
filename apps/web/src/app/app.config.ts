@@ -2,9 +2,9 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, TitleStrategy } from '@angular/router';
 import { routes } from './app.routes';
-import { apiInterceptor } from './core/http/api.interceptor';
-import { erroHttpInterceptor } from './core/http/erro-http.interceptor';
-import { TituloDaPagina } from './core/navegacao/titulo-da-pagina';
+import { apiInterceptor } from './core/interceptors/api.interceptor';
+import { erroHttpInterceptor } from './core/interceptors/erro-http.interceptor';
+import { TituloDaPagina } from './core/services/titulo-da-pagina';
 
 export const appConfig: ApplicationConfig = {
   providers: [
