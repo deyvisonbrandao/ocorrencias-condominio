@@ -1,14 +1,32 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { UsuarioSessao } from '@ocorrencias/contratos';
+import { SessaoService } from '../../services/sessao.service';
 import rotasMorador from './morador.routes';
+
+const MORADOR: UsuarioSessao = {
+  nome: 'Bia Souza',
+  telefone: '+5511912345678',
+  papel: 'MORADOR',
+  status: 'ATIVO',
+  senhaTemporaria: false,
+  condominio: { nome: 'Residencial Jardim', slug: 'jardim' },
+};
 
 describe('ShellMorador', () => {
   let harness: RouterTestingHarness;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [provideRouter([{ path: 'app', children: rotasMorador }])],
+      providers: [
+        provideRouter([{ path: 'app', children: rotasMorador }]),
+        {
+          provide: SessaoService,
+          useValue: { usuario: signal(MORADOR), saindo: signal(false), erroAoSair: signal(null) },
+        },
+      ],
     });
     harness = await RouterTestingHarness.create();
   });
@@ -67,5 +85,11 @@ describe('ShellMorador', () => {
     await navegar('/app');
 
     expect(TestBed.inject(Router).url).toBe('/app/ocorrencias');
+  });
+
+  it('mostra o nome do condomínio da sessão na barra superior', async () => {
+    const shell = await navegar('/app/ocorrencias');
+
+    expect(shell.querySelector('ui-barra-superior')?.textContent).toContain('Residencial Jardim');
   });
 });

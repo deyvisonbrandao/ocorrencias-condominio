@@ -30,7 +30,11 @@ export default [
         data: { issue: 14 },
       },
       { path: 'minhas', title: 'Minhas ocorrências', component: PaginaProvisoria, data: { issue: 13 } },
-      { path: 'perfil', title: 'Perfil', component: PaginaProvisoria, data: { issue: 9 } },
+      {
+        path: 'perfil',
+        title: 'Perfil',
+        loadComponent: () => import('../../../features/perfil/perfil').then((m) => m.Perfil),
+      },
       {
         path: 'nova',
         title: 'Nova ocorrência',

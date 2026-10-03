@@ -15,7 +15,11 @@ export default [
     component: ShellAdmin,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'painel' },
-      { path: 'painel', title: 'Painel', component: PaginaProvisoria, data: { issue: 22 } },
+      {
+        path: 'painel',
+        title: 'Painel',
+        loadComponent: () => import('../../../features/painel/painel').then((m) => m.Painel),
+      },
       { path: 'ocorrencias', title: 'Ocorrências', component: PaginaProvisoria, data: { issue: 15 } },
       {
         path: 'ocorrencias/nova',

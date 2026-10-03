@@ -1,7 +1,8 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NOME_PRODUTO } from '../../config/marca';
 import { dadosDaTelaAtual } from '../../services/rota-atual';
+import { SessaoService } from '../../services/sessao.service';
 import { BarraSuperior } from '../../../shared/components/barra-superior/barra-superior';
 import { Botao } from '../../../shared/components/botao/botao';
 import { BottomNav } from '../../../shared/components/bottom-nav/bottom-nav';
@@ -37,7 +38,7 @@ interface LinkMorador {
         [iconeVoltar]="pilha.icone"
       />
     }
-    <ui-barra-superior marca largura="responsiva" [visibilidade]="empilhada() ? 'a-partir-md' : 'sempre'" [titulo]="nomeProduto">
+    <ui-barra-superior marca largura="responsiva" [visibilidade]="empilhada() ? 'a-partir-md' : 'sempre'" [titulo]="nomeDoCondominio()">
       <nav aria-label="Navegação principal" class="hidden items-center gap-1 md:flex">
         @for (link of links; track link.rota) {
           <a
@@ -79,7 +80,10 @@ interface LinkMorador {
   `,
 })
 export class ShellMorador {
-  protected readonly nomeProduto = NOME_PRODUTO;
+  private readonly sessao = inject(SessaoService);
+  protected readonly nomeDoCondominio = computed(
+    () => this.sessao.usuario()?.condominio.nome ?? NOME_PRODUTO,
+  );
   protected readonly tela = dadosDaTelaAtual();
   protected readonly empilhada = computed(() => this.tela().pilha !== null);
   protected readonly correspondencia: IsActiveMatchOptions = {
