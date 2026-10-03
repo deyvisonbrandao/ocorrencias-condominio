@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   CadastrarMoradorRequisicao,
@@ -25,9 +25,14 @@ import {
   MENSAGEM_ERRO_INESPERADO,
   mensagemDeErroGlobal,
 } from '../../core/interceptors/erro-http.interceptor';
-import { condominioDaRota } from '../../core/services/condominio-da-rota';
+import {
+  CHAVE_CONDOMINIO_NO_ESTADO,
+  condominioDaRota,
+  TITULO_CONDOMINIO_NAO_ENCONTRADO,
+} from '../../core/services/condominio-da-rota';
 import { CondominiosPublicoService } from '../../core/services/condominios-publico.service';
 import { Botao } from '../../shared/components/botao/botao';
+import { CaixaSelecao } from '../../shared/components/caixa-selecao/caixa-selecao';
 import { Campo } from '../../shared/components/campo/campo';
 import { CondominioNaoEncontrado } from '../../shared/components/estados/condominio-nao-encontrado';
 import { EstadoErro } from '../../shared/components/estados/estado-erro';
@@ -35,6 +40,7 @@ import { Skeleton } from '../../shared/components/estados/skeleton';
 import { ToastService } from '../../shared/services/toast.service';
 import { errosPorCampo, lerErroApi } from '../../shared/utils/erro-api';
 import {
+  aceiteObrigatorio,
   celularBr,
   emailOpcional,
   maximo,
@@ -47,9 +53,24 @@ import {
 
 export const MENSAGEM_TELEFONE_EM_USO = 'Este telefone já tem cadastro neste condomínio.';
 
-export type CampoCadastroMorador = 'nome' | 'telefone' | 'bloco' | 'apto' | 'email' | 'senha';
+export type CampoCadastroMorador =
+  | 'nome'
+  | 'telefone'
+  | 'bloco'
+  | 'apto'
+  | 'email'
+  | 'senha'
+  | 'aceite';
 
-const CAMPOS: readonly CampoCadastroMorador[] = ['nome', 'telefone', 'bloco', 'apto', 'email', 'senha'];
+const CAMPOS: readonly CampoCadastroMorador[] = [
+  'nome',
+  'telefone',
+  'bloco',
+  'apto',
+  'email',
+  'senha',
+  'aceite',
+];
 
 function ehCampoCadastroMorador(campo: string): campo is CampoCadastroMorador {
   return (CAMPOS as readonly string[]).includes(campo);
@@ -65,6 +86,7 @@ function texto(...regras: readonly Regra[]): FormControl<string> {
     ReactiveFormsModule,
     RouterLink,
     Botao,
+    CaixaSelecao,
     Campo,
     CondominioNaoEncontrado,
     EstadoErro,
@@ -88,6 +110,7 @@ export class CadastroMorador {
   protected readonly esperaLonga = this.pagina.esperaLonga;
   protected readonly maxNome = REGRAS_NOME_PESSOA.max;
   protected readonly mensagemTelefoneEmUso = MENSAGEM_TELEFONE_EM_USO;
+  protected readonly tituloNaoEncontrado = TITULO_CONDOMINIO_NAO_ENCONTRADO;
 
   protected readonly formulario = new FormGroup({
     nome: texto(obrigatorio('Informe seu nome.'), maximo(REGRAS_NOME_PESSOA.max)),
@@ -96,6 +119,7 @@ export class CadastroMorador {
     apto: texto(obrigatorio('Informe o apartamento.'), maximo(REGRAS_APTO.max, normalizarApto)),
     email: texto(emailOpcional),
     senha: texto(senha),
+    aceite: new FormControl(false, { nonNullable: true, validators: aceiteObrigatorio }),
   });
 
   protected readonly enviado = signal(false);
@@ -104,7 +128,8 @@ export class CadastroMorador {
 
   constructor() {
     for (const campo of CAMPOS) {
-      this.formulario.controls[campo].valueChanges
+      const controle: AbstractControl = this.formulario.controls[campo];
+      controle.valueChanges
         .pipe(takeUntilDestroyed())
         .subscribe(() => this.limparErroDoServidor(campo));
     }
@@ -137,15 +162,19 @@ export class CadastroMorador {
       .cadastrarMorador(slug, requisicao)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.router.navigate(['/c', slug, 'aguardando-aprovacao']).then(
-            (navegou) => {
-              if (!navegou) {
-                this.liberar();
-              }
-            },
-            () => this.liberar(),
-          );
+        next: ({ condominio }) => {
+          this.router
+            .navigate(['/c', slug, 'aguardando-aprovacao'], {
+              state: { [CHAVE_CONDOMINIO_NO_ESTADO]: condominio },
+            })
+            .then(
+              (navegou) => {
+                if (!navegou) {
+                  this.liberar();
+                }
+              },
+              () => this.liberar(),
+            );
         },
         error: (erro: unknown) => this.falhar(erro),
       });

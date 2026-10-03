@@ -1,6 +1,6 @@
 <div class="md:mx-auto md:max-w-md">
   <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
-    {{ estado().tipo === 'nao-encontrado' ? 'Condomínio não encontrado' : 'Entrar' }}
+    {{ estado().tipo === 'nao-encontrado' ? tituloNaoEncontrado : 'Entrar' }}
   </h1>
 
   @switch (estado().tipo) {

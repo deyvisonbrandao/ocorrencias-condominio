@@ -336,7 +336,7 @@ Largura mínima suportada: 320px, sem rolagem horizontal da página. Só a linha
 - \*\*Os dois veem Condomínio. O subsíndico entra em **modo leitura** (R6): link, copiar, QR e cartaz, sem o formulário de dados.
 - A pessoa logada aparece como "Ana Lima · Síndico(a)" (R9).
 
-**Na troca de rota:** o `document.title` vira `"{Título da tela} · {Condomínio}"`, o foco vai para o `h1` (`tabindex="-1"`) e a rolagem volta ao topo, exceto no "voltar" para uma lista, que restaura a posição.
+**Na troca de rota:** o `document.title` vira `"{Título da tela} · {Condomínio}"` (nas telas públicas, assim que o condomínio do slug carrega; antes disso, e nas telas sem condomínio, `"{Título da tela} · {Produto}"`; a página do condomínio, cujo h1 já é o nome, usa `"{Condomínio} · {Produto}"`), o foco vai para o `h1` (`tabindex="-1"`) e a rolagem volta ao topo, exceto no "voltar" para uma lista, que restaura a posição.
 
 ---
 

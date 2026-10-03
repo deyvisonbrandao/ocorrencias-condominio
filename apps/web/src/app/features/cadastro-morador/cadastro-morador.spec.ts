@@ -1,5 +1,5 @@
 import { HttpContext, HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -14,7 +14,13 @@ import { ToastService } from '../../shared/services/toast.service';
 import { CadastroMorador, MENSAGEM_TELEFONE_EM_USO } from './cadastro-morador';
 
 @Component({ template: '<h1 tabindex="-1">Destino</h1>' })
-class Destino {}
+class Destino {
+  static estadoRecebido: unknown;
+
+  constructor() {
+    Destino.estadoRecebido = inject(Router).currentNavigation()?.extras.state;
+  }
+}
 
 const JARDIM: CondominioPublico = { nome: 'Residencial Jardim', slug: 'jardim' };
 
@@ -79,7 +85,12 @@ describe('CadastroMorador', () => {
     entrada.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  function preencher(dados: Partial<Record<string, string>> = {}): void {
+  const aceite = () => raiz.querySelector('input[type="checkbox"]') as HTMLInputElement;
+
+  function preencher(dados: Partial<Record<string, string>> = {}, aceitar = true): void {
+    if (aceitar && !aceite().checked) {
+      aceite().click();
+    }
     const valores = {
       'Nome completo': '  João Pereira ',
       'Telefone (celular)': '11987654321',
@@ -106,7 +117,7 @@ describe('CadastroMorador', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([
-          { path: 'c/:slug/cadastro', component: CadastroMorador },
+          { path: 'c/:slug/cadastro', title: 'Criar conta', component: CadastroMorador },
           { path: '**', component: Destino },
         ]),
         { provide: CondominiosPublicoService, useValue: api },
@@ -125,6 +136,7 @@ describe('CadastroMorador', () => {
       await abrir();
 
       expect(titulo()).toBe('Criar conta');
+      expect(document.title).toBe('Criar conta · Residencial Jardim');
       expect(raiz.textContent).toContain('Residencial Jardim');
       expect(descricao(campo('E-mail'), '-dica')?.textContent).toBe('Só para contato da administração.');
       expect(raiz.querySelector('label[for="' + campo('E-mail').id + '"]')?.textContent).toContain(
@@ -186,9 +198,36 @@ describe('CadastroMorador', () => {
       expect(erroDe(campo('Apartamento'))).toBe('Informe o apartamento.');
       expect(erroDe(campo('E-mail'))).toBeUndefined();
       expect(erroDe(campo('Senha'))).toBe('A senha precisa ter pelo menos 8 caracteres.');
+      expect(erroDe(aceite())).toBe(
+        'Para continuar, aceite os termos de uso e a política de privacidade.',
+      );
       expect(campo('Nome completo').getAttribute('aria-invalid')).toBe('true');
       expect(document.activeElement).toBe(campo('Nome completo'));
       expect(api.cadastrarMorador).not.toHaveBeenCalled();
+    });
+
+    it('sem o aceite dos termos: mostra o erro no aceite, foca nele e não chama a API', async () => {
+      await abrir();
+      preencher({}, false);
+
+      await enviar();
+
+      expect(erroDe(aceite())).toBe(
+        'Para continuar, aceite os termos de uso e a política de privacidade.',
+      );
+      expect(aceite().getAttribute('aria-invalid')).toBe('true');
+      expect(document.activeElement).toBe(aceite());
+      expect(api.cadastrarMorador).not.toHaveBeenCalled();
+    });
+
+    it('o aceite traz os links dos termos e da política, abrindo em nova aba', async () => {
+      await abrir();
+
+      const links = [...raiz.querySelectorAll<HTMLAnchorElement>('ui-caixa-selecao a')];
+
+      expect(links.map((link) => link.getAttribute('href'))).toEqual(['/termos', '/privacidade']);
+      expect(links.every((link) => link.target === '_blank')).toBe(true);
+      expect(links.every((link) => link.textContent?.includes('(abre em nova aba)'))).toBe(true);
     });
 
     it('e-mail preenchido precisa ter formato válido', async () => {
@@ -242,6 +281,21 @@ describe('CadastroMorador', () => {
         senha: 'senha-forte',
       });
       expect(TestBed.inject(Router).url).toBe('/c/jardim/aguardando-aprovacao');
+    });
+
+    it('sucesso: leva o condomínio da resposta no state da navegação', async () => {
+      Destino.estadoRecebido = undefined;
+      api.cadastrarMorador.mockReturnValue(
+        of({ ...CADASTRADO, condominio: { nome: 'Jardim (resposta)', slug: 'jardim' } }),
+      );
+      await abrir();
+      preencher();
+
+      await enviar();
+
+      expect(Destino.estadoRecebido).toEqual({
+        condominio: { nome: 'Jardim (resposta)', slug: 'jardim' },
+      });
     });
 
     it('envia o e-mail quando preenchido', async () => {
@@ -298,7 +352,7 @@ describe('CadastroMorador', () => {
       await esperar();
 
       expect(erroDe(campo('Telefone (celular)'))).toBeUndefined();
-      expect(raiz.querySelector('form a')).toBeNull();
+      expect(raiz.querySelector('form a[href="/c/jardim/entrar"]')).toBeNull();
     });
 
     it('400 de validação: mostra a mensagem da API no campo indicado', async () => {

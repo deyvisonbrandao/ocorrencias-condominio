@@ -54,7 +54,7 @@ import { Icone } from '../../shared/components/icone/icone';
   `,
 })
 export class AguardandoAprovacao {
-  private readonly pagina = condominioDaRota();
+  private readonly pagina = condominioDaRota({ aceitarDoEstadoDaNavegacao: true });
 
   protected readonly tituloNaoEncontrado = TITULO_CONDOMINIO_NAO_ENCONTRADO;
   protected readonly slug = this.pagina.slug;

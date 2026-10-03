@@ -1,6 +1,6 @@
 import { HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { CondominioPublico } from '@ocorrencias/contratos';
 import { Observable, of, throwError } from 'rxjs';
@@ -28,12 +28,37 @@ describe('AguardandoAprovacao', () => {
     api.buscarPorSlug.mockReset().mockReturnValue(of(JARDIM));
     TestBed.configureTestingModule({
       providers: [
-        provideRouter([{ path: 'c/:slug/aguardando-aprovacao', component: AguardandoAprovacao }]),
+        provideRouter([
+          {
+            path: 'c/:slug/aguardando-aprovacao',
+            title: 'Cadastro enviado',
+            component: AguardandoAprovacao,
+          },
+        ]),
         { provide: CondominiosPublicoService, useValue: api },
       ],
     });
     harness = await RouterTestingHarness.create();
     raiz = harness.fixture.nativeElement as HTMLElement;
+  });
+
+  it('vindo do cadastro: usa o condomínio do state, sem consultar a API', async () => {
+    await TestBed.inject(Router).navigateByUrl('/c/jardim/aguardando-aprovacao', {
+      state: { condominio: { nome: 'Jardim do state', slug: 'jardim' } },
+    });
+    await harness.fixture.whenStable();
+
+    expect(api.buscarPorSlug).not.toHaveBeenCalled();
+    expect(texto()).toContain('A administração do Jardim do state precisa aprovar seu acesso.');
+    expect(raiz.querySelector('ui-estado-erro')).toBeNull();
+    expect(document.title).toBe('Cadastro enviado · Jardim do state');
+  });
+
+  it('recarga (sem state): busca o condomínio e usa o título com o nome dele', async () => {
+    await abrir();
+
+    expect(api.buscarPorSlug).toHaveBeenCalledTimes(1);
+    expect(document.title).toBe('Cadastro enviado · Residencial Jardim');
   });
 
   it('mostra o relógio, o h1, o texto com o nome do condomínio e o botão para o login', async () => {

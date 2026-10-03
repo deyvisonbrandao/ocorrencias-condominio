@@ -1,6 +1,6 @@
 <div class="md:mx-auto md:max-w-md">
   <h1 tabindex="-1" class="text-xl leading-7 font-bold md:text-2xl md:leading-8">
-    {{ estado().tipo === 'nao-encontrado' ? 'Condomínio não encontrado' : 'Criar conta' }}
+    {{ estado().tipo === 'nao-encontrado' ? tituloNaoEncontrado : 'Criar conta' }}
   </h1>
 
   @switch (estado().tipo) {
@@ -91,6 +91,17 @@
           autocomplete="new-password"
           [erro]="erro('senha')"
         />
+
+        <ui-caixa-selecao formControlName="aceite" [erro]="erro('aceite')">
+          Li e aceito os
+          <a routerLink="/termos" target="_blank" class="font-medium text-primaria underline"
+            >termos de uso<span class="sr-only"> (abre em nova aba)</span></a
+          >
+          e a
+          <a routerLink="/privacidade" target="_blank" class="font-medium text-primaria underline"
+            >política de privacidade<span class="sr-only"> (abre em nova aba)</span></a
+          >
+        </ui-caixa-selecao>
 
         <button
           type="submit"

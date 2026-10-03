@@ -57,7 +57,7 @@ import { Skeleton } from '../../shared/components/estados/skeleton';
   `,
 })
 export class PaginaDoCondominio {
-  private readonly pagina = condominioDaRota();
+  private readonly pagina = condominioDaRota({ tituloComCondominio: false });
 
   protected readonly slug = this.pagina.slug;
   protected readonly estado = this.pagina.estado;

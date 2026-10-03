@@ -16,7 +16,10 @@ import {
   MENSAGEM_ERRO_INESPERADO,
   mensagemDeErroGlobal,
 } from '../../core/interceptors/erro-http.interceptor';
-import { condominioDaRota } from '../../core/services/condominio-da-rota';
+import {
+  condominioDaRota,
+  TITULO_CONDOMINIO_NAO_ENCONTRADO,
+} from '../../core/services/condominio-da-rota';
 import {
   destinoAposLogin,
   MENSAGEM_SESSAO_TERMINOU,
@@ -86,6 +89,7 @@ export class Entrar {
   protected readonly estado = this.pagina.estado;
   protected readonly condominio = this.pagina.condominio;
   protected readonly esperaLonga = this.pagina.esperaLonga;
+  protected readonly tituloNaoEncontrado = TITULO_CONDOMINIO_NAO_ENCONTRADO;
 
   protected readonly formulario = new FormGroup({
     telefone: new FormControl('', { nonNullable: true, validators: validarCom(celularBr) }),

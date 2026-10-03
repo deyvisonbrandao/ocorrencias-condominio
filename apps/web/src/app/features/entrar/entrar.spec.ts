@@ -91,7 +91,7 @@ describe('Entrar', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([
-          { path: 'c/:slug/entrar', component: Entrar },
+          { path: 'c/:slug/entrar', title: 'Entrar', component: Entrar },
           { path: '**', component: Destino },
         ]),
         { provide: CondominiosPublicoService, useValue: api },
@@ -112,6 +112,7 @@ describe('Entrar', () => {
       expect(api.buscarPorSlug).toHaveBeenCalledWith('jardim', expect.any(HttpContext));
       expect(api.buscarPorSlug.mock.calls[0][1]?.get(SEM_TOAST_DE_ERRO)).toBe(true);
       expect(titulo()).toBe('Entrar');
+      expect(document.title).toBe('Entrar · Residencial Jardim');
       expect(raiz.textContent).toContain('Residencial Jardim');
       expect(raiz.textContent).toContain('Esqueceu a senha? Peça à administração do condomínio para redefinir.');
       const criarConta = [...raiz.querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Criar conta');
