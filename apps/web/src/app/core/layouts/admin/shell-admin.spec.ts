@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { PainelAdmin, Papel, UsuarioSessao } from '@ocorrencias/contratos';
-import { NEVER, Observable } from 'rxjs';
+import { NEVER, Observable, of } from 'rxjs';
 import { restaurarDialogoNativo, simularDialogoNativo } from '../../../../testes/dialogo-nativo';
 import { PainelService } from '../../../features/painel/services/painel.service';
 import { focarTituloERolarAoNavegar } from '../../services/foco-na-navegacao';
@@ -31,6 +31,7 @@ describe('ShellAdmin', () => {
     erroAoSair: signal<string | null>(null),
     sair: vi.fn(),
     descartarErroAoSair: vi.fn(),
+    carregar: () => of(sessao.usuario()),
   };
 
   const gaveta = () => raiz.querySelector('ui-drawer dialog') as HTMLDialogElement;
@@ -162,5 +163,24 @@ describe('ShellAdmin', () => {
 
     const rotulos = [...raiz.querySelectorAll('aside nav a')].map((a) => a.textContent?.trim());
     expect(rotulos.includes('Equipe')).toBe(ve);
+  });
+
+  it.each<[Papel, string]>([
+    ['SINDICO', '/admin/equipe'],
+    ['SUBSINDICO', '/admin/painel'],
+  ])('acesso direto a /admin/equipe como %s termina em %s', async (papel, destino) => {
+    sessao.usuario.set(usuario(papel));
+
+    await harness.navigateByUrl('/admin/equipe');
+
+    expect(TestBed.inject(Router).url).toBe(destino);
+  });
+
+  it('o subsíndico lê /admin/condominio (não é bloqueado)', async () => {
+    sessao.usuario.set(usuario('SUBSINDICO'));
+
+    await harness.navigateByUrl('/admin/condominio');
+
+    expect(TestBed.inject(Router).url).toBe('/admin/condominio');
   });
 });

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, RedirectCommand, Router } from '@angular/router';
+import { Papel } from '@ocorrencias/contratos';
 import { catchError, map, of } from 'rxjs';
 import { ToastService } from '../../shared/services/toast.service';
 import { AreaDaSessao } from '../models/sessao';
@@ -15,7 +16,7 @@ import {
 import { SessaoService } from '../services/sessao.service';
 import { UltimoCondominio } from '../services/ultimo-condominio';
 
-export function exigirArea(area: AreaDaSessao): CanActivateFn {
+export function exigirArea(area: AreaDaSessao, papeis?: readonly Papel[]): CanActivateFn {
   return (_rota, estado) => {
     const sessao = inject(SessaoService);
     const router = inject(Router);
@@ -30,7 +31,7 @@ export function exigirArea(area: AreaDaSessao): CanActivateFn {
           return router.parseUrl(ROTA_TROCAR_SENHA);
         }
         const areaDoUsuario = areaDoPapel(usuario.papel);
-        if (areaDoUsuario !== area) {
+        if (areaDoUsuario !== area || (papeis && !papeis.includes(usuario.papel))) {
           toasts.erro(MENSAGEM_SEM_ACESSO);
           return router.parseUrl(ROTA_INICIAL[areaDoUsuario]);
         }
@@ -53,6 +54,7 @@ export function exigirArea(area: AreaDaSessao): CanActivateFn {
 
 export const areaAdmin = exigirArea('admin');
 export const areaMorador = exigirArea('morador');
+export const somenteSindico = exigirArea('admin', ['SINDICO']);
 
 export const loginSemSessao: CanActivateFn = (rota) => {
   const router = inject(Router);

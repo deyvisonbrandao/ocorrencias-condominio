@@ -18,7 +18,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { MENSAGEM_SEM_ACESSO } from '../services/navegacao-da-sessao';
 import { SessaoService } from '../services/sessao.service';
 import { UltimoCondominio } from '../services/ultimo-condominio';
-import { areaAdmin, areaMorador, loginSemSessao } from './sessao.guards';
+import { areaAdmin, areaMorador, loginSemSessao, somenteSindico } from './sessao.guards';
 
 function usuario(papel: Papel, extras: Partial<UsuarioSessao> = {}): UsuarioSessao {
   return {
@@ -135,6 +135,46 @@ describe('guards de sessão', () => {
         }),
       ).toBe(true);
       expect(sessao.carregar).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('somente síndico (Equipe)', () => {
+    it('síndico entra', async () => {
+      sessao.carregar.mockReturnValue(of(usuario('SINDICO')));
+
+      expect(await executar(somenteSindico, '/admin/equipe')).toBe(true);
+      expect(toasts.erro).not.toHaveBeenCalled();
+    });
+
+    it('subsíndico vai para o painel com o aviso de acesso', async () => {
+      sessao.carregar.mockReturnValue(of(usuario('SUBSINDICO')));
+
+      expect(await executar(somenteSindico, '/admin/equipe')).toBe('/admin/painel');
+      expect(toasts.erro).toHaveBeenCalledTimes(1);
+      expect(toasts.erro).toHaveBeenCalledWith(MENSAGEM_SEM_ACESSO);
+    });
+
+    it('morador vai para a própria área com um único aviso', async () => {
+      sessao.carregar.mockReturnValue(of(usuario('MORADOR')));
+
+      expect(await executar(somenteSindico, '/admin/equipe')).toBe('/app/ocorrencias');
+      expect(toasts.erro).toHaveBeenCalledTimes(1);
+    });
+
+    it('sem sessão, segue o fluxo do guard da área: login com voltar', async () => {
+      sessao.carregar.mockReturnValue(of(null));
+      ultimo.ler.mockReturnValue('jardim');
+
+      expect(await executar(somenteSindico, '/admin/equipe')).toBe(
+        '/c/jardim/entrar?voltar=%2Fadmin%2Fequipe',
+      );
+      expect(toasts.erro).not.toHaveBeenCalled();
+    });
+
+    it('subsíndico com senha temporária vai para a troca de senha', async () => {
+      sessao.carregar.mockReturnValue(of(usuario('SUBSINDICO', { senhaTemporaria: true })));
+
+      expect(await executar(somenteSindico, '/admin/equipe')).toBe('/trocar-senha');
     });
   });
 
