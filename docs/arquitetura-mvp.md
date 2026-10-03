@@ -51,10 +51,10 @@ condominio-ocorrencias/
 
 **Estrutura da API** (`apps/api/src`, mesma divisão do web, com módulos Nest)
 - `core/`: infraestrutura essencial, carregada uma vez: configuração validada (`config/`), pipeline HTTP e erro padrão (`http/`), clients do Prisma (`prisma/`), contexto de condomínio (`tenancy/`), hash de senha e, na #6, sessão e guards (`auth/`), e o `health/`.
-- `features/<feature>/`: uma pasta por área de negócio, com o `<feature>.module.ts` na raiz. Subpastas só quando a feature precisa: `publico/` (rotas sem autenticação, que podem usar o `PrismaSistema`), `dto/`, `enums/`, `interfaces/`. Controllers e services ficam junto da rota que atendem.
+- `features/<feature>/`: uma pasta por área de negócio, com o `<feature>.module.ts` na raiz. Subpastas só quando a feature precisa: `publico/` (rotas sem autenticação), `dto/`, `enums/`, `interfaces/`. Controllers e services ficam junto da rota que atendem.
 - `shared/`: reutilizável entre features e sem estado, agrupado por tipo: `validators/` (decorators de validação de DTO, como celular, e-mail e senha), `pipes/`, `decorators/` e `utils/`. Só nasce quando há um segundo consumidor real ou previsto na issue seguinte.
 - Dependências: `features` importam `core` e `shared`; `shared` não importa `core`, `features` nem o client gerado do Prisma; `core` não importa `features` (o `AppModule` é a única ligação); uma feature não importa arquivo de outra, só o módulo Nest que a outra exporta. O `.oxlintrc.json` da API aplica as três primeiras regras; a última fica na revisão.
-- `PrismaSistema` (client sem filtro) só pode ser importado em `core/prisma`, `core/health`, `features/condominios/publico`, `features/acesso/login` (#6), `prisma/`, `scripts/` e `test/` (ADR-001).
+- `PrismaSistema` (client sem filtro) só pode ser importado em `core/prisma`, `core/health`, `features/condominios/publico/condominios-publico.service.ts` (autocadastro e resolução do slug), `prisma/`, `scripts/` e `test/` (ADR-001).
 
 **Swagger**
 - `@nestjs/swagger` em `/api/docs`, com DTOs anotados e autenticação por cookie.
@@ -79,7 +79,7 @@ condominio-ocorrencias/
 - Uma **client extension** fail-closed (`PrismaEscopado`) injeta o `condominioId` em toda leitura e escrita.
   - Sem contexto, lança exceção.
   - `$queryRaw` fica bloqueado.
-- O `PrismaSistema` (sem filtro) é restrito por lint a login, autocadastro e scripts.
+- O `PrismaSistema` (sem filtro) é restrito por lint ao autocadastro, à resolução do slug e a scripts. O login (#6) usa o `PrismaEscopado` dentro de `ContextoTenant.executar`.
 - Um teste sobre o DMMF exige que todo modelo esteja classificado como de condomínio ou global.
 - FKs compostas `(condominio_id, x_id)` em todas as relações.
 

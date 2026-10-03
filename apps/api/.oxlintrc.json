@@ -112,8 +112,7 @@
     },
     {
       "files": [
-        "src/features/condominios/publico/**",
-        "src/features/acesso/login/**",
+        "src/features/condominios/publico/condominios-publico.service.ts",
         "prisma/**",
         "scripts/**",
         "test/**"
