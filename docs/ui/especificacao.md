@@ -691,6 +691,9 @@ O mesmo formulário de 5.10, com estas diferenças:
   - "Baixar QR code (PNG)";
   - "Imprimir cartaz".
 - **Cartaz:** rota ou `@media print` com o nome do condomínio, o QR de 8cm, "Aponte a câmera do celular para se cadastrar e registrar ocorrências" e a URL em texto. Em A4 retrato, preto no branco.
+  - **Implementado como rota** `/admin/condominio/cartaz` (issue #11), fora do shell do admin: a tela mostra a prévia do cartaz com "Voltar para Condomínio" e "Imprimir" (que abre a impressão do navegador), e esses controles somem no papel (`print:hidden`). `@page { size: A4 portrait }` só vale nessa rota. Descartado `@media print` na própria tela: exigiria esconder sidebar, barra, drawer e toasts por CSS global e deixaria a impressão da tela Condomínio diferente do que se vê.
+  - Título para leitor de tela: "Cartaz para imprimir" (`h1` `sr-only`); o nome do condomínio é o `h2` visível.
+- **Textos da tela:** dica do link "Moradores usam este link para se cadastrar e registrar ocorrências."; erros de carga "Não foi possível carregar os dados do condomínio." e "Não foi possível carregar o cartaz."; gerando QR "Gerando QR code…" (`sr-only`); botão de download no envio "Gerando PNG…". Falha ao baixar o PNG usa o toast de erro com "Não foi possível gerar o QR code.".
 
 ### 5.20 Telas globais
 

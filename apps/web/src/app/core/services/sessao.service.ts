@@ -1,7 +1,7 @@
 import { HttpClient, HttpContext, HttpContextToken, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoginRequisicao, UsuarioSessao } from '@ocorrencias/contratos';
+import { CondominioPublico, LoginRequisicao, UsuarioSessao } from '@ocorrencias/contratos';
 import { catchError, finalize, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 import {
   MENSAGEM_ERRO_INESPERADO,
@@ -85,6 +85,13 @@ export class SessaoService {
         );
       },
     });
+  }
+
+  atualizarCondominio(condominio: CondominioPublico): void {
+    const usuario = this.estado();
+    if (usuario) {
+      this.estado.set({ ...usuario, condominio });
+    }
   }
 
   invalidar(): void {

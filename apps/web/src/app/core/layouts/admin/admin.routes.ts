@@ -12,6 +12,11 @@ const VOLTAR_PARA_FILA: Pilha = {
 
 export default [
   {
+    path: 'condominio/cartaz',
+    title: 'Cartaz',
+    loadComponent: () => import('../../../features/condominio/cartaz').then((m) => m.Cartaz),
+  },
+  {
     path: '',
     component: ShellAdmin,
     children: [
@@ -42,7 +47,11 @@ export default [
         component: PaginaProvisoria,
         data: { issue: 10 },
       },
-      { path: 'condominio', title: 'Condomínio', component: PaginaProvisoria, data: { issue: 11 } },
+      {
+        path: 'condominio',
+        title: 'Condomínio',
+        loadComponent: () => import('../../../features/condominio/condominio').then((m) => m.Condominio),
+      },
     ],
   },
 ] satisfies Routes;
