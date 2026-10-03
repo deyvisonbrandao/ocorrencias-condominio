@@ -100,7 +100,7 @@ const ITENS: readonly ItemNavegacao[] = [
     <ng-template #rodape>
       <div class="shrink-0 border-t border-borda p-3">
         @if (pessoa(); as rotulo) {
-          <p class="truncate px-3 py-2 text-sm text-texto-secundario">{{ rotulo }}</p>
+          <p class="px-3 py-2 text-sm break-words text-texto-secundario">{{ rotulo }}</p>
         }
         @if (sessao.erroAoSair(); as erro) {
           <ui-alerta class="mb-2" tom="perigo" anunciar>{{ erro }}</ui-alerta>
