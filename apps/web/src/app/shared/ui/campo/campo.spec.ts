@@ -111,3 +111,40 @@ describe('ui-campo', () => {
     expect(mostrar.getAttribute('aria-pressed')).toBe('true');
   });
 });
+
+@Component({
+  imports: [Campo, ReactiveFormsModule],
+  template: `
+    <ui-campo rotulo="Telefone" tipo="tel" mascara="telefone" [formControl]="controle">
+      <p class="status">Conteúdo abaixo do campo</p>
+    </ui-campo>
+  `,
+})
+class HospedeiroTelefone {
+  readonly controle = new FormControl('', { nonNullable: true });
+}
+
+describe('ui-campo com máscara de telefone', () => {
+  let fixture: ComponentFixture<HospedeiroTelefone>;
+  let raiz: HTMLElement;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(HospedeiroTelefone);
+    raiz = fixture.nativeElement as HTMLElement;
+    await fixture.whenStable();
+  });
+
+  it('formata o que é digitado e entrega o texto formatado ao formulário', () => {
+    const entrada = raiz.querySelector('input') as HTMLInputElement;
+
+    entrada.value = '11912345678';
+    entrada.dispatchEvent(new Event('input'));
+
+    expect(entrada.value).toBe('(11) 91234-5678');
+    expect(fixture.componentInstance.controle.value).toBe('(11) 91234-5678');
+  });
+
+  it('mostra o conteúdo projetado junto ao campo', () => {
+    expect(raiz.querySelector('ui-moldura-campo .status')?.textContent).toBe('Conteúdo abaixo do campo');
+  });
+});

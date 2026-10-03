@@ -13,7 +13,9 @@ import { BadgeTipo } from '../shared/ui/badge/badge-tipo';
 import { BadgeUrgencia } from '../shared/ui/badge/badge-urgencia';
 import { Marcador } from '../shared/ui/badge/marcador';
 import { Botao } from '../shared/ui/botao/botao';
+import { CaixaSelecao } from '../shared/ui/caixa-selecao/caixa-selecao';
 import { Campo } from '../shared/ui/campo/campo';
+import { Copiar } from '../shared/ui/copiar/copiar';
 import { TIPO_OCORRENCIA, URGENCIA } from '../shared/ui/dominio';
 import { Drawer } from '../shared/ui/drawer/drawer';
 import { EstadoErro } from '../shared/ui/estados/estado-erro';
@@ -36,7 +38,9 @@ import { ToastService } from '../shared/ui/toast/toast.service';
     BadgeUrgencia,
     Marcador,
     Botao,
+    CaixaSelecao,
     Campo,
+    Copiar,
     Drawer,
     EstadoErro,
     EstadoVazio,
@@ -83,6 +87,7 @@ export class VitrineUi {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(20)],
     }),
+    aceite: new FormControl(false, { nonNullable: true, validators: [Validators.requiredTrue] }),
   });
 
   protected erroDoTitulo(): string | null {
@@ -106,6 +111,12 @@ export class VitrineUi {
     return controle.hasError('required')
       ? 'Descreva a ocorrência.'
       : 'A descrição precisa ter pelo menos 20 caracteres.';
+  }
+
+  protected erroDoAceite(): string | null {
+    return this.enviado() && this.formulario.controls.aceite.invalid
+      ? 'Para continuar, aceite os termos de uso e a política de privacidade.'
+      : null;
   }
 
   protected validar(): void {

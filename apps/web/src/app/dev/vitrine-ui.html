@@ -35,11 +35,18 @@
     <ui-campo formControlName="local" rotulo="Local" opcional dica="Ex.: garagem G2, hall do bloco B, salão de festas." />
     <ui-campo formControlName="prazo" tipo="date" rotulo="Prazo" />
     <ui-campo rotulo="Número da principal" prefixo="#" inputmode="numeric" />
+    <ui-campo rotulo="Telefone (celular)" tipo="tel" mascara="telefone" inputmode="tel" autocomplete="tel-national" placeholder="(11) 91234-5678" />
     <ui-select rotulo="Tipo" placeholder="Escolha o tipo" [opcoes]="opcoesTipo" />
     <ui-select formControlName="urgencia" rotulo="Urgência" opcional placeholder="Escolha a urgência" [opcoes]="opcoesUrgencia" dica="O morador não vê a urgência." />
     <ui-area-texto formControlName="descricao" rotulo="Descrição" dica="Conte o que aconteceu, quando e onde. Mínimo de 20 caracteres." contador [min]="20" [max]="2000" [erro]="erroDaDescricao()" />
+    <ui-caixa-selecao formControlName="aceite" [erro]="erroDoAceite()">Li e aceito os <a href="/termos" class="font-medium text-primaria underline">termos de uso</a></ui-caixa-selecao>
     <button type="submit" ui-botao variante="secundario">Validar formulário</button>
   </form>
+</section>
+
+<section class="mt-8" aria-labelledby="vitrine-copiar">
+  <h2 id="vitrine-copiar" class="text-lg font-semibold">Copiar</h2>
+  <ui-copiar class="mt-3" valor="https://exemplo.com/c/jardim-das-flores" />
 </section>
 
 <section class="mt-8" aria-labelledby="vitrine-badges">

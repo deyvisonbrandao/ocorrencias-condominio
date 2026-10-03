@@ -4,8 +4,10 @@ import { classesControle } from '../formulario/classes-controle';
 import { ControleDeValor } from '../formulario/controle-de-valor';
 import { MolduraCampo } from '../formulario/moldura-campo';
 import { Icone } from '../icone/icone';
+import { formatarTelefone } from './mascara-telefone';
 
 export type TipoCampo = 'text' | 'tel' | 'email' | 'password' | 'date' | 'search';
+export type MascaraCampo = 'telefone';
 
 @Component({
   selector: 'ui-campo',
@@ -37,6 +39,8 @@ export type TipoCampo = 'text' | 'tel' | 'email' | 'password' | 'date' | 'search
           [disabled]="estaDesabilitado()"
           [readOnly]="somenteLeitura()"
           [attr.autocomplete]="autocomplete() ?? null"
+          [attr.autocapitalize]="autocapitalize() ?? null"
+          [attr.spellcheck]="corretor() ?? null"
           [attr.inputmode]="inputmode() ?? null"
           [attr.placeholder]="placeholder() ?? null"
           [attr.min]="min() ?? null"
@@ -61,13 +65,17 @@ export type TipoCampo = 'text' | 'tel' | 'email' | 'password' | 'date' | 'search
           </button>
         }
       </div>
+      <ng-content />
     </ui-moldura-campo>
   `,
 })
 export class Campo extends ControleDeValor {
   readonly tipo = input<TipoCampo>('text');
   readonly prefixo = input<string>();
+  readonly mascara = input<MascaraCampo>();
   readonly autocomplete = input<string>();
+  readonly autocapitalize = input<'none' | 'sentences' | 'words' | 'characters'>();
+  readonly corretor = input<boolean>();
   readonly inputmode = input<string>();
   readonly placeholder = input<string>();
   readonly min = input<string>();
@@ -87,6 +95,14 @@ export class Campo extends ControleDeValor {
     const leitura = this.somenteLeitura() ? 'bg-superficie-app' : '';
     return classesControle(!!this.erro(), `min-h-toque ${arredondamento} ${folgaSenha} ${leitura}`);
   });
+
+  protected override aoAlterar(evento: Event): void {
+    const alvo = evento.target as HTMLInputElement;
+    if (this.mascara() === 'telefone') {
+      alvo.value = formatarTelefone(alvo.value);
+    }
+    super.aoAlterar(evento);
+  }
 
   protected alternarSenha(): void {
     this.senhaVisivel.update((visivel) => !visivel);
