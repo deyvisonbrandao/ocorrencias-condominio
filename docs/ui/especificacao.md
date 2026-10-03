@@ -424,6 +424,13 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
 | 429 | "Muitas tentativas. Aguarde {n} minutos e tente de novo." (n vem do `Retry-After`; sem ele, "Aguarde alguns minutos…") |
 
 - **Sucesso:** com senha temporária vai para `/trocar-senha`; senão, morador vai para `/app/ocorrencias` e admin para `/admin/painel`. Com `?voltar=` válido (rota interna), volta para ela.
+- **Implementação (issue #6):**
+  - `?voltar=` válido = começa com uma só `/`, sem `\` nem caractere de controle, **e** é da área do papel (`/admin…` para síndico e subsíndico, `/app…` para morador). Fora disso, vai para o início da área;
+  - o nome do condomínio vem de `GET /public/condominios/:slug`. Slug inexistente ou fora do formato: o h1 vira "Condomínio não encontrado", com o texto e o link de 5.3 e sem formulário. Falha de carga: `ui-estado-erro` "Não foi possível carregar o condomínio." com "Tentar de novo";
+  - quem abre o login já com sessão no mesmo condomínio segue direto para o destino acima;
+  - rede, 500 e 429 também aparecem no alerta da tela (não em toast), já que o formulário é a única ação;
+  - depois de um 401 numa tela autenticada (5.20), o alerta é `aviso`: "Sua sessão terminou. Entre de novo.";
+  - **sem sessão, a área protegida não sabe o slug:** o web lembra o último condomínio usado (login, sessão restaurada ou cadastro do condomínio) no `localStorage` e manda para o login dele com `?voltar=`. Sem esse registro (outro aparelho, navegação privada), vai para a landing, onde o "Já usa?" leva ao login.
 
 ### 5.6 Aguardando aprovação `/c/:slug/aguardando-aprovacao`
 
@@ -528,7 +535,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   - card com os dados somente leitura: Nome, Telefone, Bloco e apartamento, E-mail;
   - o texto "Para alterar seus dados, fale com a administração.";
   - seção "Senha" com o botão secundário "Trocar senha" (issue #9). Ele expande, na própria página, os campos "Senha atual" e "Nova senha" (com "Mostrar senha"), mais "Salvar nova senha" e "Cancelar". O foco vai para "Senha atual". No sucesso, o toast "Senha alterada." aparece e a seção recolhe;
-  - botão texto "Sair", com confirmação.
+  - botão texto "Sair", com confirmação: `alertdialog` "Sair da sua conta?", com "Para voltar, você vai entrar de novo com telefone e senha." e os botões "Cancelar" (foco inicial) e "Sair". Falha ao sair aparece dentro do diálogo. Entrou com a issue #6; o resto da tela continua provisório até a #9.
 - A exclusão de conta fica para a issue #25: o lugar reservado é o fim da página, com o botão `perigo-contorno` "Excluir minha conta" e confirmação dupla.
   - 1ª confirmação: `alertdialog` "Excluir sua conta?", com "Seus dados pessoais serão apagados. As ocorrências continuam, como 'autor removido'.".
   - 2ª confirmação: digitar "EXCLUIR" para habilitar o botão final.
@@ -547,6 +554,7 @@ Convenção de cada tela: **objetivo**, **conteúdo em ordem de leitura** (é ta
   2. Aprove os cadastros;
   3. Convide um subsíndico (opcional; só síndico).
 - **375 vs. desktop:** 2 colunas → 4 colunas a partir de 1024px.
+- **Até a issue #22 (issue #6):** abaixo do h1, o nome do condomínio vindo de `GET /admin/painel`, e sempre os "Primeiros passos", porque ainda não há contadores. Falha de carga: `ui-estado-erro` "Não foi possível carregar o painel." com "Tentar de novo".
 
 ### 5.14 Fila de ocorrências `/admin/ocorrencias` · mockup [`fila-admin.html`](mockups/fila-admin.html)
 
@@ -885,6 +893,7 @@ stateDiagram-v2
 | Aceite dos termos | obrigatório | "Para continuar, aceite os termos de uso e a política de privacidade." |
 | E-mail | formato, se preenchido | "Confira o e-mail." |
 | Senha | 8–128 | "A senha precisa ter pelo menos 8 caracteres." / "A senha pode ter no máximo 128 caracteres." |
+| Senha (login) | obrigatório; sem regra de tamanho no cliente | "Informe sua senha." |
 | Slug | obrigatório; 3–40; `a-z0-9-`; sem hífen nas pontas; único | "Informe o endereço do link." / "Use só letras minúsculas, números e hífen." / "O endereço não pode começar nem terminar com hífen." / "Use de 3 a 40 caracteres." / "Endereço já em uso. Tente outro." |
 | Endereço do condomínio (landing, "Já usa?") | obrigatório; existente | "Informe o endereço do seu condomínio." / "Não encontramos esse condomínio. Confira o endereço com a administração." |
 | Prazo | ≥ hoje | "Escolha uma data a partir de hoje." |
